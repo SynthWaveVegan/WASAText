@@ -1,0 +1,570 @@
+openapi: 3.0.0
+servers:
+  - url: "http://localhost:3000"
+info:
+  title: WASAText
+  description: WASAText, the skeleton project for Web and Software architecture course
+  version: 1.0.0
+
+tags:
+  - name: "User"
+    description: endpoints for users related operations
+  - name: "Conversations"
+    description: endpoints for conversation related operations
+  - name: "Login"
+    description: enpoints for loggin in action
+  - name: "Photo"
+    description: endpoints for photo related operations
+  - name: "Message"
+    description: endpoints for message related operations
+  - name: "Group"
+    description: endpoints for group related operations
+  - name: "Like"
+    description: endpoints for like related operations
+  - name: "Comment"
+    description: endpoints for comment related operations
+  
+paths:
+
+  /groups/{id}:
+
+
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        -Group
+      summary: sets the name of the group
+      description: |-
+        sets the name that
+        the group will be seen with
+      parameters:
+        name: id
+        in: path
+        required: true
+      operationId: setGroupName
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "components/schemas/Group/name"
+      responses:
+        "204":
+          description: group name updated succesfully
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        -Group
+        -Photo
+      summary: sets the photo of the group
+      description: |-
+        sets the photo that
+        the group will be seen with
+      parameters:
+        name: id
+        in: path
+        required: true
+      operationId: setGroupPhoto
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "components/schemas/Group/groupPhoto"
+      responses:
+        "204":
+          description: group photo updated succesfully
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    
+
+
+    post:
+      security:
+        -bearerAuth: []
+      tags:
+        -Group
+      summary: creates a new group
+      description: |-
+        creates a new object
+        group with one or more users
+      parameters:
+        name: id
+        in: path
+        required: true
+      operationId: addToGroup
+      requestBody:
+        content:
+          application/json:
+            schema: 
+              $ref: "#/components/schemas/Group"
+      responses:
+        "201":
+          description: group created succesfully
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+
+    delete:
+      security:
+        -bearerAuth: []
+      tags:
+        -Group
+      summary: deletes a  group
+      description: |-
+        removes the user from a group
+      parameters:
+        name: id
+        in: path
+        required: true
+      operationId: deleteGroup
+      requestBody:
+        content:
+          application/json:
+            schema: 
+              $ref: "#/components/schemas/Group"
+      responses:
+        "204":
+          description: group removed succesfully
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+
+
+  /users/{id}/messages:
+    post:
+      security:
+        -bearerAuth: []
+      tags:
+        -Message
+      summary: creates a message in a conversation
+      description: |-
+        sends a message to a user
+        or a group conversation
+      parameters:
+        name: id
+        in: path
+        required: true
+      operationId: sendMessage
+      requestBody:
+        content:
+          application/json: 
+            schema:
+              $ref: "#/components/schemas/Message"
+      responses:
+        "201":
+          description: message created succesfully
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+        
+    put:
+      security:
+        -bearerAuth: []
+      tags:
+        -Message
+      summary: forwards a message in another conversation
+      description: |-
+        sends a message already existent
+        to another conversation
+      parameters:
+        name: id
+        in: path
+        required: true
+      operationId: forwardMessage
+      requestBody:
+        content:
+          application/json: 
+            schema:
+              $ref: "#/components/schemas/Message"
+      responses:
+        "200":
+          description: message forwarded succesfully
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+
+    delete:
+      security:
+        -bearerAuth: []
+      tags:
+        -Message
+      summary: deletes a message
+      description: |-
+        removes a message 
+        of a specific user
+      operationId: deleteMessage
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Message"
+      responses:
+        "204":
+          description: message removed succesfully
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        
+  /users/{id}/messages/{id}:
+    post:
+      security:
+        -bearerAuth: []
+      tags:
+        -Comment
+        -Message
+      summary: comments a message
+      description: |-
+        add a comment to a 
+        message of a specific user
+      operationId: commentMessage
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Comment"
+      responses:
+        "201":
+          description: comment created succesfully
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+
+    delete:
+      security:
+        -bearerAuth: []
+      tags:
+        -Comment
+        -Message
+      summary: deletes a comment
+      description: |-
+        removes a comment to a 
+        message of a specific user
+      operationId: uncommentMessage
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Comment"
+      responses:
+        "204":
+          description: comment removed succesfully
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /conversations:
+    get:
+      security:
+        -bearerAuth: []
+      tags:
+        -Conversations
+      summary: returns all the conversations
+      description: |-
+        returns personal stream of conversations
+        for the user
+      operationId: getMyConversations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConversationList"
+            
+      responses:
+        "200":
+          description: conversations retrieved succesfully
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+    
+  /conversations/{id}:
+    get:
+      security:
+        -bearerAuth: []
+        tags:
+          -Conversations
+        summary: returns a specific conversation
+        description: |-
+          finds a specific conversation
+          from its id
+        parameters:
+          name: id
+          in: path
+          required: true
+        operationId: getConversation
+        requestBody:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Conversations"
+        responses:
+        "200":
+          description: conversation retrieved succesfully
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+              
+
+
+  /login:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - Login
+      summary: logs in the  user
+      description: |-
+        if the user does not exist it will be created
+        else it will be logged in; either way the userId is returned
+      operationId: doLogin
+      requestBody:
+        description: Username to be used for loggin in
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserName"
+
+        required: true
+
+      responses:
+        "201":
+          description: user log in action succesful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /users/{id}:
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        -User
+      summary: sets the name of the user
+      description: |-
+        sets the name that
+        the user will be seen with
+      parameters:
+        name: id
+        in: path
+        required: true
+      operationId: setMyUsername
+      requestBody:
+        description: creates/changes your own username
+        content:
+          application/json:
+            schema:
+              $ref: "components/schemas/Username"
+      responses:
+        "204":
+          description: username updated succesfully
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        -User
+        -Photo
+      summary: sets the photo of the user
+      description: |-
+        sets the photo that
+        the user will be seen with
+      parameters:
+        name: id
+        in: path
+        required: true
+      operationId: setMyPhoto
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "components/schemas/User/myPhoto"
+      responses:
+        "204":
+          description: user photo updated succesfully
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+components:
+
+  responses:
+    
+      BadRequest:
+        description: syntax of the request was not compliant with docs, check parameters
+    
+      Forbidden:
+        description: server will not accept request due to lacking of client permissions
+    
+      NotFound:
+        description: resource not found
+
+    
+      InternalServerError:
+        description: the server encountered an error while processing the request
+
+
+  schemas:
+
+    User:
+      title: user
+      description: local user
+      type: object
+      properties:
+        username:
+          $ref: "#/components/schemas/Username"
+        myPhoto:
+          $ref: "#/components/schemas/Photo"
+        conversationList:
+          $ref: "#/components/schemas/ConversationList"
+          
+    ConversatonList:
+      title: conversationList
+      description: stream of all conversations
+      type: array
+      description: list of conversations in the stream
+      items:
+        $ref: "#/components/schemas/Conversation"
+
+
+    Username:
+      title: username
+      description: user name associated with userId, part of a user obj
+      type: string
+      example: filippohd
+      pattern: "^[a-z0-9]*?$"
+      minLength: 3
+      maxLength: 12
+
+    Message:
+      title: message
+      description: message of a user in a conversation
+      type: object
+      properties:
+        message: 
+          type: string
+          example: ciao
+          pattern: "^[a-z0-9]*?$"
+          minLenght: 1
+          maxLenght: 50
+        comment:
+          $ref: "#/components/schemas/Comment"
+
+    Conversation:
+      title: conversation
+      description: conversation on the platform
+      type: object
+      properties:
+         messageStream:
+          type: array
+          items:
+            $ref: "#/components/schemas/Message"
+
+    Comment:
+      title: comment
+      description: comment of a message
+      type: string
+      example: ciao
+      pattern: "^[a-z0-9]*?$"
+      minLenght: 1
+      maxLenght: 50
+    
+    Group:
+      title: group
+      description: group conversation of multiple users
+      type: object
+      properties:
+        name:
+          type: string
+          example: gruppohd
+          pattern: "^[a-z0-9]*?$"
+          minLength: 3
+          maxLength: 12
+        messageStream:
+          type: array
+          items:
+            $ref: "#/components/schemas/Message"
+        groupPhoto:
+          $ref: "#/components/schemas/Photo"
+
+        
+    Photo:
+      title: photo
+      description: profile photo of the user
+      type: object
+      properties:
+        photoId: 
+          description:  Unique photo identifier.
+          type: string
+          pattern: '^.*?$'
+          example: "#P1234"
+          minLength: 3
+          maxLength: 16
+        file: 
+          description: file
+          type: string
+          format: binary
+          minLength: 1
+          maxLength: 9999
+            
