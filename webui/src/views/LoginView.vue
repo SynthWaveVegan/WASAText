@@ -2,18 +2,24 @@
 export default {
   data() {
     return {
-      text: ''
+      username: ''
     }
   },
   methods: {
     loadmenu() {
-      if (this.text.trim() !== '') {
-        this.$router.push({ name: 'home', query: { text: this.text } })
+      if (this.username.trim() !== '') {
+        this.$router.push({ name: 'home', query: { username: this.username } })
       } else {
         alert('Please insert your nickname.')
+        this.username = localStorage.setItem('username')
       }
+      
     }
-  }
+  },
+  mounted() {
+    console.log('Componente montato!')
+		
+	}
 }
 </script>
 
@@ -25,7 +31,7 @@ export default {
 
   <div class="text-center">
     <div class="text-center">Login</div>
-    <input v-model="text" placeholder="Type here" />
+    <input v-model="username" placeholder="Type here" />
     <button type="button" class="btn btn-primary" @click="loadmenu">Go</button>
   </div>
 </template>
