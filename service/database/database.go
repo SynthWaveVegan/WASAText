@@ -59,16 +59,25 @@ func New(db *sql.DB) (AppDatabase, error) {
 	var tableName string
 	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='example_table';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
-		sqlStmt := `CREATE TABLE example_table (id INTEGER NOT NULL PRIMARY KEY, name TEXT);`
-		_, err = db.Exec(sqlStmt)
-		if err != nil {
-			return nil, fmt.Errorf("error creating database structure: %w", err)
-		}
+		
+		createUserTable(db)
 	}
 
 	return &appdbimpl{
 		c: db,
 	}, nil
+}
+
+func createUserTable(db * sql.DB) {
+	userQuery := CREATE TABLE IF NOT EXIST user (
+		userId SERIAL PRIMARY KEY
+		username VARCHAR(16) NOT NULL,
+	)
+	_, err := db.Exec(userQuery)
+
+	if err != nil {
+			log.fatal(err)
+		}
 }
 
 func (db *appdbimpl) Ping() error {
