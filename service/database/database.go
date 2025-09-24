@@ -34,6 +34,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"github.com/SynthWaveVegan/WASAText/service/structs"
 )
 
 // AppDatabase is the high level interface for the DB
@@ -61,6 +62,9 @@ func New(db *sql.DB) (AppDatabase, error) {
 	if errors.Is(err, sql.ErrNoRows) {
 		
 		createUserTable(db)
+		createMessageTable(db)
+		createCommentTable(db)
+		
 	}
 
 	return &appdbimpl{
@@ -70,7 +74,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 
 func createUserTable(db * sql.DB) {
 	userQuery := CREATE TABLE IF NOT EXIST user (
-		userId SERIAL PRIMARY KEY
+		userId VARCHAR(11) NOT NULL PRIMARY KEY,
 		username VARCHAR(16) NOT NULL,
 	)
 	_, err := db.Exec(userQuery)
@@ -79,6 +83,29 @@ func createUserTable(db * sql.DB) {
 			log.fatal(err)
 		}
 }
+
+func createMessageTable(db * sql.DB) {
+	messageQuery := CREATE TABLE IF NOT EXIST message (
+		messageId VARCHAR(11) NOT NULL PRIMARY KEY,
+		messageBody TEXT,
+		date TEXT
+		uploaderId VARCHAR(11) NOT NULL
+		FOREIGN KEY (uploaderId) REFERENCES user(userId)
+	)
+}
+
+func createCommentTable(db * sql.DB) {
+	commentQuery := CREATE TABLE IF NOT EXIST comment (
+		commentId VARCHAR(11) NOT NULL PRIMARY KEY
+		commentBody TEXT
+		date TEXT
+		uploaderId VARCHAR(11) NOT NULL
+		messageId VARCHAR(11) NOT NULL
+		FOREIGN KEY (uploaderId) REFERENCES user(userId)
+		FOREIGN KEY (messageId) REFERENCES message(messageId)
+	)
+}
+
 
 func (db *appdbimpl) Ping() error {
 	return db.c.Ping()

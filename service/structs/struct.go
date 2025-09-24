@@ -14,6 +14,7 @@ type Message struct {
 	Comments             []Comment
 	UploaderUserid       Identifier
 	UploaderUsername     string
+	Date                 string
 }
 
 type Comment struct {
@@ -21,8 +22,14 @@ type Comment struct {
 	UploaderUsername     string
 	MessageId            Identifier
 	CommentBody          string
+
 }
 type Photo struct {
 	PhotoId              Identifier
 	Path                 string
+}
+
+type Group struct {
+	GroupId              Identifier
+	Users                []User
 }
