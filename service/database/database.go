@@ -39,8 +39,23 @@ import (
 
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
-	GetName() (string, error)
-	SetName(name string) error
+	
+
+	//TODO 
+	//• doLogin 
+	getConversation() (structs.Conversation, error)
+	//• getMyConversations
+	SetMyUserame(name string) error
+	sendMessage(MessageBody string Comments []Comment UploaderUserid Identifier MessageId Identifier Date string ConversationId Identifier) (error)
+	//• forwardMessage
+	//• commentMessage
+	//• uncommentMessage
+	deleteMessage(messageId string) error 
+	//• addToGroup
+	//• leaveGroup
+	//• setGroupName
+	//• setMyPhoto
+	//• setGroupPhoto
 
 	Ping() error
 }
@@ -64,6 +79,8 @@ func New(db *sql.DB) (AppDatabase, error) {
 		createUserTable(db)
 		createMessageTable(db)
 		createCommentTable(db)
+		createGroupTable(db)
+		createConversationTable(db)
 		
 	}
 
@@ -88,25 +105,57 @@ func createMessageTable(db * sql.DB) {
 	messageQuery := CREATE TABLE IF NOT EXIST message (
 		messageId VARCHAR(11) NOT NULL PRIMARY KEY,
 		messageBody TEXT,
-		date TEXT
-		uploaderId VARCHAR(11) NOT NULL
-		FOREIGN KEY (uploaderId) REFERENCES user(userId)
+		date TEXT,
+		uploaderId VARCHAR(11) NOT NULL,
+		conversationId VARCHAR(11) NOT NULL,
+		FOREIGN KEY (uploaderId) REFERENCES user(userId),
+		FOREIGN KEY (conversationId) REFERENCES conversation(conversationId),
 	)
+	_, err := db.Exec(messageQuery)
+
+	if err != nil {
+			log.fatal(err)
+		}
 }
 
 func createCommentTable(db * sql.DB) {
 	commentQuery := CREATE TABLE IF NOT EXIST comment (
-		commentId VARCHAR(11) NOT NULL PRIMARY KEY
-		commentBody TEXT
-		date TEXT
-		uploaderId VARCHAR(11) NOT NULL
-		messageId VARCHAR(11) NOT NULL
-		FOREIGN KEY (uploaderId) REFERENCES user(userId)
-		FOREIGN KEY (messageId) REFERENCES message(messageId)
+		commentId VARCHAR(11) NOT NULL PRIMARY KEY,
+		commentBody TEXT,
+		date TEXT,
+		uploaderId VARCHAR(11) NOT NULL,
+		messageId VARCHAR(11) NOT NULL,
+		FOREIGN KEY (uploaderId) REFERENCES user(userId),
+		FOREIGN KEY (messageId) REFERENCES message(messageId),
 	)
+	_, err := db.Exec(commentQuery)
+
+	if err != nil {
+			log.fatal(err)
+		}
 }
 
+func createGroupTable(db * sql.DB) {
+	groupQuery := CREATE TABLE IF NOT EXIST group (
+		groupId VARCHAR(11) NOT NULL PRIMARY KEY,
+		groupName VARCHAR(16) NOT NULL,
 
+	)
+	_, err := db.Exec(groupQuery)
+
+	if err != nil {
+			log.fatal(err)
+		}
+}
+
+func createConversationTable(db, * sql.DB) {
+	conversationQuery := CREATE TABLE IF NOT EXIST conversation (
+		conversationId VARCHAR(11) NOT NULL PRIMARY KEY,
+		userConnected VARCHAR(11),
+		FOREIGN KEY (userConnected) REFERENCES user(userId),
+
+	)
+}
 func (db *appdbimpl) Ping() error {
 	return db.c.Ping()
 }
