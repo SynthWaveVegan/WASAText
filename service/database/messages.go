@@ -9,7 +9,7 @@ import (
 )
 
 func (db * appdbimpl) insertMessage(MessageBody string, Comments []structs.Comment, UploaderUserid structs.Identifier, MessageId structs.Identifier, Date string, ConversationId structs.Identifier) (error) {
-	_, err := db.c.Exec("INSERT INTO message (MessageBody, Comments, Uploaderid, MessageId, Date, ConversationId) VALUES (?, ?, ?, ?, ?, ?)" (MessageBody, Comments, Uploaderid, MessageId, Date, ConversationId))
+	_, err := db.c.Exec(`INSERT INTO message (MessageBody, Comments, Uploaderid, MessageId, Date, ConversationId) VALUES (?, ?, ?, ?, ?, ?)` (MessageBody, Comments, Uploaderid, MessageId, Date, ConversationId))
 
 	return err
 }
@@ -54,13 +54,13 @@ func (db * appdbimpl) sendMessage(MessageBody string, UploaderId structs.Identif
 }
 
 func (db * appdbimpl) deleteMessage(MessageId structs.Identifier) error {
-	_, err := db.c.Exec("DELETE FROM message WHERE MessageId = ?", MessageId)
+	_, err := db.c.Exec(`DELETE FROM message WHERE MessageId = ?`, MessageId)
 	return err
 }
 
 func (db * appdbimpl) insertComment(CommentId structs.Identifier, MessageId structs.Identifier, CommentBody string, Date string) error {
 
-	_, err := db.c.Exec("INSERT INTO comment(CommentId, MessageId, CommentBody, Date) VALUES (?, ?, ?, ?)" (CommentId, MessageId, CommentBody, Date))
+	_, err := db.c.Exec(`INSERT INTO comment(CommentId, MessageId, CommentBody, Date) VALUES (?, ?, ?, ?)` (CommentId, MessageId, CommentBody, Date))
 	
 	return err
 }
@@ -104,6 +104,6 @@ func (db * appdbimpl) commentMessage(CommentBody string, MessageId structs.Ident
 }
 
 func (db * appdbimpl) uncommentMessage(CommentId structs.Identifier) error {
-	_, err:= db.c.Exec("DELETE FROM comment WHERE CommentId = ?", CommentId)
+	_, err:= db.c.Exec(`DELETE FROM comment WHERE CommentId = ?`, CommentId)
 	return err
 }

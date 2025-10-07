@@ -35,7 +35,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/SynthWaveVegan/WASAText/service/structs"
-	"log"
+	
 )
 
 // AppDatabase is the high level interface for the DB
@@ -80,34 +80,11 @@ func New(db *sql.DB) (AppDatabase, error) {
 	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='example_table';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
 		
-		createUserTable(db)
-		createMessageTable(db)
-		createCommentTable(db)
-		createGroupTable(db)
-		createConversationTable(db)
-		//da creare photo table
-		
-	}
-
-	return &appdbimpl{
-		c: db,
-	}, nil
-}
-
-func createUserTable(db * sql.DB) {
-	userQuery := `CREATE TABLE IF NOT EXIST user (
+		userQuery := `CREATE TABLE IF NOT EXIST user (
 		          userId VARCHAR(11) NOT NULL PRIMARY KEY,
 		          username VARCHAR(16) NOT NULL
-	            )`
-	_, err := db.Exec(userQuery)
-
-	if err != nil {
-			log.fatal(err)
-		}
-}
-
-func createMessageTable(db * sql.DB) {
-	messageQuery := `CREATE TABLE IF NOT EXIST message (
+	)`
+		messageQuery := `CREATE TABLE IF NOT EXIST message (
 		messageId VARCHAR(11) NOT NULL PRIMARY KEY,
 		messageBody TEXT,
 		date TEXT,
@@ -116,15 +93,7 @@ func createMessageTable(db * sql.DB) {
 		FOREIGN KEY (uploaderId) REFERENCES user(userId),
 		FOREIGN KEY (conversationId) REFERENCES conversation(conversationId)
 	)`
-	_, err := db.Exec(messageQuery)
-
-	if err != nil {
-			log.fatal(err)
-		}
-}
-
-func createCommentTable(db * sql.DB) {
-	commentQuery := `CREATE TABLE IF NOT EXIST comment (
+		commentQuery := `CREATE TABLE IF NOT EXIST comment (
 		commentId VARCHAR(11) NOT NULL PRIMARY KEY,
 		commentBody TEXT,
 		date TEXT,
@@ -133,33 +102,41 @@ func createCommentTable(db * sql.DB) {
 		FOREIGN KEY (uploaderId) REFERENCES user(userId),
 		FOREIGN KEY (messageId) REFERENCES message(messageId)
 	)`
-	_, err := db.Exec(commentQuery)
-
-	if err != nil {
-			log.fatal(err)
-		}
-}
-
-func createGroupTable(db * sql.DB) {
-	groupQuery := `CREATE TABLE IF NOT EXIST group (
+		groupQuery := `CREATE TABLE IF NOT EXIST group (
 		groupId VARCHAR(11) NOT NULL PRIMARY KEY,
 		groupName VARCHAR(16) NOT NULL
 
 	)`
-	_, err := db.Exec(groupQuery)
-
-	if err != nil {
-			log.fatal(err)
-		}
-}
-
-func createConversationTable(db * sql.DB) {
-	conversationQuery := `CREATE TABLE IF NOT EXIST conversation (
+		conversationQuery := `CREATE TABLE IF NOT EXIST conversation (
 		conversationId VARCHAR(11) NOT NULL PRIMARY KEY,
 		userConnected VARCHAR(11),
 		FOREIGN KEY (userConnected) REFERENCES user(userId)
 
 	)`
+		//da creare photo table
+
+		err = execQueries(db, userQuery, messageQuery, commentQuery, groupQuery, conversationQuery)
+		if err != nil {
+			log.Println("Error creating tables")
+		}
+		
+	}
+
+	return &appdbimpl{
+		c: db,
+	}, nil
+}
+
+func execQueries(db *sql.DB, tables ...string) error {
+	for _, el := range tables {
+		_, err := db.Exec(el)
+
+		if err != nil {
+
+			return fmt.Errorf("error creating db structurev: %w", err)
+		}
+	}
+	return nil
 }
 func (db *appdbimpl) Ping() error {
 	return db.c.Ping()
