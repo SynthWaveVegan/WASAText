@@ -35,7 +35,7 @@ func (db * appdbimpl) sendMessage(MessageBody string, UploaderId structs.Identif
 
 	messageDate := time.Now().UTC().Format(time.RFC3339)
 
-	err := db.insertMessage(MessageBody, []structs.Comment{}, UploaderId.Id, thisMessageId, messageDate, ConversationId.Id)
+	err := db.insertMessage(MessageBody, []structs.Comment{}, UploaderId, thisMessageId, messageDate, ConversationId)
 	if err != nil {
 		return nil, err
 	}
@@ -53,22 +53,56 @@ func (db * appdbimpl) sendMessage(MessageBody string, UploaderId structs.Identif
 	return newMessage, nil
 }
 
-
-
-
-
-
-
-
 func (db * appdbimpl) deleteMessage(MessageId Identifier) error {
 	_, err := db.c.Exec("DELETE FROM message WHERE MessageId = ?", MessageId)
 	return err
 }
+
 func (db * appdbimpl) insertComment(CommentId Identifier MessageId Identifier CommentBody string Date string) error {
+
 	_, err := db.c.Exec("INSERT INTO comment(CommentId, MessageId, CommentBody, Date) VALUES (?, ?, ?, ?)" CommentId, MessageId, CommentBody, Date)
-	//da inserire nel messaggio
+	
 	return err
 }
+
+func (db * appdbimpl) commentMessage(CommentBody string MessageId Identifier) (structs.Comment, error) {
+
+	var thisCommentId string
+	var checkId false
+
+	thisCommentId, err = generateIdentifier("T")
+	if err != nil {
+		return nil, err
+	}
+	checkId, err = checkValidId(thisCommentId, "T")
+	if checkId == false {
+		return nil, err
+	}
+	if err != nil {
+		return nil, err
+	}
+
+
+	commentDate := time.Now().UTC().Format(time.RFC3339)
+
+	err := db.insertComment(thisCommentId MessageId CommentBody commentDate)
+	if err != nil {
+		return nil, err
+	}
+
+	newComment = structs.Comment {
+		CommentId            thisCommentId
+		MessageId            MessageId
+		CommentBody          CommentBody
+		Date                 commentDate
+	}
+
+	return newComment, err
+
+
+	
+}
+
 func (db * appdbimpl) uncommentMessage(CommentId Identifier) error {
 	_, err:= db.c.Exec("DELETE FROM comment WHERE CommentId = ?", CommentId)
 	return err

@@ -49,6 +49,7 @@ type AppDatabase interface {
 	insertMessage(MessageBody string Comments []Comment UploaderUserid Identifier MessageId Identifier Date string ConversationId Identifier) (error)
 	sendMessage(MessageBody string, UploaderId structs.Identifier, ConversationId structs.Identifier) (structs.Message , error)
 	//• forwardMessage
+	commentMessage(CommentBody string MessageId Identifier) (structs.Comment, error)
 	insertComment(CommentId Identifier MessageId Identifier CommentBody string Date string) error
 	uncommentMessage(CommentId Identifier) error 
 	deleteMessage(messageId string) error 

@@ -18,7 +18,7 @@ func (db * appdbimpl) getConversation() (structs.Conversation, error) {
 	} else if err != nil {
 		return nil, err
 	}
-	else return &conversation, nil
+	else return conversation, nil
 	
 	
 
