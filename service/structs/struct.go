@@ -15,7 +15,7 @@ type Message struct {
 
 	MessageBody          string
 	Comments             []Comment
-	UploaderUserid       Identifier
+	Uploader             Identifier
 	MessageId            Identifier
 	Date                 string
 	ConversationId       Identifier
@@ -23,8 +23,7 @@ type Message struct {
 
 type Comment struct {
 
-	UploaderUserid       Identifier
-	UploaderUsername     string
+	CommentId            Identifier
 	MessageId            Identifier
 	CommentBody          string
 	Date                 string

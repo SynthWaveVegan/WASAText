@@ -46,14 +46,16 @@ type AppDatabase interface {
 	getConversation() (structs.Conversation, error)
 	//• getMyConversations
 	SetMyUserame(name string) error
-	sendMessage(MessageBody string Comments []Comment UploaderUserid Identifier MessageId Identifier Date string ConversationId Identifier) (error)
+	insertMessage(MessageBody string Comments []Comment UploaderUserid Identifier MessageId Identifier Date string ConversationId Identifier) (error)
+	sendMessage(MessageBody string, UploaderId structs.Identifier, ConversationId structs.Identifier) (structs.Message , error)
 	//• forwardMessage
-	//• commentMessage
-	//• uncommentMessage
+	insertComment(CommentId Identifier MessageId Identifier CommentBody string Date string) error
+	uncommentMessage(CommentId Identifier) error 
 	deleteMessage(messageId string) error 
 	//• addToGroup
 	//• leaveGroup
 	//• setGroupName
+	createGroup(GroupId Identifier User []User Messages []Message GroupName string Photo Photo) error
 	//• setMyPhoto
 	//• setGroupPhoto
 
@@ -81,6 +83,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 		createCommentTable(db)
 		createGroupTable(db)
 		createConversationTable(db)
+		//da creare photo table
 		
 	}
 
