@@ -10,7 +10,7 @@ import (
 
 
 // startId: U(user) M(message) C(conversation) G(group) T(comment) P(photo) E(error)
-func generateIdentifier(startId string) (structs,Identifier, error) {
+func generateIdentifier(startId string) (structs.Identifier, error) {
 
 	
 	const lenght = 9
@@ -24,13 +24,13 @@ func generateIdentifier(startId string) (structs,Identifier, error) {
 	}
 
 	newId := structs.Identifier {
-		Identifier: ("@" + startId + randomInt)
+		Identifier: ("@" + startId + randomInt),
 	}
 	
 	return newId, nil
 }
 
-func checkValidId(checkingId string startId string) (bool, error) {
+func checkValidId(checkingId string, startId string) (bool, error) {
 
 	var countCheck int 
 	var err error

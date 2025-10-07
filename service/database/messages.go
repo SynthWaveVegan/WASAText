@@ -8,8 +8,8 @@ import (
 	"github.com/SynthWaveVegan/WASAText/service/structs"
 )
 
-func (db * appdbimpl) insertMessage(MessageBody string Comments []Comment Uploaderid Identifier MessageId Identifier Date string ConversationId Identifier) (error) {
-	_, err := db.c.Exec("INSERT INTO message (MessageBody, Comments, Uploaderid, MessageId, Date, ConversationId) VALUES (?, ?, ?, ?, ?, ?)" MessageBody, Comments, Uploaderid, MessageId, Date, ConversationId)
+func (db * appdbimpl) insertMessage(MessageBody string, Comments []structs.Comment, UploaderUserid structs.Identifier, MessageId structs.Identifier, Date string, ConversationId structs.Identifier) (error) {
+	_, err := db.c.Exec("INSERT INTO message (MessageBody, Comments, Uploaderid, MessageId, Date, ConversationId) VALUES (?, ?, ?, ?, ?, ?)" (MessageBody, Comments, Uploaderid, MessageId, Date, ConversationId))
 
 	return err
 }
@@ -42,30 +42,30 @@ func (db * appdbimpl) sendMessage(MessageBody string, UploaderId structs.Identif
 
 
 	newMessage = structs.Message {
-		MessageBody          MessageBody
-		Comments             []structs.Comment{}
-		Uploaderid           UploaderId
-		MessageId            thisMessageId
-		Date                 messageDate
-		ConversationId       ConversationId
+		MessageBody:          MessageBody,
+		Comments:             []structs.Comment{},
+		Uploaderid:           UploaderId,
+		MessageId:            thisMessageId,
+		Date:                 messageDate,
+		ConversationId:       ConversationId,
 	}
 
 	return newMessage, nil
 }
 
-func (db * appdbimpl) deleteMessage(MessageId Identifier) error {
+func (db * appdbimpl) deleteMessage(MessageId structs.Identifier) error {
 	_, err := db.c.Exec("DELETE FROM message WHERE MessageId = ?", MessageId)
 	return err
 }
 
-func (db * appdbimpl) insertComment(CommentId Identifier MessageId Identifier CommentBody string Date string) error {
+func (db * appdbimpl) insertComment(CommentId structs.Identifier, MessageId structs.Identifier, CommentBody string, Date string) error {
 
-	_, err := db.c.Exec("INSERT INTO comment(CommentId, MessageId, CommentBody, Date) VALUES (?, ?, ?, ?)" CommentId, MessageId, CommentBody, Date)
+	_, err := db.c.Exec("INSERT INTO comment(CommentId, MessageId, CommentBody, Date) VALUES (?, ?, ?, ?)" (CommentId, MessageId, CommentBody, Date))
 	
 	return err
 }
 
-func (db * appdbimpl) commentMessage(CommentBody string MessageId Identifier) (structs.Comment, error) {
+func (db * appdbimpl) commentMessage(CommentBody string, MessageId structs.Identifier) (structs.Comment, error) {
 
 	var thisCommentId string
 	var checkId false
@@ -85,16 +85,16 @@ func (db * appdbimpl) commentMessage(CommentBody string MessageId Identifier) (s
 
 	commentDate := time.Now().UTC().Format(time.RFC3339)
 
-	err := db.insertComment(thisCommentId MessageId CommentBody commentDate)
+	err := db.insertComment(thisCommentId, MessageId, CommentBody, commentDate)
 	if err != nil {
 		return nil, err
 	}
 
 	newComment = structs.Comment {
-		CommentId            thisCommentId
-		MessageId            MessageId
-		CommentBody          CommentBody
-		Date                 commentDate
+		CommentId:            thisCommentId,
+		MessageId:            MessageId,
+		CommentBody:          CommentBody,
+		Date:                 commentDate,
 	}
 
 	return newComment, err
@@ -103,7 +103,7 @@ func (db * appdbimpl) commentMessage(CommentBody string MessageId Identifier) (s
 	
 }
 
-func (db * appdbimpl) uncommentMessage(CommentId Identifier) error {
+func (db * appdbimpl) uncommentMessage(CommentId structs.Identifier) error {
 	_, err:= db.c.Exec("DELETE FROM comment WHERE CommentId = ?", CommentId)
 	return err
 }

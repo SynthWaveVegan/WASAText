@@ -8,7 +8,7 @@ import (
 	"github.com/SynthWaveVegan/WASAText/service/structs"
 )
 
-func (db *appdbimpl) DoLogin(username String) error {
+func (db *appdbimpl) DoLogin(username string) error {
 	
 }
 func (db *appdbimpl) SetMyUserame(name string) error {

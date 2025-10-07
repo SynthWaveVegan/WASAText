@@ -8,8 +8,8 @@ import (
 	"github.com/SynthWaveVegan/WASAText/service/structs"
 )
 
-func (db * appdbimpl) createGroup(GroupId Identifier User []User Messages []Message GroupName string Photo Photo) error {
-	_, err := db.c.Exec("INSERT INTO group (GroupId, User, Messages, GroupName, Photo) VALUES (?, ?, ?, ?, ?)" GroupId, User, Messages, GroupName, Photo)
+func (db * appdbimpl) createGroup(GroupId structs.Identifier, User []structs.User, Messages []structs.Message, GroupName string, Photo structs.Photo) error {
+	_, err := db.c.Exec("INSERT INTO group (GroupId, User, Messages, GroupName, Photo) VALUES (?, ?, ?, ?, ?)" (GroupId, User, Messages, GroupName, Photo))
 	return err
 }
 

@@ -35,6 +35,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/SynthWaveVegan/WASAText/service/structs"
+	"log"
 )
 
 // AppDatabase is the high level interface for the DB
@@ -46,17 +47,17 @@ type AppDatabase interface {
 	getConversation() (structs.Conversation, error)
 	//• getMyConversations
 	SetMyUserame(name string) error
-	insertMessage(MessageBody string Comments []Comment UploaderUserid Identifier MessageId Identifier Date string ConversationId Identifier) (error)
+	insertMessage(MessageBody string, Comments []structs.Comment, UploaderUserid structs.Identifier, MessageId structs.Identifier, Date string, ConversationId structs.Identifier) (error)
 	sendMessage(MessageBody string, UploaderId structs.Identifier, ConversationId structs.Identifier) (structs.Message , error)
 	//• forwardMessage
-	commentMessage(CommentBody string MessageId Identifier) (structs.Comment, error)
-	insertComment(CommentId Identifier MessageId Identifier CommentBody string Date string) error
-	uncommentMessage(CommentId Identifier) error 
+	commentMessage(CommentBody string, MessageId structs.Identifier) (structs.Comment, error)
+	insertComment(CommentId structs.Identifier, MessageId structs.Identifier, CommentBody string, Date string) error
+	uncommentMessage(CommentId structs.Identifier) error 
 	deleteMessage(messageId string) error 
 	//• addToGroup
 	//• leaveGroup
 	//• setGroupName
-	createGroup(GroupId Identifier User []User Messages []Message GroupName string Photo Photo) error
+	createGroup(GroupId structs.Identifier, User []structs.User, Messages []structs.Message, GroupName string, Photo structs.Photo) error
 	//• setMyPhoto
 	//• setGroupPhoto
 
@@ -94,10 +95,10 @@ func New(db *sql.DB) (AppDatabase, error) {
 }
 
 func createUserTable(db * sql.DB) {
-	userQuery := CREATE TABLE IF NOT EXIST user (
-		userId VARCHAR(11) NOT NULL PRIMARY KEY,
-		username VARCHAR(16) NOT NULL,
-	)
+	userQuery := `CREATE TABLE IF NOT EXIST user (
+		          userId VARCHAR(11) NOT NULL PRIMARY KEY,
+		          username VARCHAR(16) NOT NULL
+	            )`
 	_, err := db.Exec(userQuery)
 
 	if err != nil {
@@ -106,15 +107,15 @@ func createUserTable(db * sql.DB) {
 }
 
 func createMessageTable(db * sql.DB) {
-	messageQuery := CREATE TABLE IF NOT EXIST message (
+	messageQuery := `CREATE TABLE IF NOT EXIST message (
 		messageId VARCHAR(11) NOT NULL PRIMARY KEY,
 		messageBody TEXT,
 		date TEXT,
 		uploaderId VARCHAR(11) NOT NULL,
 		conversationId VARCHAR(11) NOT NULL,
 		FOREIGN KEY (uploaderId) REFERENCES user(userId),
-		FOREIGN KEY (conversationId) REFERENCES conversation(conversationId),
-	)
+		FOREIGN KEY (conversationId) REFERENCES conversation(conversationId)
+	)`
 	_, err := db.Exec(messageQuery)
 
 	if err != nil {
@@ -123,15 +124,15 @@ func createMessageTable(db * sql.DB) {
 }
 
 func createCommentTable(db * sql.DB) {
-	commentQuery := CREATE TABLE IF NOT EXIST comment (
+	commentQuery := `CREATE TABLE IF NOT EXIST comment (
 		commentId VARCHAR(11) NOT NULL PRIMARY KEY,
 		commentBody TEXT,
 		date TEXT,
 		uploaderId VARCHAR(11) NOT NULL,
 		messageId VARCHAR(11) NOT NULL,
 		FOREIGN KEY (uploaderId) REFERENCES user(userId),
-		FOREIGN KEY (messageId) REFERENCES message(messageId),
-	)
+		FOREIGN KEY (messageId) REFERENCES message(messageId)
+	)`
 	_, err := db.Exec(commentQuery)
 
 	if err != nil {
@@ -140,11 +141,11 @@ func createCommentTable(db * sql.DB) {
 }
 
 func createGroupTable(db * sql.DB) {
-	groupQuery := CREATE TABLE IF NOT EXIST group (
+	groupQuery := `CREATE TABLE IF NOT EXIST group (
 		groupId VARCHAR(11) NOT NULL PRIMARY KEY,
-		groupName VARCHAR(16) NOT NULL,
+		groupName VARCHAR(16) NOT NULL
 
-	)
+	)`
 	_, err := db.Exec(groupQuery)
 
 	if err != nil {
@@ -152,13 +153,13 @@ func createGroupTable(db * sql.DB) {
 		}
 }
 
-func createConversationTable(db, * sql.DB) {
-	conversationQuery := CREATE TABLE IF NOT EXIST conversation (
+func createConversationTable(db * sql.DB) {
+	conversationQuery := `CREATE TABLE IF NOT EXIST conversation (
 		conversationId VARCHAR(11) NOT NULL PRIMARY KEY,
 		userConnected VARCHAR(11),
-		FOREIGN KEY (userConnected) REFERENCES user(userId),
+		FOREIGN KEY (userConnected) REFERENCES user(userId)
 
-	)
+	)`
 }
 func (db *appdbimpl) Ping() error {
 	return db.c.Ping()
