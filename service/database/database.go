@@ -43,22 +43,22 @@ type AppDatabase interface {
 	
 
 	//TODO 
-	DoLogin(username string) (structs.Identifier, error)
+	DoLogin(Username string) (structs.Identifier, error)
 	checkValidId(checkingId string, startId string) (bool, error)
-	checkUserExist(username string) (string, bool, error)
-	CreateUser(username string, userId string) error
+	checkUserExist(Username string) (string, bool, error)
+	CreateUser(Username string, UserId string) error
 	getConversation() (structs.Conversation, error)
 	//• getMyConversations
-	SetMyUserame(mode string, newName string, userId string) error 
-	CreateUser(username string, userId string) error
-	checkUserExist(username string) (string, bool, error)
+	SetMyUserame(mode string, newName string, UserId string) error 
+	CreateUser(Username string, UserId string) error
+	checkUserExist(Username string) (string, bool, error)
 	insertMessage(MessageBody string, Comments []structs.Comment, UploaderUserid structs.Identifier, MessageId structs.Identifier, Date string, ConversationId structs.Identifier) (error)
-	sendMessage(MessageBody string, UploaderId structs.Identifier, ConversationId structs.Identifier) (structs.Message , error)
-	//• forwardMessage
+	sendMessage(MessageBody string, UploaderId structs.Identifier, ConversationId structs.Identifier) (structs.Message, error)
+	forwardMessage(ConversationId structs.Identifier, OldMessageId structs.Identifier, UploaderId structs.Identifier) (structs.Message, error)
 	commentMessage(CommentBody string, MessageId structs.Identifier) (structs.Comment, error)
 	insertComment(CommentId structs.Identifier, MessageId structs.Identifier, CommentBody string, Date string) error
 	uncommentMessage(CommentId structs.Identifier) error 
-	deleteMessage(messageId string) error 
+	deleteMessage(MessageId string) error 
 	//• addToGroup
 	//• leaveGroup
 	//• setGroupName
@@ -86,36 +86,36 @@ func New(db *sql.DB) (AppDatabase, error) {
 	if errors.Is(err, sql.ErrNoRows) {
 		
 		userQuery := `CREATE TABLE IF NOT EXIST user (
-		          userId VARCHAR(11) NOT NULL PRIMARY KEY,
-		          username VARCHAR(16) NOT NULL
+		          UserId VARCHAR(11) NOT NULL PRIMARY KEY,
+		          Username VARCHAR(16) NOT NULL
 	)`
 		messageQuery := `CREATE TABLE IF NOT EXIST message (
-		messageId VARCHAR(11) NOT NULL PRIMARY KEY,
-		messageBody TEXT,
-		date TEXT,
-		uploaderId VARCHAR(11) NOT NULL,
-		conversationId VARCHAR(11) NOT NULL,
-		FOREIGN KEY (uploaderId) REFERENCES user(userId),
-		FOREIGN KEY (conversationId) REFERENCES conversation(conversationId)
+		MessageId VARCHAR(11) NOT NULL PRIMARY KEY,
+		MessageBody TEXT,
+		Date TEXT,
+		UploaderId VARCHAR(11) NOT NULL,
+		ConversationId VARCHAR(11) NOT NULL,
+		FOREIGN KEY (UploaderId) REFERENCES user(UserId),
+		FOREIGN KEY (ConversationId) REFERENCES conversation(ConversationId)
 	)`
 		commentQuery := `CREATE TABLE IF NOT EXIST comment (
-		commentId VARCHAR(11) NOT NULL PRIMARY KEY,
-		commentBody TEXT,
-		date TEXT,
-		uploaderId VARCHAR(11) NOT NULL,
-		messageId VARCHAR(11) NOT NULL,
-		FOREIGN KEY (uploaderId) REFERENCES user(userId),
-		FOREIGN KEY (messageId) REFERENCES message(messageId)
+		CommentId VARCHAR(11) NOT NULL PRIMARY KEY,
+		CommentBody TEXT,
+		Date TEXT,
+		UploaderId VARCHAR(11) NOT NULL,
+		MessageId VARCHAR(11) NOT NULL,
+		FOREIGN KEY (UploaderId) REFERENCES user(UserId),
+		FOREIGN KEY (MessageId) REFERENCES message(MessageId)
 	)`
 		groupQuery := `CREATE TABLE IF NOT EXIST group (
-		groupId VARCHAR(11) NOT NULL PRIMARY KEY,
-		groupName VARCHAR(16) NOT NULL
+		GroupId VARCHAR(11) NOT NULL PRIMARY KEY,
+		GroupName VARCHAR(16) NOT NULL
 
 	)`
 		conversationQuery := `CREATE TABLE IF NOT EXIST conversation (
-		conversationId VARCHAR(11) NOT NULL PRIMARY KEY,
-		userConnected VARCHAR(11),
-		FOREIGN KEY (userConnected) REFERENCES user(userId)
+		ConversationId VARCHAR(11) NOT NULL PRIMARY KEY,
+		UserConnected VARCHAR(11),
+		FOREIGN KEY (UserConnected) REFERENCES user(UserId)
 
 	)`
 		//da creare photo table

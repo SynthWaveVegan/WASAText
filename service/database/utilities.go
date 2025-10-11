@@ -53,7 +53,8 @@ func (db * appdbimpl) checkValidId(checkingId string, startId string) (bool, err
 		case "P":
 			err = db.c.QueryRow(`SELECT COUNT(*) FROM photo WHERE photoId = ?`, checkingId).Scan(&countCheck)
 
-		default: //da completare
+		default:
+			return err
 	}
 
 	if err != nil {
