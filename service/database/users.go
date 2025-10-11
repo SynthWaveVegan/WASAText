@@ -53,21 +53,51 @@ func (db *appdbimpl) DoLogin(username string) (structs.Identifier, error) {
 	}
 	
 }
-func (db *appdbimpl) SetMyUserame(mode string name string) error {
+func (db *appdbimpl) SetMyUserame(mode string, newName string, userId string) error {
 
+	var counter int
+	validName, err = checkValidUsername(newName)
+
+	err := db.c.QueryRow(`SELECT COUNT(*) FROM user WHERE username = ?`, newName).scan(&counter)
+	if err != nil {
+		return err
+	}
+	if count != 0 {
+		log.Printf("username taken")
+		return nil
+	}
+	if validName == false {
+		log.Printf("username invalid")
+		return nil
+	}
+	if count == 0 && validName == true {
+
+		switch mode {
+
+		case "New":
+
+			err := db.createUser(newName, userId)
+			return err
+
+		case "Update":
+
+			
+			_, err := db.c.Exec(`UPDATE user SET username = ? WHERE userId = ?`, newName, userId)
+			return err
+
+		default:
+			return err
+		}
+	}
 	
-
-
-
-
-
-
-
-	_, err := db.c.Exec("INSERT INTO user (username) VALUES (?)", username)
-	return err
+	return nil
 }
 
-checkUserExist(username string) (string, bool, error) {
+func (db * appdbimpl) CreateUser(username string, userId string) error {
+
+}
+
+func (db * appdbimpl) checkUserExist(username string) (string, bool, error) {
 
 	var userId string
 	//questo controlla se esiste username nella table user e ritorna il corrispondente userId

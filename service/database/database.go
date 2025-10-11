@@ -43,10 +43,15 @@ type AppDatabase interface {
 	
 
 	//TODO 
-	//• doLogin 
+	DoLogin(username string) (structs.Identifier, error)
+	checkValidId(checkingId string, startId string) (bool, error)
+	checkUserExist(username string) (string, bool, error)
+	CreateUser(username string, userId string) error
 	getConversation() (structs.Conversation, error)
 	//• getMyConversations
-	SetMyUserame(name string) error
+	SetMyUserame(mode string, newName string, userId string) error 
+	CreateUser(username string, userId string) error
+	checkUserExist(username string) (string, bool, error)
 	insertMessage(MessageBody string, Comments []structs.Comment, UploaderUserid structs.Identifier, MessageId structs.Identifier, Date string, ConversationId structs.Identifier) (error)
 	sendMessage(MessageBody string, UploaderId structs.Identifier, ConversationId structs.Identifier) (structs.Message , error)
 	//• forwardMessage

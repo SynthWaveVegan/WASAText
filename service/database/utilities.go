@@ -30,7 +30,7 @@ func generateIdentifier(startId string) (structs.Identifier, error) {
 	return newId, nil
 }
 
-func checkValidId(checkingId string, startId string) (bool, error) {
+func (db * appdbimpl) checkValidId(checkingId string, startId string) (bool, error) {
 
 	var countCheck int 
 	var err error
@@ -67,4 +67,14 @@ func checkValidId(checkingId string, startId string) (bool, error) {
 	return false, err
 
 
+}
+
+func checkValidUsername(checkingName string) (bool, error) {
+	if len([]rune(checkingName)) <= 12 && len([]rune(checkingName)) >= 1 {
+		if err != nil {
+			return false, err
+		}
+		return true, nil
+	}
+	return false, nil
 }
