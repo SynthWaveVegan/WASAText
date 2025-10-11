@@ -9,7 +9,9 @@ import (
 )
 
 func (db * appdbimpl) getConversation() (structs.Conversation, error) {
-
+	var emptyConversationId string
+	err := db.c.QueryRow("SELECT conversationId FROM conversation WHERE id=?").Scan(&emptyConversationId)
+	return 
 
 }
 
