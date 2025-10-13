@@ -79,3 +79,10 @@ func checkValidUsername(checkingName string) (bool, error) {
 	}
 	return false, nil
 }
+
+func first_character(ran string) rune {
+    for _, r := range ran {
+        return r 
+    }
+    return 0 
+}

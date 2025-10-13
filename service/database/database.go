@@ -35,6 +35,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/SynthWaveVegan/WASAText/service/structs"
+	"time"
 	
 )
 
@@ -46,15 +47,16 @@ type AppDatabase interface {
 	DoLogin(Username string) (structs.Identifier, error)
 	checkValidId(checkingId string, startId string) (bool, error)
 	checkUserExist(Username string) (string, bool, error)
-	CreateUser(Username string, UserId string) error
 	getConversation() (structs.Conversation, error)
 	//• getMyConversations
 	SetMyUserame(mode string, newName string, UserId string) error 
 	CreateUser(Username string, UserId string) error
 	checkUserExist(Username string) (string, bool, error)
-	insertMessage(MessageBody string, Comments []structs.Comment, UploaderUserid structs.Identifier, MessageId structs.Identifier, Date string, ConversationId structs.Identifier) (error)
-	sendMessage(MessageBody string, UploaderId structs.Identifier, ConversationId structs.Identifier) (structs.Message, error)
-	forwardMessage(ConversationId structs.Identifier, OldMessageId structs.Identifier, UploaderId structs.Identifier) (structs.Message, error)
+	createPhoto(file []byte, format string, UploaderId structs.Identifier) (structs.Photo, error) 
+	insertPhoto(PhotoId string, Path string, UploaderId string, Date string) (error)
+	insertMessage(MessageBody string, Comments []structs.Comment, UploaderUserid structs.Identifier, MessageId structs.Identifier, Date string) (error)
+	sendMessage(MessageBody string, UploaderId structs.Identifier) (structs.Message, error)
+	forwardMessage(OldMessageId structs.Identifier, UploaderId structs.Identifier) (structs.Message, error)
 	commentMessage(CommentBody string, MessageId structs.Identifier) (structs.Comment, error)
 	insertComment(CommentId structs.Identifier, MessageId structs.Identifier, CommentBody string, Date string) error
 	uncommentMessage(CommentId structs.Identifier) error 
@@ -94,9 +96,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 		MessageBody TEXT,
 		Date TEXT,
 		UploaderId VARCHAR(11) NOT NULL,
-		ConversationId VARCHAR(11) NOT NULL,
 		FOREIGN KEY (UploaderId) REFERENCES user(UserId),
-		FOREIGN KEY (ConversationId) REFERENCES conversation(ConversationId)
 	)`
 		commentQuery := `CREATE TABLE IF NOT EXIST comment (
 		CommentId VARCHAR(11) NOT NULL PRIMARY KEY,
@@ -107,9 +107,12 @@ func New(db *sql.DB) (AppDatabase, error) {
 		FOREIGN KEY (UploaderId) REFERENCES user(UserId),
 		FOREIGN KEY (MessageId) REFERENCES message(MessageId)
 	)`
-		groupQuery := `CREATE TABLE IF NOT EXIST group (
+		UserGroupQuery := `CREATE TABLE IF NOT EXIST usergroup (
 		GroupId VARCHAR(11) NOT NULL PRIMARY KEY,
-		GroupName VARCHAR(16) NOT NULL
+		UserId VARCHAR(11) NOT NULL PRIMARY KEY,
+		FOREIGN KEY (UserId) REFERENCES user(UserId)
+		FOREIGN KEY (GroupId) REFERENCES group(GroupId)
+		
 
 	)`
 		conversationQuery := `CREATE TABLE IF NOT EXIST conversation (
@@ -118,9 +121,20 @@ func New(db *sql.DB) (AppDatabase, error) {
 		FOREIGN KEY (UserConnected) REFERENCES user(UserId)
 
 	)`
-		//da creare photo table
+		photoQuery := `CREATE TABLE IF NOT EXIST photo (
+		PhotoId VARCHAR(11) NOT NULL PRIMARY KEY
+		UploaderId VARCHAR(11) NOT NULL
+		Date TEXT,
+		PhotoPath TEXT
+		FOREIGN KEY (UploaderId) REFERENCES user(UserId)
+	)`
 
-		err = execQueries(db, userQuery, messageQuery, commentQuery, groupQuery, conversationQuery)
+	    groupQuery := `CREATE TABLE IF NOT EXIST group (
+		GroupId VARCHAR(11) NOT NULL PRIMARY KEY,
+		GroupName VARCHAR(16) NOT NULL,
+	)`
+
+		err = execQueries(db, userQuery, messageQuery, commentQuery, UserGroupQuery, conversationQuery, photoQuery, groupQuery)
 		if err != nil {
 			log.Println("Error creating tables")
 		}

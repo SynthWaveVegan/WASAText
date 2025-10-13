@@ -2,7 +2,7 @@ package structs
 
 type Identifier struct {
 
-	Identifier           string //'json:"Identifier"'
+	Id                   string //'json:"Identifier"'
 }
 
 type User struct {
@@ -15,10 +15,10 @@ type Message struct {
 
 	MessageBody          string
 	Comments             []Comment
-	Uploader             Identifier
+	UploaderId           Identifier
 	MessageId            Identifier
 	Date                 string
-	ConversationId       Identifier
+	
 }
 
 type Comment struct {
@@ -27,6 +27,7 @@ type Comment struct {
 	MessageId            Identifier
 	CommentBody          string
 	Date                 string
+	UploaderId           Identifier
 
 }
 
@@ -34,6 +35,9 @@ type Photo struct {
 
 	PhotoId              Identifier
 	Path                 string
+	UploaderId           Identifier
+	Date                 string
+	Comments             []Comment
 }
 
 type Group struct {
@@ -42,7 +46,7 @@ type Group struct {
 	Users                []User
 	Messages             []Message
 	GroupName            string
-	Photo                Photo
+	GroupPhoto           Photo
 }
 
 type Conversation struct {
@@ -54,3 +58,4 @@ type Conversation struct {
 
 
 }
+

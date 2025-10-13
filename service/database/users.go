@@ -97,6 +97,27 @@ func (db * appdbimpl) CreateUser(username string, userId string) error {
 
 }
 
+func (db * appdbimpl) GetUser(UserId structs.Identifier) structs.User, error {
+	var username string
+	err := db.c.QueryRow(`SELECT Username FROM user WHERE UserId = ?`, UserId).Scan(&username)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return structs.User{}, err
+		} else {
+			return structs.User{}, err
+		}
+	}
+	
+	UserFound = structs.User {
+		Username: username
+		UserId: UserId
+	}
+
+	return UserFound, nil
+
+
+}
+
 func (db * appdbimpl) checkUserExist(username string) (string, bool, error) {
 
 	var userId string
