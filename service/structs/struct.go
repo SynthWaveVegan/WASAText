@@ -51,9 +51,9 @@ type Group struct {
 
 type Conversation struct {
 
+	ConversationId       Identifier
 	UserConnected        Identifier
 	UserHosting          Identifier
-	Messages             []Message
 	ChatName             string
 
 

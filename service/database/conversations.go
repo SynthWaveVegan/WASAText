@@ -8,12 +8,24 @@ import (
 	"github.com/SynthWaveVegan/WASAText/service/structs"
 )
 
-func (db * appdbimpl) getConversation() (structs.Conversation, error) {
-	var  string
+func (db * appdbimpl) getConversation(UserHosting structs.Identifier, UserConnected structs.Identifier) (structs.Conversation, error) {
+	var ConversationId string
+	err := db.c.QueryRow(`SELECT ConversationId FROM conversation WHERE UserHosting = ? AND UserConnected = ?`UserHosting, UserConnected).Scan(&ConversationId)
+	if err != nil {
+		return structs.Conversation{}, err
+	}
+	thisChatName, err := db.getUsername(UserConnected)
+	if err != nil {
+		return structs.Conversation{}, err
+	}
+	ChatRetrieved = structs.Conversation {
 
-	err := db.c.QueryRow("SELECT  FROM conversation WHERE id=?").Scan(&)
-
-	return 
+		ConversationId:       ConversationId,
+		UserConnected:        UserConnected
+		UserHosting:          UserHosting
+		ChatName:             thisChatName
+	}
+	return ChatRetrieved, nil
 
 }
 

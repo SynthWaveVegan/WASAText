@@ -123,8 +123,9 @@ func New(db *sql.DB) (AppDatabase, error) {
 
 	)`
 		conversationQuery := `CREATE TABLE IF NOT EXIST conversation (
-		UserHosting VARCHAR(11) NOT NULL PRIMARY KEY,
-		UserConnected VARCHAR(11) NOT NULL PRIMARY KEY,
+		UserHosting VARCHAR(11) NOT NULL,
+		UserConnected VARCHAR(11) NOT NULL,
+		PRIMARY KEY (UserHosting, UserConnected)
 		FOREIGN KEY (UserConnected) REFERENCES user(UserId)
 		FOREIGN KEY (UserHosting) REFERENCES user(UserId)
 

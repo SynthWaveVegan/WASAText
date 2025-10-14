@@ -123,7 +123,7 @@ func (db * appdbimpl) checkUserExist(username string) (string, bool, error) {
 
 	var userId string
 	//questo controlla se esiste username nella table user e ritorna il corrispondente userId
-	err := db.c.QueryRow(`SELECT userId FROM user WHERE username = ?`, username).Scan(&userid)
+	err := db.c.QueryRow(`SELECT UserId FROM user WHERE Username = ?`, username).Scan(&userid)
 
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -135,5 +135,14 @@ func (db * appdbimpl) checkUserExist(username string) (string, bool, error) {
 		return true, userId, nil
 	}
 
+}
+
+func (db * appdbimpl) getUsername(UserId structs.identifier) (string, error) {
+	var username string
+	err := db.c.QueryRow(`SELECT Username FROM user WHERE UserId = ?`, UserId).Scan(&username)
+	if err != nil {
+		return {}, err
+	}
+	return username, nil
 }
 		

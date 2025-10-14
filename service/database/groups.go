@@ -135,45 +135,7 @@ func (db * appdbimpl) leaveGroup(GroupId structs.Identifier, UserId structs.Iden
 	var counter int
 	
 
-	err := db.c.QueryRow(`SELECT COUNT(*) Ffunc (db *appdbimpl) SetMyUserame(mode string, newName string, userId string) error {
-
-	var counter int
-	validName, err = checkValidName(newName)
-
-	err := db.c.QueryRow(`SELECT COUNT(*) FROM user WHERE username = ?`, newName).Scan(&counter)
-	if err != nil {
-		return err
-	}
-	if count != 0 {
-		log.Printf("username taken")
-		return nil
-	}
-	if validName == false {
-		log.Printf("username invalid")
-		return nil
-	}
-	if count == 0 && validName == true {
-
-		switch mode {
-
-		case "New":
-
-			err := db.createUser(newName, userId)
-			return err
-
-		case "Update":
-
-			
-			_, err := db.c.Exec(`UPDATE user SET username = ? WHERE userId = ?`, newName, userId)
-			return err
-
-		default:
-			return err
-		}
-	}
-	
-	return nil
-}ROM userGroup WHERE GroupId = ? AND UserId = ?`, GroupId, UserId).Scan(&counter)
+	err := db.c.QueryRow(`SELECT COUNT(*) FROM userGroup WHERE GroupId = ? AND UserId = ?`, GroupId, UserId).Scan(&counter)
 
 	if err != nil {
 		return err
