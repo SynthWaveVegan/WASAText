@@ -43,16 +43,16 @@ type Photo struct {
 type Group struct {
 
 	GroupId              Identifier
+	GroupName            string
 	Users                []User
 	Messages             []Message
-	GroupName            string
 	GroupPhoto           Photo
 }
 
 type Conversation struct {
 
-	ConversationId       Identifier
-	UserConnected        User
+	UserConnected        Identifier
+	UserHosting          Identifier
 	Messages             []Message
 	ChatName             string
 

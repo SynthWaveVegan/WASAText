@@ -38,7 +38,7 @@ func (db *appdbimpl) DoLogin(username string) (structs.Identifier, error) {
 			return structs.Identifier{}, err
 		}
 
-		validId, err := checkValidId(newUserId, "U")
+		validId, err := db.checkValidId(newUserId, "U")
 
 		if checkId == false {
 			return structs.Identifier{}, err
@@ -53,16 +53,16 @@ func (db *appdbimpl) DoLogin(username string) (structs.Identifier, error) {
 	}
 	
 }
-func (db *appdbimpl) SetMyUserame(mode string, newName string, userId string) error {
+func (db *appdbimpl) SetMyUsername(mode string, newName string, userId string) error {
 
 	var counter int
-	validName, err = checkValidUsername(newName)
+	validName, err = checkValidName(newName)
 
-	err := db.c.QueryRow(`SELECT COUNT(*) FROM user WHERE username = ?`, newName).scan(&counter)
+	err := db.c.QueryRow(`SELECT COUNT(*) FROM user WHERE Username = ?`, newName).Scan(&counter)
 	if err != nil {
 		return err
 	}
-	if count != 0 {
+	if counter != 0 {
 		log.Printf("username taken")
 		return nil
 	}
@@ -70,7 +70,7 @@ func (db *appdbimpl) SetMyUserame(mode string, newName string, userId string) er
 		log.Printf("username invalid")
 		return nil
 	}
-	if count == 0 && validName == true {
+	if counter == 0 && validName == true {
 
 		switch mode {
 
@@ -82,7 +82,7 @@ func (db *appdbimpl) SetMyUserame(mode string, newName string, userId string) er
 		case "Update":
 
 			
-			_, err := db.c.Exec(`UPDATE user SET username = ? WHERE userId = ?`, newName, userId)
+			_, err := db.c.Exec(`UPDATE user SET Username = ? WHERE UserId = ?`, newName, userId)
 			return err
 
 		default:
@@ -94,7 +94,8 @@ func (db *appdbimpl) SetMyUserame(mode string, newName string, userId string) er
 }
 
 func (db * appdbimpl) CreateUser(username string, userId string) error {
-
+	_, err := db.c.Exec(`INSERT INTO user (UserId, Username) VALUES (?, ?)` (userId, username))
+	return err
 }
 
 func (db * appdbimpl) GetUser(UserId structs.Identifier) structs.User, error {

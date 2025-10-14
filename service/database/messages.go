@@ -17,68 +17,6 @@ func (db * appdbimpl) insertMessage(MessageBody string, UploaderId structs.Ident
 	return err
 }
 
-func (db * appdbimpl) insertPhoto(PhotoId string, Path string, UploaderId string, Date string) (error) {
-	_, err := db.c.Exec(`INSERT INTO photo (PhotoId, PhotoPath,  Date, UploaderId) VALUES (?, ?, ?, ?)` (PhotoId, Path,  Date,  UploaderId))
-
-	return err
-}
-
-func (db * appdbimpl) createPhoto(file []byte, format string, UploaderId structs.Identifier) (structs.Photo, error) {
-
-	const Folder string = "/tmp/wasatext/WASAText/images/"
-
-	thisPhotoId, err := generateIdentifier("P")
-	if err != nil {
-		return structs.Photo{}, err
-	}
-
-	checkId, err = checkValidId(thisPhotoId, "P")
-
-	if checkId == false {
-		return structs.Photo{}, err
-	}
-	if err != nil {
-		return structs.Photo{}, err
-	}
-
-	photoDate := time.Now().UTC().Format(time.RFC3339)
-
-	PhotoPath = Folder + UploaderId + "/" + thisPhotoId "." + format
-
-	err := savePhoto(file, PhotoPath)
-	if err != nil {
-		return structs.Photo{}, err
-	}
-
-	newPhoto = structs.Photo {
-
-		PhotoId:              thisPhotoId,
-		Path:                 UploaderId + "/" + thisPhotoId "." + format,
-		UploaderId:           UploaderId,
-		Date:                 photoDate,
-		Comments:             []structs.Comment{},
-
-	}
-	
-	return newPhoto, nil
-
-	
-}
-
-func savePhoto(file []byte, path string) error {
-	
-	dir := filepath.Dir(path)
-	
-	err := os.MkdirAll(dir, 0755)
-	if err != nil {
-		return err
-	}
-	err = os.WriteFile(path, file, 0644)
-
-	return err
-}
-
-
 func (db * appdbimpl) sendMessage(MessageBody string, UploaderId structs.Identifier) (structs.Message , error) {
 
 	var thisMessageId structs.Identifier
@@ -89,7 +27,7 @@ func (db * appdbimpl) sendMessage(MessageBody string, UploaderId structs.Identif
 		return nil, err
 	}
 	
-	checkId, err = checkValidId(thisMessageId, "M")
+	checkId, err = db.checkValidId(thisMessageId, "M")
 
 	if checkId == false {
 		return nil, err
@@ -129,7 +67,7 @@ func (db * appdbimpl) forwardMessage(OldMessageId structs.Identifier, UploaderId
 			return nil, err
 		}
 	
-		checkId, err = checkValidId(thisMessageId, "M")
+		checkId, err = db.checkValidId(thisMessageId, "M")
 
 		if checkId == false {
 			return nil, err
@@ -168,7 +106,7 @@ func (db * appdbimpl) forwardMessage(OldMessageId structs.Identifier, UploaderId
 			return nil, err
 		}
 	
-		checkId, err = checkValidId(thisPhotoId, "P")
+		checkId, err = db.checkValidId(thisPhotoId, "P")
 
 		if checkId == false {
 			return nil, err
@@ -181,15 +119,24 @@ func (db * appdbimpl) forwardMessage(OldMessageId structs.Identifier, UploaderId
 
 		err := db.c.QueryRow(`SELECT PhotoPath FROM photo WHERE PhotoId = ?`, OldMessageId).Scan(&PhotoPath)
 
+		err := db.insertPhoto(thisPhotoId, PhotoPath, UploaderId, photoDate)
+
+		forwardedPhoto = structs.Photo {
+
+			PhotoId:              thisPhotoId,
+			Path:                 UploaderId + "/" + thisPhotoId "." + format,
+			UploaderId:           UploaderId,
+			Date:                 photoDate,
+			Comments:             []structs.Comment{},
+
+		}
+	
+		return forwardedPhoto, nil
+
+
 	}
 
-	
-
 }
-
-//creare tutte le interazioni per messaggi foto
-
-
 
 
 func (db * appdbimpl) deleteMessage(MessageId structs.Identifier) error {
@@ -197,53 +144,3 @@ func (db * appdbimpl) deleteMessage(MessageId structs.Identifier) error {
 	return err
 }
 
-func (db * appdbimpl) insertComment(CommentId structs.Identifier, MessageId structs.Identifier, CommentBody string, Date string, UploaderId structs.Identifier) error {
-
-	_, err := db.c.Exec(`INSERT INTO comment(CommentId, MessageId, CommentBody, Date, UploaderId) VALUES (?, ?, ?, ?, ?)` (CommentId, MessageId, CommentBody, Date, UploaderId))
-	
-	return err
-}
-
-func (db * appdbimpl) commentMessage(CommentBody string, MessageId structs.Identifier, UploaderId structs.Identifier) (structs.Comment, error) {
-
-	var thisCommentId string
-	var checkId false
-
-	thisCommentId, err = generateIdentifier("T")
-	if err != nil {
-		return nil, err
-	}
-	checkId, err = checkValidId(thisCommentId, "T")
-	if checkId == false {
-		return nil, err
-	}
-	if err != nil {
-		return nil, err
-	}
-
-
-	commentDate := time.Now().UTC().Format(time.RFC3339)
-
-	err := db.insertComment(thisCommentId, MessageId, CommentBody, commentDate)
-	if err != nil {
-		return nil, err
-	}
-
-	newComment = structs.Comment {
-		CommentId:            thisCommentId,
-		MessageId:            MessageId,
-		CommentBody:          CommentBody,
-		Date:                 commentDate,
-		UploaderId:           UploaderId,
-	}
-
-	return newComment, err
-
-
-	
-}
-
-func (db * appdbimpl) uncommentMessage(CommentId structs.Identifier) error {
-	_, err:= db.c.Exec(`DELETE FROM comment WHERE CommentId = ?`, CommentId)
-	return err
-}

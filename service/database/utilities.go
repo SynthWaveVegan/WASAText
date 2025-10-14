@@ -41,13 +41,10 @@ func (db * appdbimpl) checkValidId(checkingId string, startId string) (bool, err
 		case "M":
 			err = db.c.QueryRow(`SELECT COUNT(*) FROM message WHERE messageId = ?`, checkingId).Scan(&countCheck)
 
-		case "C":
-			err = db.c.QueryRow(`SELECT COUNT(*) FROM conversation WHERE conversationId = ?`, checkingId).Scan(&countCheck)
-
 		case "G":
 			err = db.c.QueryRow(`SELECT COUNT(*) FROM group WHERE groupId = ?`, checkingId).Scan(&countCheck)
 
-		case "T":
+		case "C":
 			err = db.c.QueryRow(`SELECT COUNT(*) FROM comment WHERE commentId = ?`, checkingId).Scan(&countCheck)
 
 		case "P":
@@ -70,7 +67,7 @@ func (db * appdbimpl) checkValidId(checkingId string, startId string) (bool, err
 
 }
 
-func checkValidUsername(checkingName string) (bool, error) {
+func checkValidName(checkingName string) (bool, error) {
 	if len([]rune(checkingName)) <= 12 && len([]rune(checkingName)) >= 1 {
 		if err != nil {
 			return false, err
@@ -79,6 +76,7 @@ func checkValidUsername(checkingName string) (bool, error) {
 	}
 	return false, nil
 }
+
 
 func first_character(ran string) rune {
     for _, r := range ran {

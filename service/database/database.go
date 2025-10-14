@@ -45,26 +45,33 @@ type AppDatabase interface {
 
 	//TODO 
 	DoLogin(Username string) (structs.Identifier, error)
-	checkValidId(checkingId string, startId string) (bool, error)
-	checkUserExist(Username string) (string, bool, error)
+	//checkValidId(checkingId string, startId string) (bool, error)
+	//checkUserExist(Username string) (string, bool, error)
+
 	getConversation() (structs.Conversation, error)
 	//• getMyConversations
-	SetMyUserame(mode string, newName string, UserId string) error 
-	CreateUser(Username string, UserId string) error
-	checkUserExist(Username string) (string, bool, error)
-	createPhoto(file []byte, format string, UploaderId structs.Identifier) (structs.Photo, error) 
-	insertPhoto(PhotoId string, Path string, UploaderId string, Date string) (error)
-	insertMessage(MessageBody string, Comments []structs.Comment, UploaderUserid structs.Identifier, MessageId structs.Identifier, Date string) (error)
+
+	SetMyUsername(mode string, newName string, UserId string) error 
+	//CreateUser(Username string, UserId string) error
+	//checkUserExist(Username string) (string, bool, error)
+
+	sendPhoto(file []byte, format string, UploaderId structs.Identifier) (structs.Photo, error) 
+	//insertPhoto(PhotoId string, Path string, UploaderId string, Date string) (error)
+	
+	//insertMessage(MessageBody string, Comments []structs.Comment, UploaderUserid structs.Identifier, MessageId structs.Identifier, Date string) (error)
 	sendMessage(MessageBody string, UploaderId structs.Identifier) (structs.Message, error)
 	forwardMessage(OldMessageId structs.Identifier, UploaderId structs.Identifier) (structs.Message, error)
+
 	commentMessage(CommentBody string, MessageId structs.Identifier) (structs.Comment, error)
-	insertComment(CommentId structs.Identifier, MessageId structs.Identifier, CommentBody string, Date string) error
+	//insertComment(CommentId structs.Identifier, MessageId structs.Identifier, CommentBody string, Date string) error
 	uncommentMessage(CommentId structs.Identifier) error 
 	deleteMessage(MessageId string) error 
-	//• addToGroup
-	//• leaveGroup
+
+	addToGroup(GroupId structs.Identifier, AddUserId structs.Identifier) (error)
+	leaveGroup(GroupId structs.Identifier, UserId structs.Identifier) error
 	//• setGroupName
-	createGroup(GroupId structs.Identifier, User []structs.User, Messages []structs.Message, GroupName string, Photo structs.Photo) error
+	//createGroup(GroupId structs.Identifier, User []structs.User, Messages []structs.Message, GroupName string, Photo structs.Photo) error
+
 	//• setMyPhoto
 	//• setGroupPhoto
 
@@ -107,7 +114,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 		FOREIGN KEY (UploaderId) REFERENCES user(UserId),
 		FOREIGN KEY (MessageId) REFERENCES message(MessageId)
 	)`
-		UserGroupQuery := `CREATE TABLE IF NOT EXIST usergroup (
+		userGroupQuery := `CREATE TABLE IF NOT EXIST usergroup (
 		GroupId VARCHAR(11) NOT NULL PRIMARY KEY,
 		UserId VARCHAR(11) NOT NULL PRIMARY KEY,
 		FOREIGN KEY (UserId) REFERENCES user(UserId)
@@ -116,9 +123,10 @@ func New(db *sql.DB) (AppDatabase, error) {
 
 	)`
 		conversationQuery := `CREATE TABLE IF NOT EXIST conversation (
-		ConversationId VARCHAR(11) NOT NULL PRIMARY KEY,
-		UserConnected VARCHAR(11),
+		UserHosting VARCHAR(11) NOT NULL PRIMARY KEY,
+		UserConnected VARCHAR(11) NOT NULL PRIMARY KEY,
 		FOREIGN KEY (UserConnected) REFERENCES user(UserId)
+		FOREIGN KEY (UserHosting) REFERENCES user(UserId)
 
 	)`
 		photoQuery := `CREATE TABLE IF NOT EXIST photo (
@@ -134,7 +142,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 		GroupName VARCHAR(16) NOT NULL,
 	)`
 
-		err = execQueries(db, userQuery, messageQuery, commentQuery, UserGroupQuery, conversationQuery, photoQuery, groupQuery)
+		err = execQueries(db, userQuery, messageQuery, commentQuery, userGroupQuery, conversationQuery, photoQuery, groupQuery)
 		if err != nil {
 			log.Println("Error creating tables")
 		}
