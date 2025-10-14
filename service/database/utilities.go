@@ -84,3 +84,13 @@ func first_character(ran string) rune {
     }
     return 0 
 }
+
+func (db * appdbimpl) getUsernamebyId(UserId structs.identifier) (string, error) {
+	var username string
+	err := db.c.QueryRow(`SELECT Username FROM user WHERE UserId = ?`, UserId).Scan(&username)
+	if err != nil {
+		return {}, err
+	}
+	return username, nil
+}
+	

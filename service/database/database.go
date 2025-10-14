@@ -48,8 +48,8 @@ type AppDatabase interface {
 	//checkValidId(checkingId string, startId string) (bool, error)
 	//checkUserExist(Username string) (string, bool, error)
 
-	getConversation() (structs.Conversation, error)
-	//• getMyConversations
+	getConversation(UserHosting structs.Identifier, UserConnected structs.Identifier) (structs.Conversation, error)
+	getMyConversations(UserHosting structs.Identifier) ([]structs.Identifier, error)
 
 	SetMyUsername(mode string, newName string, UserId string) error 
 	//CreateUser(Username string, UserId string) error
@@ -69,7 +69,7 @@ type AppDatabase interface {
 
 	addToGroup(GroupId structs.Identifier, AddUserId structs.Identifier) (error)
 	leaveGroup(GroupId structs.Identifier, UserId structs.Identifier) error
-	//• setGroupName
+	SetGroupName(mode string, newName string, GroupId string) error
 	//createGroup(GroupId structs.Identifier, User []structs.User, Messages []structs.Message, GroupName string, Photo structs.Photo) error
 
 	//• setMyPhoto
