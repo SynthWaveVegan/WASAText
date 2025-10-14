@@ -7,25 +7,25 @@ import (
 	"fmt"
 	"github.com/SynthWaveVegan/WASAText/service/structs"
 )
-
+// da capire con conversation id se si può direttamente usare il duo users
 func (db * appdbimpl) getConversation(UserHosting structs.Identifier, UserConnected structs.Identifier) (structs.Conversation, error) {
 
-	var ConversationId string
+	var thisUserHosting string
+	var thisUserConnected string
 
-	err := db.c.QueryRow(`SELECT ConversationId FROM conversation WHERE UserHosting = ? AND UserConnected = ?`UserHosting, UserConnected).Scan(&ConversationId)
+	err := db.c.QueryRow(`SELECT (UserHosting, UserConnected) FROM conversation WHERE UserHosting = ? AND UserConnected = ?`UserHosting, UserConnected).Scan(&thisUserHosting, &thisUserConnected)
 
 	if err != nil {
 		return structs.Conversation{}, err
 	}
-	thisChatName, err := db.getUsername(UserConnected)
+	thisChatName, err := db.getUsername(thisUserConnected)
 	if err != nil {
 		return structs.Conversation{}, err
 	}
 	ChatRetrieved = structs.Conversation {
 
-		ConversationId:       ConversationId,
-		UserConnected:        UserConnected
-		UserHosting:          UserHosting
+		UserConnected:        thisUserConnected
+		UserHosting:          thisUserHosting
 		ChatName:             thisChatName
 	}
 	return ChatRetrieved, nil
@@ -35,9 +35,9 @@ func (db * appdbimpl) getConversation(UserHosting structs.Identifier, UserConnec
 func (db * appdbimpl) getMyConversations(UserHosting structs.Identifier) ([]structs.Identifier, error) {
 
 	var ChatStream []structs.Identifier
-	var ConversationId structs.Identifier
+	var UserConnected structs.Identifier
 
-	rows, err := db.Query(`SELECT ConversationId FROM conversation WHERE UserHosting = ?` UserHosting)
+	rows, err := db.Query(`SELECT UserConnected FROM conversation WHERE UserHosting = ?` UserHosting)
 	if err != nil {
     	log.Fatal(err)
 	}
@@ -45,11 +45,11 @@ func (db * appdbimpl) getMyConversations(UserHosting structs.Identifier) ([]stru
 
 	for rows.Next() {
 
-		err = rows.Scan(&ConversationId)
+		err = rows.Scan(&UserConnected)
 		if err != nil {
 			return nil, err
 		}
-		ChatStream = append(ChatStream, ConversationId)
+		ChatStream = append(ChatStream, UserConnected)
 	}
 	err = rows.Err()
 
