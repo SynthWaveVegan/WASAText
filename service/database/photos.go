@@ -19,7 +19,7 @@ func (db * appdbimpl) insertPhoto(PhotoId string, Path string, UploaderId string
 
 func (db * appdbimpl) sendPhoto(file []byte, format string, UploaderId structs.Identifier) (structs.Photo, error) {
 
-	const Folder string = "/tmp/wasatext/WASAText/images/"
+	const Folder string = "/tmp/WASAText/images/"
 
 	thisPhotoId, err := generateIdentifier("P")
 	if err != nil {

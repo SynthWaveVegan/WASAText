@@ -437,7 +437,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "components/schemas/User/myPhoto"
+              $ref: "components/schemas/User/Photo"
       responses:
         "204":
           description: user photo updated succesfully
@@ -483,88 +483,135 @@ components:
       description: local user
       type: object
       properties:
-        username:
+        Username:
           type: string
           example: gruppohd
           pattern: "^[a-z0-9]*?$"
           minLength: 1
           maxLength: 12
-        userId:
+        UserId:
           $ref: "#/components/schemas/Identifier"
-
-        
-          
-    ConversatonList:
-      title: conversationList
-      description: stream of all conversations
-      type: array
-      description: list of conversations in the stream
-      items:
-        $ref: "#/components/schemas/Conversation"
 
     Message:
       title: message
       description: message of a user in a conversation
       type: object
       properties:
-        message: 
+        MessageBody: 
           type: string
           example: ciao
           pattern: "^[a-z0-9]*?$"
           minLenght: 1
           maxLenght: 50
-        comment:
-          $ref: "#/components/schemas/Comment"
-
-    Conversation:
-      title: conversation
-      description: conversation on the platform
-      type: object
-      properties:
-         messageStream:
+        Comments:
           type: array
           items:
-            $ref: "#/components/schemas/Message"
+            $ref: "#/components/schemas/Comment"
+        UploaderId:
+          $ref: "#/components/schemas/Identifier"
+        MessageId:
+          $ref: "#/components/schemas/Identifier"
+        Date:
+          type: string
+          format: date-time
+          pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+          example: "2021-05-12T09:00:00Z"
+          minLength: 20
+          maxLength: 20
 
     Comment:
       title: comment
       description: comment of a message
-      type: string
-      example: ciao
-      pattern: "^[a-z0-9]*?$"
-      minLenght: 1
-      maxLenght: 50
+      type: object
+      properties:
+        CommentId:
+          $ref: "#/components/schemas/Identifier"
+        MessageId:
+          $ref: "#/components/schemas/Identifier"
+        CommentBody:
+          type: string
+          example: ciao
+          pattern: "^[a-z0-9]*?$"
+          minLenght: 1
+          maxLenght: 50
+        Date:
+          type: string
+          format: date-time
+          pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+          example: "2021-05-12T09:00:00Z"
+          minLength: 20
+          maxLength: 20
+        UploaderId:
+          $ref: "#/components/schemas/Identifier"
+        
+
+    Photo:
+      title: photo
+      description: profile photo of the user
+      type: object
+      properties:
+        PhotoId: 
+          $ref: "#/components/schemas/Identifier"
+        Path:
+          description: position in filesystem for a file
+          type: string
+          minLength: 47
+          maxLength: 47
+          pattern: "^.?" 
+          example: "/tmp/WASAText/images/U001011010/P001011010.jpg"
+        UploaderId:
+          $ref: "#/components/schemas/Identifier"
+        Date:
+          type: string
+          format: date-time
+          pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+          example: "2021-05-12T09:00:00Z"
+          minLength: 20
+          maxLength: 20
+        Comments:
+          type: array
+          items:
+            $ref: "#/components/schemas/Comment"
     
     Group:
       title: group
       description: group conversation of multiple users
       type: object
       properties:
-        name:
+        GroupId:
+          $ref: "#/components/schemas/Identifier"
+        GroupName:
           type: string
           example: gruppohd
           pattern: "^[a-z0-9]*?$"
           minLength: 1
           maxLength: 12
-        messageStream:
+        Users:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+        Messages:
           type: array
           items:
             $ref: "#/components/schemas/Message"
         groupPhoto:
           $ref: "#/components/schemas/Photo"
 
-        
-    Photo:
-      title: photo
-      description: profile photo of the user
+    Conversation:
+      title: conversation
+      description: conversation on the platform
       type: object
       properties:
-        photoId: 
+        UserConnected:
           $ref: "#/components/schemas/Identifier"
-        file: 
-          description: file
+        UserHosting:
+          $ref: "#/components/schemas/Identifier"
+        ChatName:    
           type: string
-          format: binary
+          description: the name of the conversation is the same as the user connected
+          example: gruppohd
+          pattern: "^[a-z0-9]*?$"
           minLength: 1
-          maxLength: 9999
+          maxLength: 12 
+
             
