@@ -35,15 +35,14 @@ import (
 	"errors"
 	"fmt"
 	"github.com/SynthWaveVegan/WASAText/service/structs"
-	"time"
-	
+	"log"
+	// "time"
 )
 
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
-	
 
-	//TODO 
+	//TODO
 	DoLogin(Username string) (structs.Identifier, error)
 	//checkValidId(checkingId string, startId string) (bool, error)
 	//checkUserExist(Username string) (string, bool, error)
@@ -51,25 +50,26 @@ type AppDatabase interface {
 	getConversation(UserHosting structs.Identifier, UserConnected structs.Identifier) (structs.Conversation, error)
 	getMyConversations(UserHosting structs.Identifier) ([]structs.Identifier, error)
 
-	SetMyUsername(mode string, newName string, UserId string) error 
+	SetMyUsername(mode string, newName string, UserId string) error
 	//CreateUser(Username string, UserId string) error
 	//checkUserExist(Username string) (string, bool, error)
 
-	sendPhoto(file []byte, format string, UploaderId structs.Identifier) (structs.Photo, error) 
+	sendPhoto(file []byte, format string, UploaderId structs.Identifier) (structs.Photo, error)
+	forwardPhoto(OldPhotoId structs.Identifier, UploaderId structs.Identifier) (structs.Photo, error)
 	//insertPhoto(PhotoId string, Path string, UploaderId string, Date string) (error)
-	
+
 	//insertMessage(MessageBody string, Comments []structs.Comment, UploaderUserid structs.Identifier, MessageId structs.Identifier, Date string) (error)
 	sendMessage(MessageBody string, UploaderId structs.Identifier) (structs.Message, error)
 	forwardMessage(OldMessageId structs.Identifier, UploaderId structs.Identifier) (structs.Message, error)
 
-	commentMessage(CommentBody string, MessageId structs.Identifier) (structs.Comment, error)
+	commentMessage(CommentBody string, MessageId structs.Identifier, UploaderId structs.Identifier) (structs.Comment, error)
 	//insertComment(CommentId structs.Identifier, MessageId structs.Identifier, CommentBody string, Date string) error
-	uncommentMessage(CommentId structs.Identifier) error 
-	deleteMessage(MessageId string) error 
+	uncommentMessage(CommentId structs.Identifier) error
+	deleteMessage(MessageId structs.Identifier) error
 
-	addToGroup(GroupId structs.Identifier, AddUserId structs.Identifier) (error)
+	addToGroup(GroupId structs.Identifier, AddUserId structs.Identifier) error
 	leaveGroup(GroupId structs.Identifier, UserId structs.Identifier) error
-	SetGroupName(mode string, newName string, GroupId string) error
+	SetGroupName(mode string, newName string, GroupId structs.Identifier) (string, error)
 	//createGroup(GroupId structs.Identifier, User []structs.User, Messages []structs.Message, GroupName string, Photo structs.Photo) error
 
 	//• setMyPhoto
@@ -93,19 +93,19 @@ func New(db *sql.DB) (AppDatabase, error) {
 	var tableName string
 	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='example_table';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
-		
-		userQuery := `CREATE TABLE IF NOT EXIST user (
+
+		userQuery := `CREATE TABLE IF NOT EXISTS user (
 		          UserId VARCHAR(11) NOT NULL PRIMARY KEY,
 		          Username VARCHAR(16) NOT NULL
 	)`
-		messageQuery := `CREATE TABLE IF NOT EXIST message (
+		messageQuery := `CREATE TABLE IF NOT EXISTS message (
 		MessageId VARCHAR(11) NOT NULL PRIMARY KEY,
 		MessageBody TEXT,
 		Date TEXT,
 		UploaderId VARCHAR(11) NOT NULL,
-		FOREIGN KEY (UploaderId) REFERENCES user(UserId),
+		FOREIGN KEY (UploaderId) REFERENCES user(UserId)
 	)`
-		commentQuery := `CREATE TABLE IF NOT EXIST comment (
+		commentQuery := `CREATE TABLE IF NOT EXISTS comment (
 		CommentId VARCHAR(11) NOT NULL PRIMARY KEY,
 		CommentBody TEXT,
 		Date TEXT,
@@ -114,40 +114,40 @@ func New(db *sql.DB) (AppDatabase, error) {
 		FOREIGN KEY (UploaderId) REFERENCES user(UserId),
 		FOREIGN KEY (MessageId) REFERENCES message(MessageId)
 	)`
-		userGroupQuery := `CREATE TABLE IF NOT EXIST usergroup (
+		userGroupQuery := `CREATE TABLE IF NOT EXISTS userGroup (
 		GroupId VARCHAR(11) NOT NULL PRIMARY KEY,
-		UserId VARCHAR(11) NOT NULL PRIMARY KEY,
-		FOREIGN KEY (UserId) REFERENCES user(UserId)
-		FOREIGN KEY (GroupId) REFERENCES group(GroupId)
+		UserId VARCHAR(11) NOT NULL,
+		FOREIGN KEY (UserId) REFERENCES user(UserId),
+		FOREIGN KEY (GroupId) REFERENCES groups(GroupId)
 		
 
 	)`
-		conversationQuery := `CREATE TABLE IF NOT EXIST conversation (
+		conversationQuery := `CREATE TABLE IF NOT EXISTS conversation (
 		UserHosting VARCHAR(11) NOT NULL,
 		UserConnected VARCHAR(11) NOT NULL,
-		PRIMARY KEY (UserHosting, UserConnected)
-		FOREIGN KEY (UserConnected) REFERENCES user(UserId)
+		PRIMARY KEY (UserHosting, UserConnected),
+		FOREIGN KEY (UserConnected) REFERENCES user(UserId),
 		FOREIGN KEY (UserHosting) REFERENCES user(UserId)
 
 	)`
-		photoQuery := `CREATE TABLE IF NOT EXIST photo (
-		PhotoId VARCHAR(11) NOT NULL PRIMARY KEY
-		UploaderId VARCHAR(11) NOT NULL
+		photoQuery := `CREATE TABLE IF NOT EXISTS photo (
+		PhotoId VARCHAR(11) NOT NULL PRIMARY KEY,
+		UploaderId VARCHAR(11) NOT NULL,
 		Date TEXT,
-		PhotoPath TEXT
+		PhotoPath TEXT,
 		FOREIGN KEY (UploaderId) REFERENCES user(UserId)
 	)`
 
-	    groupQuery := `CREATE TABLE IF NOT EXIST group (
+		groupQuery := `CREATE TABLE IF NOT EXISTS groups (
 		GroupId VARCHAR(11) NOT NULL PRIMARY KEY,
-		GroupName VARCHAR(16) NOT NULL,
+		GroupName VARCHAR(16) NOT NULL
 	)`
 
 		err = execQueries(db, userQuery, messageQuery, commentQuery, userGroupQuery, conversationQuery, photoQuery, groupQuery)
 		if err != nil {
-			log.Println("Error creating tables")
+			log.Println("Error creating tables: ", err)
 		}
-		
+
 	}
 
 	return &appdbimpl{

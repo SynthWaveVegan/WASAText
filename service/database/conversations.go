@@ -1,45 +1,46 @@
 package database
 
 import (
-	"errors"
-	"database/sql"
-	"log"
-	"fmt"
+	// "database/sql"
+	// "errors"
+	// "fmt"
 	"github.com/SynthWaveVegan/WASAText/service/structs"
+	"log"
 )
+
 // da capire con conversation id se si può direttamente usare il duo users
-func (db * appdbimpl) getConversation(UserHosting structs.Identifier, UserConnected structs.Identifier) (structs.Conversation, error) {
+func (db *appdbimpl) getConversation(UserHosting structs.Identifier, UserConnected structs.Identifier) (structs.Conversation, error) {
 
-	var thisUserHosting string
-	var thisUserConnected string
+	var thisUserHosting structs.Identifier
+	var thisUserConnected structs.Identifier
 
-	err := db.c.QueryRow(`SELECT (UserHosting, UserConnected) FROM conversation WHERE UserHosting = ? AND UserConnected = ?`UserHosting, UserConnected).Scan(&thisUserHosting, &thisUserConnected)
+	err := db.c.QueryRow(`SELECT (UserHosting, UserConnected) FROM conversation WHERE UserHosting = ? AND UserConnected = ?`, UserHosting, UserConnected).Scan(&thisUserHosting, &thisUserConnected)
 
 	if err != nil {
 		return structs.Conversation{}, err
 	}
-	thisChatName, err := db.getUsername(thisUserConnected)
+	thisChatName, err := db.getUsernamebyId(thisUserConnected)
 	if err != nil {
 		return structs.Conversation{}, err
 	}
-	ChatRetrieved = structs.Conversation {
+	ChatRetrieved := structs.Conversation{
 
-		UserConnected:        thisUserConnected
-		UserHosting:          thisUserHosting
-		ChatName:             thisChatName
+		UserConnected: thisUserConnected,
+		UserHosting:   thisUserHosting,
+		ChatName:      thisChatName,
 	}
 	return ChatRetrieved, nil
 
 }
 
-func (db * appdbimpl) getMyConversations(UserHosting structs.Identifier) ([]structs.Identifier, error) {
+func (db *appdbimpl) getMyConversations(UserHosting structs.Identifier) ([]structs.Identifier, error) {
 
 	var ChatStream []structs.Identifier
 	var UserConnected structs.Identifier
 
-	rows, err := db.Query(`SELECT UserConnected FROM conversation WHERE UserHosting = ?` UserHosting)
+	rows, err := db.c.Query(`SELECT UserConnected FROM conversation WHERE UserHosting = ?`, UserHosting)
 	if err != nil {
-    	log.Fatal(err)
+		log.Fatal(err)
 	}
 	defer rows.Close()
 
@@ -60,7 +61,3 @@ func (db * appdbimpl) getMyConversations(UserHosting structs.Identifier) ([]stru
 	return ChatStream, nil
 
 }
-	
-
-
-
