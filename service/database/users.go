@@ -50,6 +50,7 @@ func (db *appdbimpl) DoLogin(username string) (structs.Identifier, error) {
 	}
 	return structs.Identifier{}, err
 }
+
 func (db *appdbimpl) SetMyUsername(mode string, newName string, userId string) error {
 
 	var counter int
@@ -130,4 +131,9 @@ func (db *appdbimpl) CheckUserExist(username string) (string, bool, error) {
 		return userId, true, nil
 	}
 
+}
+
+func (db *appdbimpl) SetMyPhoto(userId structs.Identifier, photoLink string) error {
+	_, err := db.c.Exec(`UPDATE user SET UserPhoto = ? WHERE Userid = ?`, photoLink, userId)
+	return err
 }

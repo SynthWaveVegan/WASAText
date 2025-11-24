@@ -72,8 +72,8 @@ type AppDatabase interface {
 	SetGroupName(mode string, newName string, GroupId structs.Identifier) (string, error)
 	//createGroup(GroupId structs.Identifier, User []structs.User, Messages []structs.Message, GroupName string, Photo structs.Photo) error
 
-	//• setMyPhoto
-	//• setGroupPhoto
+	SetMyPhoto(userId structs.Identifier, photoLink string) error
+	setGroupPhoto(photoLink string, GroupId structs.Identifier) error
 
 	Ping() error
 }
@@ -96,7 +96,8 @@ func New(db *sql.DB) (AppDatabase, error) {
 
 		userQuery := `CREATE TABLE IF NOT EXISTS user (
 		          UserId VARCHAR(11) NOT NULL PRIMARY KEY,
-		          Username VARCHAR(16) NOT NULL
+		          Username VARCHAR(16) NOT NULL,
+				  UserPhoto TEXT
 	)`
 		messageQuery := `CREATE TABLE IF NOT EXISTS message (
 		MessageId VARCHAR(11) NOT NULL PRIMARY KEY,
@@ -115,8 +116,9 @@ func New(db *sql.DB) (AppDatabase, error) {
 		FOREIGN KEY (MessageId) REFERENCES message(MessageId)
 	)`
 		userGroupQuery := `CREATE TABLE IF NOT EXISTS userGroup (
-		GroupId VARCHAR(11) NOT NULL PRIMARY KEY,
+		GroupId VARCHAR(11) NOT NULL,
 		UserId VARCHAR(11) NOT NULL,
+		PRIMARY KEY (GroupId, UserId),
 		FOREIGN KEY (UserId) REFERENCES user(UserId),
 		FOREIGN KEY (GroupId) REFERENCES groups(GroupId)
 		
@@ -140,7 +142,8 @@ func New(db *sql.DB) (AppDatabase, error) {
 
 		groupQuery := `CREATE TABLE IF NOT EXISTS groups (
 		GroupId VARCHAR(11) NOT NULL PRIMARY KEY,
-		GroupName VARCHAR(16) NOT NULL
+		GroupName VARCHAR(16) NOT NULL,
+		GroupPhoto TEXT
 	)`
 
 		err = execQueries(db, userQuery, messageQuery, commentQuery, userGroupQuery, conversationQuery, photoQuery, groupQuery)

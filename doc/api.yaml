@@ -59,6 +59,8 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
+
+  /groups/{id}/photo:
     put:
       security:
         - bearerAuth: []
@@ -78,7 +80,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "components/schemas/Group/groupPhoto"
+              type: object
+              required: [photoUrl]
+              properties:
+                photoUrl:
+                  type: string
+                  format: uri
+                  minLength: 10
+                  maxLength: 2048
+                  pattern: '^https?://.*$'
+                  description: New photo URL for the Group
       responses:
         "204":
           description: group photo updated succesfully
@@ -152,7 +163,38 @@ paths:
 
 
 
-  /users/{id}/messages:
+  /users/{id}/messages/{id}:
+
+    delete:
+      security:
+        -bearerAuth: []
+      tags:
+        -Message
+      summary: deletes a message
+      description: |-
+        removes a message 
+        of a specific user
+      parameters:
+        name: id
+        in: path
+        required: true
+      operationId: deleteMessage
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Message"
+      responses:
+        "204":
+          description: message removed succesfully
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+
     post:
       security:
         -bearerAuth: []
@@ -213,32 +255,9 @@ paths:
           $ref: "#/components/responses/InternalServerError"
 
 
-    delete:
-      security:
-        -bearerAuth: []
-      tags:
-        -Message
-      summary: deletes a message
-      description: |-
-        removes a message 
-        of a specific user
-      operationId: deleteMessage
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Message"
-      responses:
-        "204":
-          description: message removed succesfully
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "500":
-          $ref: "#/components/responses/InternalServerError"
-        
-  /users/{id}/messages/{id}:
+    
+  /users/{id}/comments/{id}:
+
     post:
       security:
         -bearerAuth: []
@@ -249,6 +268,10 @@ paths:
       description: |-
         add a comment to a 
         message of a specific user
+      parameters:
+        name: id
+        in: path
+        required: true
       operationId: commentMessage
       requestBody:
         content:
@@ -265,7 +288,6 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
-
     delete:
       security:
         -bearerAuth: []
@@ -276,6 +298,10 @@ paths:
       description: |-
         removes a comment to a 
         message of a specific user
+      parameters:
+        name: id
+        in: path
+        required: true
       operationId: uncommentMessage
       requestBody:
         content:
@@ -367,7 +393,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UserName"
+              $ref: "#/components/schemas/User/Username"
 
         required: true
 
@@ -387,6 +413,8 @@ paths:
 
         "500":
           $ref: "#/components/responses/InternalServerError"
+
+          
   /users/{id}:
     put:
       security:
@@ -418,6 +446,8 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
+
+  /users/{id}/photo:
     put:
       security:
         - bearerAuth: []
@@ -437,7 +467,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "components/schemas/User/Photo"
+              type: object
+              required: [photoUrl]
+              properties:
+                photoUrl:
+                  type: string
+                  format: uri
+                  minLength: 10
+                  maxLength: 2048
+                  pattern: '^https?://.*$'
+                  description: New photo URL for the user
       responses:
         "204":
           description: user photo updated succesfully
@@ -594,8 +633,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Message"
-        groupPhoto:
-          $ref: "#/components/schemas/Photo"
+        
 
     Conversation:
       title: conversation

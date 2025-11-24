@@ -159,3 +159,9 @@ func (db *appdbimpl) removeUserFromGroup(GroupId structs.Identifier, UserId stru
 
 	return err
 }
+
+func (db *appdbimpl) setGroupPhoto(photoLink string, GroupId structs.Identifier) error {
+	_, err = db.c.Exec(`UPDATE groups SET GroupPhoto = ? WHERE Groupid = ?`, photoLink, groupId)
+	
+	return err
+}
