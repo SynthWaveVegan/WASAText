@@ -36,19 +36,22 @@ func (db *appdbimpl) checkValidId(checkingId string, startId string) (bool, erro
 	var err error
 	switch startId {
 	case "U":
-		err = db.c.QueryRow(`SELECT COUNT(*) FROM user WHERE userId = ?`, checkingId).Scan(&countCheck)
+		err = db.c.QueryRow(`SELECT COUNT(*) FROM user WHERE UserId = ?`, checkingId).Scan(&countCheck)
+
+	case "S":
+		err = db.c.QueryRow(`SELECT COUNT(*) FROM conversation WHERE ConversationId = ?`, checkingId).Scan(&countCheck)
 
 	case "M":
-		err = db.c.QueryRow(`SELECT COUNT(*) FROM message WHERE messageId = ?`, checkingId).Scan(&countCheck)
+		err = db.c.QueryRow(`SELECT COUNT(*) FROM message WHERE MessageId = ?`, checkingId).Scan(&countCheck)
 
 	case "G":
-		err = db.c.QueryRow(`SELECT COUNT(*) FROM group WHERE groupId = ?`, checkingId).Scan(&countCheck)
+		err = db.c.QueryRow(`SELECT COUNT(*) FROM group WHERE GroupId = ?`, checkingId).Scan(&countCheck)
 
 	case "C":
-		err = db.c.QueryRow(`SELECT COUNT(*) FROM comment WHERE commentId = ?`, checkingId).Scan(&countCheck)
+		err = db.c.QueryRow(`SELECT COUNT(*) FROM comment WHERE CommentId = ?`, checkingId).Scan(&countCheck)
 
 	case "P":
-		err = db.c.QueryRow(`SELECT COUNT(*) FROM photo WHERE photoId = ?`, checkingId).Scan(&countCheck)
+		err = db.c.QueryRow(`SELECT COUNT(*) FROM photo WHERE PhotoId = ?`, checkingId).Scan(&countCheck)
 
 	default:
 		return false, err

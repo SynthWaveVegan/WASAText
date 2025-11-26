@@ -524,7 +524,7 @@ components:
       properties:
         Username:
           type: string
-          example: gruppohd
+          example: filippohd
           pattern: "^[a-z0-9]*?$"
           minLength: 1
           maxLength: 12

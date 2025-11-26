@@ -47,7 +47,7 @@ type AppDatabase interface {
 	//checkValidId(checkingId string, startId string) (bool, error)
 	//checkUserExist(Username string) (string, bool, error)
 
-	getConversation(UserHosting structs.Identifier, UserConnected structs.Identifier) (structs.Conversation, error)
+	getConversation(ConversationId structs.Identifier) (structs.Conversation, error)
 	getMyConversations(UserHosting structs.Identifier) ([]structs.Identifier, error)
 
 	SetMyUsername(mode string, newName string, UserId string) error
@@ -122,12 +122,11 @@ func New(db *sql.DB) (AppDatabase, error) {
 		FOREIGN KEY (UserId) REFERENCES user(UserId),
 		FOREIGN KEY (GroupId) REFERENCES groups(GroupId)
 		
-
 	)`
 		conversationQuery := `CREATE TABLE IF NOT EXISTS conversation (
+		ConversationId VARCHAR(11) NOT NULL PRIMARY KEY,
 		UserHosting VARCHAR(11) NOT NULL,
 		UserConnected VARCHAR(11) NOT NULL,
-		PRIMARY KEY (UserHosting, UserConnected),
 		FOREIGN KEY (UserConnected) REFERENCES user(UserId),
 		FOREIGN KEY (UserHosting) REFERENCES user(UserId)
 

@@ -1,16 +1,16 @@
 package database
 
 import (
-	// "database/sql"
-	// "errors"
+	"database/sql"
+	"errors"
 	// "fmt"
 	"github.com/SynthWaveVegan/WASAText/service/structs"
 	"log"
 	// "tim"
 )
 
-func (db *appdbimpl) insertGroup(GroupId structs.Identifier, GroupName string) error {
-	_, err := db.c.Exec(`INSERT INTO groups (GroupId, GroupName) VALUES (?, ?)`, GroupId, GroupName)
+func (db *appdbimpl) insertGroup(GroupId structs.Identifier, GroupName string, PhotoPath string) error {
+	_, err := db.c.Exec(`INSERT INTO groups (GroupId, GroupName, GroupPhoto) VALUES (?, ?, ?)`, GroupId, GroupName, PhotoPath)
 	return err
 }
 
@@ -43,7 +43,7 @@ func (db *appdbimpl) createGroup(GroupName string, UserId structs.Identifier) (s
 		return structs.Group{}, err
 	}
 
-	err = db.insertGroup(thisGroupId, thisGroupName)
+	err = db.insertGroup(thisGroupId, thisGroupName, "")
 
 	newGroup := structs.Group{
 
@@ -79,7 +79,7 @@ func (db *appdbimpl) SetGroupName(mode string, newName string, GroupId structs.I
 
 		case "New":
 
-			err := db.insertGroup(GroupId, newName)
+			err := db.insertGroup(GroupId, newName, "")
 			return "", err
 
 		case "Update":

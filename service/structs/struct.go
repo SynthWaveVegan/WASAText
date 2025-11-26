@@ -42,7 +42,8 @@ type Group struct {
 }
 
 type Conversation struct {
-	UserConnected Identifier
-	UserHosting   Identifier
-	ChatName      string
+	ConversationId Identifier
+	UserConnected  Identifier
+	UserHosting    Identifier
+	ChatName       string
 }
