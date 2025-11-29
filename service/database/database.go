@@ -68,9 +68,10 @@ type AppDatabase interface {
 	deleteMessage(MessageId structs.Identifier) error
 
 	addToGroup(GroupId structs.Identifier, AddUserId structs.Identifier) error
+	createGroup(GroupName string, UserId structs.Identifier) (structs.Group, error)
 	leaveGroup(GroupId structs.Identifier, UserId structs.Identifier) error
 	SetGroupName(mode string, newName string, GroupId structs.Identifier) (string, error)
-	//createGroup(GroupId structs.Identifier, User []structs.User, Messages []structs.Message, GroupName string, Photo structs.Photo) error
+	createGroup(GroupId structs.Identifier, User []structs.User, Messages []structs.Message, GroupName string, Photo structs.Photo) error
 
 	SetMyPhoto(userId structs.Identifier, photoLink string) error
 	setGroupPhoto(photoLink string, GroupId structs.Identifier) error
@@ -104,6 +105,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 		MessageBody TEXT,
 		Date TEXT,
 		UploaderId VARCHAR(11) NOT NULL,
+		MediaType TEXT,
 		FOREIGN KEY (UploaderId) REFERENCES user(UserId)
 	)`
 		commentQuery := `CREATE TABLE IF NOT EXISTS comment (
@@ -131,13 +133,13 @@ func New(db *sql.DB) (AppDatabase, error) {
 		FOREIGN KEY (UserHosting) REFERENCES user(UserId)
 
 	)`
-		photoQuery := `CREATE TABLE IF NOT EXISTS photo (
+	/*	photoQuery := `CREATE TABLE IF NOT EXISTS photo (
 		PhotoId VARCHAR(11) NOT NULL PRIMARY KEY,
 		UploaderId VARCHAR(11) NOT NULL,
 		Date TEXT,
 		PhotoPath TEXT,
 		FOREIGN KEY (UploaderId) REFERENCES user(UserId)
-	)`
+	)`*/
 
 		groupQuery := `CREATE TABLE IF NOT EXISTS groups (
 		GroupId VARCHAR(11) NOT NULL PRIMARY KEY,
@@ -145,7 +147,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 		GroupPhoto TEXT
 	)`
 
-		err = execQueries(db, userQuery, messageQuery, commentQuery, userGroupQuery, conversationQuery, photoQuery, groupQuery)
+		err = execQueries(db, userQuery, messageQuery, commentQuery, userGroupQuery, conversationQuery, groupQuery)
 		if err != nil {
 			log.Println("Error creating tables: ", err)
 		}

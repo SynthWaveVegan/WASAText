@@ -12,9 +12,9 @@ import (
 
 func (rt * router) SETMYUSERNAME(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	id := ps.ByName("id")
+	userId := ps.ByName("userId")
 
-	if id == "" {
+	if userId == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -29,7 +29,13 @@ func (rt * router) SETMYUSERNAME(w http.ResponseWriter, r *http.Request, ps http
 	}
 	defer r.Body.Close()
 
-	//authorization da mettere
+	authorization := r.Header.Get("Authorization")
+
+	if userId != authorization {
+		w.WriteHeader(http.StatusForbidden)
+		ctx.Logger.Error("user is not allowed")
+		return
+	}
 
 	err := rt.db.SetMyUsername("Update", username, id)
 	if err != nil {

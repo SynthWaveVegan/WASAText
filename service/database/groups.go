@@ -17,6 +17,7 @@ func (db *appdbimpl) insertGroup(GroupId structs.Identifier, GroupName string, P
 func (db *appdbimpl) createGroup(GroupName string, UserId structs.Identifier) (structs.Group, error) {
 
 	var Users []structs.User
+	var Messages []structs.Message
 
 	thisGroupId, err := generateIdentifier("G")
 	if err != nil {
@@ -50,6 +51,7 @@ func (db *appdbimpl) createGroup(GroupName string, UserId structs.Identifier) (s
 		GroupId:   thisGroupId,
 		GroupName: thisGroupName,
 		Users:     Users,
+		Messages:  Messages,
 	}
 
 	return newGroup, nil

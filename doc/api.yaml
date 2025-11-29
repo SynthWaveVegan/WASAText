@@ -161,6 +161,37 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
+  /users/{userId}/group/{groupId}:
+        post:
+          security:
+        -bearerAuth: []
+          tags:
+            -Group
+          summary: add a user to a group
+          description: |-
+            creates a new object
+            user in an existent group
+          parameters:
+
+            - $ref: "#/components/parameters/userId"
+            - $ref: "#/components/parameters/groupId"
+        
+          operationId: addToGroup
+          requestBody:
+            content:
+              application/json:
+                schema: 
+                  $ref: "#/components/schemas/Group"
+          responses:
+            "201":
+              description: group created succesfully
+            "400":
+              $ref: "#/components/responses/BadRequest"
+            "403":
+              $ref: "#/components/responses/Forbidden"
+            "500":
+              $ref: "#/components/responses/InternalServerError"
+
 
 
   /users/{userId}/messages/{messageId}:
@@ -215,7 +246,7 @@ paths:
         content:
           application/json: 
             schema:
-              $ref: "#/components/schemas/Message"
+              $ref: "#/components/schemas/Message" 
       responses:
         "201":
           description: message created succesfully
@@ -225,7 +256,6 @@ paths:
           $ref: "#/components/responses/Forbidden"
         "500":
           $ref: "#/components/responses/InternalServerError"
-
         
     put:
       security:
@@ -450,38 +480,6 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
-  /users/{userId}/group/{groupId}:
-        post:
-          security:
-        -bearerAuth: []
-          tags:
-            -Group
-          summary: add a user to a group
-          description: |-
-            creates a new object
-            user in an existent group
-          parameters:
-
-            - $ref: "#/components/parameters/userId"
-            - $ref: "#/components/parameters/groupId"
-        
-          operationId: addToGroup
-          requestBody:
-            content:
-              application/json:
-                schema: 
-                  $ref: "#/components/schemas/Group"
-          responses:
-            "201":
-              description: group created succesfully
-            "400":
-              $ref: "#/components/responses/BadRequest"
-            "403":
-              $ref: "#/components/responses/Forbidden"
-            "500":
-              $ref: "#/components/responses/InternalServerError"
-
-
   /users/{userId}/photo:
     put:
       security:
@@ -634,6 +632,10 @@ components:
           example: "2021-05-12T09:00:00Z"
           minLength: 20
           maxLength: 20
+        MediaType:
+          type: string
+          enum: [text, photo]
+          description: Type of media in the message
 
     Comment:
       title: comment
@@ -669,10 +671,10 @@ components:
         Path:
           description: position in filesystem for a file
           type: string
-          minLength: 47
-          maxLength: 47
+          minLength: 23
+          maxLength: 99
           pattern: "^.?" 
-          example: "/tmp/WASAText/images/U001011010/P001011010.jpg"
+          example: "/tmp/WASAText/images/P001011010.jpg"
     
     Group:
       title: group
@@ -702,6 +704,8 @@ components:
       description: conversation on the platform
       type: object
       properties:
+        ConversationId:
+          $ref: "#/components/schemas/Identifier"
         UserConnected:
           $ref: "#/components/schemas/Identifier"
         UserHosting:

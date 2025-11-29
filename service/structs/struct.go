@@ -11,7 +11,7 @@ type User struct {
 
 type Message struct {
 	MessageBody string
-	Comments    []Comment
+	Comments    []structs.Comment
 	UploaderId  Identifier
 	MessageId   Identifier
 	Date        string
@@ -29,9 +29,8 @@ type Comment struct {
 type Group struct {
 	GroupId    Identifier
 	GroupName  string
-	Users      []User
-	Messages   []Message
-	GroupPhoto Photo
+	Users      []structs.User
+	Messages   []structs.Message
 }
 
 type Conversation struct {
