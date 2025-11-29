@@ -15,6 +15,7 @@ type Message struct {
 	UploaderId  Identifier
 	MessageId   Identifier
 	Date        string
+	MediaType   string
 }
 
 type Comment struct {
@@ -23,14 +24,6 @@ type Comment struct {
 	CommentBody string
 	Date        string
 	UploaderId  Identifier
-}
-
-type Photo struct {
-	PhotoId    Identifier
-	Path       string
-	UploaderId Identifier
-	Date       string
-	Comments   []Comment
 }
 
 type Group struct {

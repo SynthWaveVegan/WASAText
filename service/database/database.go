@@ -54,8 +54,8 @@ type AppDatabase interface {
 	//CreateUser(Username string, UserId string) error
 	//checkUserExist(Username string) (string, bool, error)
 
-	sendPhoto(file []byte, format string, UploaderId structs.Identifier) (structs.Photo, error)
-	forwardPhoto(OldPhotoId structs.Identifier, UploaderId structs.Identifier) (structs.Photo, error)
+	//sendPhoto(file []byte, format string, UploaderId structs.Identifier) (structs.Photo, error)
+	//forwardPhoto(OldPhotoId structs.Identifier, UploaderId structs.Identifier) (structs.Photo, error)
 	//insertPhoto(PhotoId string, Path string, UploaderId string, Date string) (error)
 
 	//insertMessage(MessageBody string, Comments []structs.Comment, UploaderUserid structs.Identifier, MessageId structs.Identifier, Date string) (error)

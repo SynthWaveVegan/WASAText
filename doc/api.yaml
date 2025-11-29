@@ -27,40 +27,10 @@ tags:
   
 paths:
 
-  /groups/{id}:
 
 
-    put:
-      security:
-        - bearerAuth: []
-      tags:
-        -Group
-      summary: sets the name of the group
-      description: |-
-        sets the name that
-        the group will be seen with
-      parameters:
-        name: id
-        in: path
-        required: true
-      operationId: setGroupName
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "components/schemas/Group/name"
-      responses:
-        "204":
-          description: group name updated succesfully
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "500":
-          $ref: "#/components/responses/InternalServerError"
 
-
-  /groups/{id}/photo:
+  /groups/{groupId}/photo:
     put:
       security:
         - bearerAuth: []
@@ -72,9 +42,9 @@ paths:
         sets the photo that
         the group will be seen with
       parameters:
-        name: id
-        in: path
-        required: true
+        
+        - $ref: "#/components/parameters/groupId"
+
       operationId: setGroupPhoto
       requestBody:
         content:
@@ -101,7 +71,37 @@ paths:
           $ref: "#/components/responses/InternalServerError"
 
     
+  /groups/{groupId}:
 
+
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        -Group
+      summary: sets the name of the group
+      description: |-
+        sets the name that
+        the group will be seen with
+      parameters:
+
+        - $ref: "#/components/parameters/groupId"
+
+      operationId: setGroupName
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "components/schemas/Group/name"
+      responses:
+        "204":
+          description: group name updated succesfully
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
     post:
       security:
@@ -113,10 +113,10 @@ paths:
         creates a new object
         group with one or more users
       parameters:
-        name: id
-        in: path
-        required: true
-      operationId: addToGroup
+
+        - $ref: "#/components/parameters/groupId"
+
+      operationId: createGroup
       requestBody:
         content:
           application/json:
@@ -142,9 +142,9 @@ paths:
       description: |-
         removes the user from a group
       parameters:
-        name: id
-        in: path
-        required: true
+
+        - $ref: "#/components/parameters/groupId"
+        
       operationId: deleteGroup
       requestBody:
         content:
@@ -163,7 +163,7 @@ paths:
 
 
 
-  /users/{id}/messages/{id}:
+  /users/{userId}/messages/{messageId}:
 
     delete:
       security:
@@ -175,9 +175,10 @@ paths:
         removes a message 
         of a specific user
       parameters:
-        name: id
-        in: path
-        required: true
+
+        - $ref: "#/components/parameters/userId"
+        - $ref: "#/components/parameters/messageId"
+        
       operationId: deleteMessage
       requestBody:
         content:
@@ -205,9 +206,10 @@ paths:
         sends a message to a user
         or a group conversation
       parameters:
-        name: id
-        in: path
-        required: true
+
+        - $ref: "#/components/parameters/userId"
+        - $ref: "#/components/parameters/messageId"
+
       operationId: sendMessage
       requestBody:
         content:
@@ -235,9 +237,10 @@ paths:
         sends a message already existent
         to another conversation
       parameters:
-        name: id
-        in: path
-        required: true
+
+        - $ref: "#/components/parameters/userId"
+        - $ref: "#/components/parameters/messageId"
+        
       operationId: forwardMessage
       requestBody:
         content:
@@ -256,7 +259,7 @@ paths:
 
 
     
-  /users/{id}/comments/{id}:
+  /users/{userId}/comments/{commentId}:
 
     post:
       security:
@@ -269,9 +272,9 @@ paths:
         add a comment to a 
         message of a specific user
       parameters:
-        name: id
-        in: path
-        required: true
+        - $ref: "#/components/parameters/userId"
+        - $ref: "#/components/parameters/commentId"
+
       operationId: commentMessage
       requestBody:
         content:
@@ -299,9 +302,10 @@ paths:
         removes a comment to a 
         message of a specific user
       parameters:
-        name: id
-        in: path
-        required: true
+
+        - $ref: "#/components/parameters/userId"
+        - $ref: "#/components/parameters/commentId"
+
       operationId: uncommentMessage
       requestBody:
         content:
@@ -345,7 +349,7 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
     
-  /conversations/{id}:
+  /conversations/{conversationId}:
     get:
       security:
         -bearerAuth: []
@@ -356,9 +360,9 @@ paths:
           finds a specific conversation
           from its id
         parameters:
-          name: id
-          in: path
-          required: true
+
+          - $ref: "#/components/parameters/conversationId"
+
         operationId: getConversation
         requestBody:
           content:
@@ -415,7 +419,7 @@ paths:
           $ref: "#/components/responses/InternalServerError"
 
           
-  /users/{id}:
+  /users/{userId}:
     put:
       security:
         - bearerAuth: []
@@ -426,9 +430,9 @@ paths:
         sets the name that
         the user will be seen with
       parameters:
-        name: id
-        in: path
-        required: true
+
+        - $ref: "#/components/parameters/userId"
+
       operationId: setMyUsername
       requestBody:
         description: creates/changes your own username
@@ -446,8 +450,39 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
+  /users/{userId}/group/{groupId}:
+        post:
+          security:
+        -bearerAuth: []
+          tags:
+            -Group
+          summary: add a user to a group
+          description: |-
+            creates a new object
+            user in an existent group
+          parameters:
 
-  /users/{id}/photo:
+            - $ref: "#/components/parameters/userId"
+            - $ref: "#/components/parameters/groupId"
+        
+          operationId: addToGroup
+          requestBody:
+            content:
+              application/json:
+                schema: 
+                  $ref: "#/components/schemas/Group"
+          responses:
+            "201":
+              description: group created succesfully
+            "400":
+              $ref: "#/components/responses/BadRequest"
+            "403":
+              $ref: "#/components/responses/Forbidden"
+            "500":
+              $ref: "#/components/responses/InternalServerError"
+
+
+  /users/{userId}/photo:
     put:
       security:
         - bearerAuth: []
@@ -459,9 +494,9 @@ paths:
         sets the photo that
         the user will be seen with
       parameters:
-        name: id
-        in: path
-        required: true
+
+        - $ref: "#/components/parameters/userId"
+        
       operationId: setMyPhoto
       requestBody:
         content:
@@ -488,6 +523,48 @@ paths:
           $ref: "#/components/responses/InternalServerError"
 
 components:
+
+  parameters:
+
+    userId:
+      description: identifier for a single user
+      schema:
+        $ref: "#/components/schemas/Identifier"
+      name: userId
+      in: path
+      required: true
+
+    messageId:
+      description: identifier for a single message
+      schema:
+        $ref: "#/components/schemas/Identifier"
+      name: messageId
+      in: path
+      required: true
+
+    commentId:
+      description: identifier for a single comment
+      schema:
+        $ref: "#/components/schemas/Identifier"
+      name: commentId
+      in: path
+      required: true
+
+    groupId:
+      description: identifier for a single group
+      schema:
+        $ref: "#/components/schemas/Identifier"
+      name: groupId
+      in: path
+      required: true
+
+    conversationId:
+      description: identifier for a single conversation
+      schema:
+        $ref: "#/components/schemas/Identifier"
+      name: conversationId
+      in: path
+      required: true
 
   responses:
     
@@ -586,11 +663,9 @@ components:
 
     Photo:
       title: photo
-      description: profile photo of the user
+      description: profile photo of the user or the group
       type: object
       properties:
-        PhotoId: 
-          $ref: "#/components/schemas/Identifier"
         Path:
           description: position in filesystem for a file
           type: string
@@ -598,19 +673,6 @@ components:
           maxLength: 47
           pattern: "^.?" 
           example: "/tmp/WASAText/images/U001011010/P001011010.jpg"
-        UploaderId:
-          $ref: "#/components/schemas/Identifier"
-        Date:
-          type: string
-          format: date-time
-          pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
-          example: "2021-05-12T09:00:00Z"
-          minLength: 20
-          maxLength: 20
-        Comments:
-          type: array
-          items:
-            $ref: "#/components/schemas/Comment"
     
     Group:
       title: group
