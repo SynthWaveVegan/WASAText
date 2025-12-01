@@ -40,6 +40,7 @@ func (rt * router) SENDMESSAGE(w http.ResponseWriter, r *http.Request, ps httpro
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("something went wrong: ", err)
 		return
+	}
 
 	var MessageBody string
 
@@ -59,7 +60,96 @@ func (rt * router) SENDMESSAGE(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(w).Encode(NewMessage)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.Error("something went wrong: ", err)
+	}
+
 	w.WriteHeader(http.StatusCreated)
 	log.Println("Message sent successfully")
 	
+}
+
+func (rt * router) FORWARDMESSAGE(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+
+	userId := ps.ByName("userId")
+	messageId := ps.ByName("messageId")
+
+	if userId == "" || messageId == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		ctx.Logger.Error("something went wrong: ", err)
+		return
+	}
+
+	authorization := r.Header.Get("Authorization")
+
+	if userId != authorization {
+		w.WriteHeader(http.StatusForbidden)
+		ctx.Logger.Error("user is not allowed")
+		return
+	}
+
+	var OldMessageId structs.Identifier
+
+	err := json.NewDecoder(r.Body).Decode(&OldMessageId)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.Error("something went wrong: ", err)
+		return
+
+	}
+	defer r.Body.Close()
+
+	ForwardedMessage, err := rt.db.forwardMessage(OldMessageId, userId)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		ctx.Logger.Error("something went wrong: ", err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(w).Encode(ForwardedMessage)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.Error("something went wrong: ", err)
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	log.Println("Message forwarded successfully")
+
+
+
+	
+}
+
+func (rt * router) DELETEMESSAGE(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+
+	userId := ps.ByName("userId")
+	messageId := ps.ByName("messageId")
+
+	if userId == "" || messageId == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		ctx.Logger.Error("something went wrong: ", err)
+		return
+	}
+
+	authorization := r.Header.Get("Authorization")
+
+	if userId != authorization {
+		w.WriteHeader(http.StatusForbidden)
+		ctx.Logger.Error("user is not allowed")
+		return
+	}
+
+	err := rt.db.deleteMessage(messageId) 
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		ctx.Logger.Error("something went wrong: ", err)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+	log.Println("Message deleted successfully")
 }

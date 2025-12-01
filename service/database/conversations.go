@@ -8,7 +8,7 @@ import (
 	"log"
 )
 
-func (db * appdbimpl) createConversation(UserHosting structs.Identifier, UserConnected structs.Identifier) error {
+func (db * appdbimpl) createConversation(UserHosting structs.Identifier, UserConnected structs.Identifier) (structs.Conversation, error) {
 
 	ConversationId, err := generateIdentifier("S")
 	if err != nil {

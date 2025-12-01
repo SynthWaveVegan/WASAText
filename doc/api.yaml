@@ -92,7 +92,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "components/schemas/Group/name"
+              $ref: "components/schemas/Group/GroupName"
       responses:
         "204":
           description: group name updated succesfully
@@ -132,25 +132,23 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
+  /users/{userId}/group/{groupId}:
 
     delete:
       security:
         -bearerAuth: []
       tags:
         -Group
-      summary: deletes a  group
+      summary: removes a user from a group
       description: |-
-        removes the user from a group
+        removes the group from
+        the user conversations
       parameters:
 
+        - $ref: "#/components/parameters/userId"
         - $ref: "#/components/parameters/groupId"
         
       operationId: deleteGroup
-      requestBody:
-        content:
-          application/json:
-            schema: 
-              $ref: "#/components/schemas/Group"
       responses:
         "204":
           description: group removed succesfully
@@ -161,40 +159,66 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
-  /users/{userId}/group/{groupId}:
-        post:
-          security:
-        -bearerAuth: []
-          tags:
-            -Group
-          summary: add a user to a group
-          description: |-
-            creates a new object
-            user in an existent group
-          parameters:
+      post:
+        security:
+      -bearerAuth: []
+        tags:
+          -Group
+        summary: add a user to a group
+        description: |-
+          creates a new object
+          user in an existent group
+        parameters:
 
-            - $ref: "#/components/parameters/userId"
-            - $ref: "#/components/parameters/groupId"
+          - $ref: "#/components/parameters/userId"
+          - $ref: "#/components/parameters/groupId"
         
-          operationId: addToGroup
-          requestBody:
-            content:
-              application/json:
-                schema: 
-                  $ref: "#/components/schemas/Group"
-          responses:
-            "201":
-              description: group created succesfully
-            "400":
-              $ref: "#/components/responses/BadRequest"
-            "403":
-              $ref: "#/components/responses/Forbidden"
-            "500":
-              $ref: "#/components/responses/InternalServerError"
+        operationId: addToGroup
+        responses:
+          "201":
+            description: group created succesfully
+          "400":
+            $ref: "#/components/responses/BadRequest"
+          "403":
+            $ref: "#/components/responses/Forbidden"
+          "500":
+            $ref: "#/components/responses/InternalServerError"
 
 
+  /users/{userId}/conversations/{conversationId}/messages:
 
-  /users/{userId}/messages/{messageId}:
+    post:
+      security:
+        -bearerAuth: []
+      tags:
+        -Message
+      summary: creates a message in a conversation
+      description: |-
+        sends a message to a user
+        or a group conversation
+      parameters:
+
+        - $ref: "#/components/parameters/userId"
+        - $ref: "#/components/parameters/conversationId"
+
+      operationId: sendMessage
+      requestBody:
+        content:
+          application/json: 
+            schema:
+              $ref: "#/components/schemas/Message" 
+      responses:
+        "201":
+          description: message created succesfully
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+
+  /users/{userId}/conversations/{conversationId}/messages/{messageId}:
 
     delete:
       security:
@@ -209,47 +233,12 @@ paths:
 
         - $ref: "#/components/parameters/userId"
         - $ref: "#/components/parameters/messageId"
+        - $ref: "#/components/parameters/conversationId"
         
       operationId: deleteMessage
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Message"
       responses:
         "204":
           description: message removed succesfully
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "500":
-          $ref: "#/components/responses/InternalServerError"
-
-
-    post:
-      security:
-        -bearerAuth: []
-      tags:
-        -Message
-      summary: creates a message in a conversation
-      description: |-
-        sends a message to a user
-        or a group conversation
-      parameters:
-
-        - $ref: "#/components/parameters/userId"
-        - $ref: "#/components/parameters/messageId"
-
-      operationId: sendMessage
-      requestBody:
-        content:
-          application/json: 
-            schema:
-              $ref: "#/components/schemas/Message" 
-      responses:
-        "201":
-          description: message created succesfully
         "400":
           $ref: "#/components/responses/BadRequest"
         "403":
@@ -278,7 +267,7 @@ paths:
             schema:
               $ref: "#/components/schemas/Message"
       responses:
-        "200":
+        "201":
           description: message forwarded succesfully
         "400":
           $ref: "#/components/responses/BadRequest"
@@ -289,7 +278,7 @@ paths:
 
 
     
-  /users/{userId}/comments/{commentId}:
+  /users/{userId}/messages/{messageId}comments:
 
     post:
       security:
@@ -303,7 +292,7 @@ paths:
         message of a specific user
       parameters:
         - $ref: "#/components/parameters/userId"
-        - $ref: "#/components/parameters/commentId"
+        - $ref: "#/components/parameters/messageId"
 
       operationId: commentMessage
       requestBody:
@@ -321,6 +310,8 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
+  /users/{userId}/messages/{messageId}comments/{commentId}:
+
     delete:
       security:
         -bearerAuth: []
@@ -334,14 +325,10 @@ paths:
       parameters:
 
         - $ref: "#/components/parameters/userId"
+        - $ref: "#/components/parameters/messageId
         - $ref: "#/components/parameters/commentId"
 
       operationId: uncommentMessage
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Comment"
       responses:
         "204":
           description: comment removed succesfully
@@ -352,7 +339,7 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
-  /conversations:
+  /users/{userId}/conversations:
     get:
       security:
         -bearerAuth: []
@@ -362,6 +349,10 @@ paths:
       description: |-
         returns personal stream of conversations
         for the user
+      parameters:
+
+          - $ref: "#/components/parameters/userId"
+
       operationId: getMyConversations
       requestBody:
         content:
@@ -379,7 +370,7 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
     
-  /conversations/{conversationId}:
+  /users/{userId}/conversations/{conversationId}:
     get:
       security:
         -bearerAuth: []
@@ -392,6 +383,7 @@ paths:
         parameters:
 
           - $ref: "#/components/parameters/conversationId"
+          - $ref: "#/components/parameters/userId"
 
         operationId: getConversation
         requestBody:
@@ -402,6 +394,35 @@ paths:
         responses:
         "200":
           description: conversation retrieved succesfully
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    post:
+      security:
+        -bearerAuth: []
+      tags:
+        -Conversation
+      summary: creates a new conversation
+      description: |-
+        generates a new conversation
+        between two users
+      parameters:
+        - $ref: "#/components/parameters/userId"
+        - $ref: "#/components/parameters/conversationId"
+
+      operationId: createConversation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Conversation"
+      responses:
+        "201":
+          description: conversation created succesfully
         "400":
           $ref: "#/components/responses/BadRequest"
         "403":
@@ -469,7 +490,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "components/schemas/Username"
+              $ref: "components/schemas/User/Username"
       responses:
         "204":
           description: username updated succesfully
@@ -575,7 +596,6 @@ components:
       NotFound:
         description: resource not found
 
-    
       InternalServerError:
         description: the server encountered an error while processing the request
 
@@ -661,20 +681,6 @@ components:
           maxLength: 20
         UploaderId:
           $ref: "#/components/schemas/Identifier"
-        
-
-    Photo:
-      title: photo
-      description: profile photo of the user or the group
-      type: object
-      properties:
-        Path:
-          description: position in filesystem for a file
-          type: string
-          minLength: 23
-          maxLength: 99
-          pattern: "^.?" 
-          example: "/tmp/WASAText/images/P001011010.jpg"
     
     Group:
       title: group

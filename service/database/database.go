@@ -49,6 +49,7 @@ type AppDatabase interface {
 
 	getConversation(ConversationId structs.Identifier) (structs.Conversation, error)
 	getMyConversations(UserHosting structs.Identifier) ([]structs.Identifier, error)
+	createConversation(UserHosting structs.Identifier, UserConnected structs.Identifier) (structs.Conversation, error)
 
 	SetMyUsername(mode string, newName string, UserId string) error
 	//CreateUser(Username string, UserId string) error
@@ -61,17 +62,16 @@ type AppDatabase interface {
 	//insertMessage(MessageBody string, Comments []structs.Comment, UploaderUserid structs.Identifier, MessageId structs.Identifier, Date string) (error)
 	sendMessage(MessageBody string, UploaderId structs.Identifier) (structs.Message, error)
 	forwardMessage(OldMessageId structs.Identifier, UploaderId structs.Identifier) (structs.Message, error)
+	deleteMessage(MessageId structs.Identifier) error
 
 	commentMessage(CommentBody string, MessageId structs.Identifier, UploaderId structs.Identifier) (structs.Comment, error)
 	//insertComment(CommentId structs.Identifier, MessageId structs.Identifier, CommentBody string, Date string) error
 	uncommentMessage(CommentId structs.Identifier) error
-	deleteMessage(MessageId structs.Identifier) error
-
+	
 	addToGroup(GroupId structs.Identifier, AddUserId structs.Identifier) error
 	createGroup(GroupName string, UserId structs.Identifier) (structs.Group, error)
 	leaveGroup(GroupId structs.Identifier, UserId structs.Identifier) error
 	SetGroupName(mode string, newName string, GroupId structs.Identifier) (string, error)
-	createGroup(GroupId structs.Identifier, User []structs.User, Messages []structs.Message, GroupName string, Photo structs.Photo) error
 
 	SetMyPhoto(userId structs.Identifier, photoLink string) error
 	setGroupPhoto(photoLink string, GroupId structs.Identifier) error
