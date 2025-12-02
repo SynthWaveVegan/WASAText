@@ -55,7 +55,25 @@ func (rt * router) CREATECONVERSATION(w http.ResponseWriter, r *http.Request, ps
 		return
 	}
 
-	NewConversation, err := rt.db.createConversation(userId, UserConnected structs.Identifier)
+	var UserNameConnected string
+	err := json.NewDecoder(r.Body).Decode(&UserNameConnected)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.Error("something went wrong: ", err)
+		return
+
+	}
+	defer r.Body.Close()
+
+	UserConnected, err := db.getUserIdByName(UserNameConnected)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.Error("something went wrong: ", err)
+		return
+
+	}
+
+	NewConversation, err := rt.db.createConversation(userId, UserConnected)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("something went wrong: ", err)
@@ -74,7 +92,7 @@ func (rt * router) CREATECONVERSATION(w http.ResponseWriter, r *http.Request, ps
 	
 }
 
-func (rt * router) GETMYCONVERSATION(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt * router) GETMYCONVERSATIONS(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	userId := ps.ByName("userId")
 

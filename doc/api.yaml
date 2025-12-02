@@ -259,6 +259,7 @@ paths:
 
         - $ref: "#/components/parameters/userId"
         - $ref: "#/components/parameters/messageId"
+        - $ref: "#/components/parameters/conversationId"
         
       operationId: forwardMessage
       requestBody:

@@ -14,9 +14,9 @@ func (rt * router) SENDMESSAGE(w http.ResponseWriter, r *http.Request, ps httpro
 
 	
 	userId := ps.ByName("userId")
-	messageId := ps.ByName("messageId")
+	conversationId := ps.ByName("conversationId")
 
-	if userId == "" || messageId == "" {
+	if userId == "" || conversationId == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("something went wrong: ", err)
 		return
@@ -76,8 +76,9 @@ func (rt * router) FORWARDMESSAGE(w http.ResponseWriter, r *http.Request, ps htt
 
 	userId := ps.ByName("userId")
 	messageId := ps.ByName("messageId")
+	conversationId := ps.ByName("conversationId")
 
-	if userId == "" || messageId == "" {
+	if userId == "" || messageId == "" || conversationId == ""{
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("something went wrong: ", err)
 		return
@@ -118,9 +119,6 @@ func (rt * router) FORWARDMESSAGE(w http.ResponseWriter, r *http.Request, ps htt
 
 	w.WriteHeader(http.StatusCreated)
 	log.Println("Message forwarded successfully")
-
-
-
 	
 }
 
@@ -128,8 +126,9 @@ func (rt * router) DELETEMESSAGE(w http.ResponseWriter, r *http.Request, ps http
 
 	userId := ps.ByName("userId")
 	messageId := ps.ByName("messageId")
+	conversationId := ps.ByName("conversationId")
 
-	if userId == "" || messageId == "" {
+	if userId == "" || messageId == "" || conversationId == ""{
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("something went wrong: ", err)
 		return
