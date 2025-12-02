@@ -176,7 +176,7 @@ paths:
         operationId: addToGroup
         responses:
           "201":
-            description: group created succesfully
+            description: user added to group succesfully
           "400":
             $ref: "#/components/responses/BadRequest"
           "403":
