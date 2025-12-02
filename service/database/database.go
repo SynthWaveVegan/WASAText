@@ -71,7 +71,7 @@ type AppDatabase interface {
 	addToGroup(GroupId structs.Identifier, AddUserId structs.Identifier) error
 	createGroup(GroupName string, UserId structs.Identifier) (structs.Group, error)
 	leaveGroup(GroupId structs.Identifier, UserId structs.Identifier) error
-	SetGroupName(mode string, newName string, GroupId structs.Identifier) (string, error)
+	setGroupName(mode string, newName string, GroupId structs.Identifier) error
 
 	SetMyPhoto(userId structs.Identifier, photoLink string) error
 	setGroupPhoto(photoLink string, GroupId structs.Identifier) error

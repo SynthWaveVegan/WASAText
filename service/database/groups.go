@@ -38,18 +38,18 @@ func (db *appdbimpl) createGroup(GroupName string, UserId structs.Identifier) (s
 	}
 	Users = append(Users, CreatorUser)
 
-	thisGroupName, err := db.SetGroupName("New", GroupName, thisGroupId)
+	err := db.setGroupName("New", GroupName, thisGroupId)
 
 	if err != nil {
 		return structs.Group{}, err
 	}
 
-	err = db.insertGroup(thisGroupId, thisGroupName, "")
+	err = db.insertGroup(thisGroupId, GroupName, "")
 
 	newGroup := structs.Group{
 
 		GroupId:   thisGroupId,
-		GroupName: thisGroupName,
+		GroupName: GroupName,
 		Users:     Users,
 		Messages:  Messages,
 	}
@@ -58,22 +58,22 @@ func (db *appdbimpl) createGroup(GroupName string, UserId structs.Identifier) (s
 
 }
 
-func (db *appdbimpl) SetGroupName(mode string, newName string, GroupId structs.Identifier) (string, error) {
+func (db *appdbimpl) setGroupName(mode string, newName string, GroupId structs.Identifier) error {
 
 	var counter int
 	validName := checkValidName(newName)
 
 	err := db.c.QueryRow(`SELECT COUNT(*) FROM groups WHERE GroupName = ?`, newName).Scan(&counter)
 	if err != nil {
-		return "", err
+		return err
 	}
 	if counter != 0 {
 		log.Printf("name taken")
-		return "", nil
+		return nil
 	}
 	if validName == false {
 		log.Printf("name invalid")
-		return "", nil
+		return nil
 	}
 	if counter == 0 && validName == true {
 
@@ -82,18 +82,18 @@ func (db *appdbimpl) SetGroupName(mode string, newName string, GroupId structs.I
 		case "New":
 
 			err := db.insertGroup(GroupId, newName, "")
-			return "", err
+			return nil
 
 		case "Update":
 
 			_, err := db.c.Exec(`UPDATE groups SET GroupName = ? WHERE GroupId = ?`, newName, GroupId)
-			return newName, err
+			return nil
 
 		default:
-			return "", err
+			return err
 		}
 	}
-	return "", err
+	return err
 
 }
 
