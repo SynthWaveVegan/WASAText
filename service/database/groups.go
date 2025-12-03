@@ -97,9 +97,27 @@ func (db *appdbimpl) setGroupName(mode string, newName string, GroupId structs.I
 
 }
 
-func (db *appdbimpl) addToGroup(GroupId structs.Identifier, AddUserId structs.Identifier) error {
+func (db *appdbimpl) addToGroup(GroupName string, AddUserId structs.Identifier) error {
 
 	var counter int
+	var checkId bool
+	var GroupId structs.Identifier
+
+	GroupId, checkId, err := db.CheckGroupExist(GroupName)
+	if err != nil {
+		return err
+	}
+	if checkId == false {
+		NewGroup, err := db.createGroup(GroupName, AddUserId)
+		err := db.insertUserinGroup(NewGroup.GroupId, AddUserId)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}
+	
+	
 
 	err := db.c.QueryRow(`SELECT COUNT(*) FROM userGroup WHERE GroupId = ? AND UserId = ?`, GroupId, AddUserId).Scan(&counter)
 
@@ -166,4 +184,22 @@ func (db *appdbimpl) setGroupPhoto(photoLink string, GroupId structs.Identifier)
 	_, err = db.c.Exec(`UPDATE groups SET GroupPhoto = ? WHERE Groupid = ?`, photoLink, groupId)
 	
 	return err
+}
+
+func (db *appdbimpl) CheckGroupExist(Groupname string) (string, bool, error) {
+
+	var GroupId string
+	
+	err := db.c.QueryRow(`SELECT GroupId FROM groups WHERE GroupName = ?`, Groupname).Scan(&GroupId)
+
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return "", false, nil
+		} else {
+			return "", false, err
+		}
+	} else {
+		return GroupId, true, nil
+	}
+
 }

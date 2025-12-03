@@ -103,34 +103,6 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
-    post:
-      security:
-        -bearerAuth: []
-      tags:
-        -Group
-      summary: creates a new group
-      description: |-
-        creates a new object
-        group with one or more users
-      parameters:
-
-        - $ref: "#/components/parameters/groupId"
-
-      operationId: createGroup
-      requestBody:
-        content:
-          application/json:
-            schema: 
-              $ref: "#/components/schemas/Group"
-      responses:
-        "201":
-          description: group created succesfully
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "500":
-          $ref: "#/components/responses/InternalServerError"
 
   /users/{userId}/group/{groupId}:
 
@@ -166,8 +138,8 @@ paths:
           -Group
         summary: add a user to a group
         description: |-
-          creates a new object
-          user in an existent group
+          creates a new group or
+          add a user in an existent one
         parameters:
 
           - $ref: "#/components/parameters/userId"

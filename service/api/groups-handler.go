@@ -12,28 +12,7 @@ import (
 
 func (rt * router) ADDTOGROUP(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	err := rt.db.addToGroup(GroupId structs.Identifier, AddUserId structs.Identifier)
-}
-
-func (rt * router) CREATEGROUP(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-
-	groupId := ps.ByName("groupId")
-	if groupId == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	var GroupName string
-	err := json.NewDecoder(r.Body).Decode(&GroupName)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		ctx.Logger.Error("something went wrong: ", err)
-		return
-
-	}
-	defer r.Body.Close()
-
-	NewGroup, err := rt.db.createGroup(GroupName, UserId structs.Identifier)
+	err := rt.db.addToGroup(GroupName string, AddUserId structs.Identifier)
 }
 
 func (rt * router) LEAVEGROUP(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
