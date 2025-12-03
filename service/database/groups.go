@@ -103,6 +103,11 @@ func (db *appdbimpl) addToGroup(GroupName string, AddUserId structs.Identifier) 
 	var checkId bool
 	var GroupId structs.Identifier
 
+	
+	if err != nil {
+		return err
+	}
+
 	GroupId, checkId, err := db.CheckGroupExist(GroupName)
 	if err != nil {
 		return err
