@@ -8,7 +8,7 @@ import (
 	"log"
 )
 
-func (db * appdbimpl) createConversation(UserHosting structs.Identifier, UserConnected structs.Identifier) (structs.Conversation, error) {
+func (db *appdbimpl) createConversation(UserHosting structs.Identifier, UserConnected structs.Identifier) (structs.Conversation, error) {
 
 	ConversationId, err := generateIdentifier("S")
 	if err != nil {
@@ -62,9 +62,9 @@ func (db *appdbimpl) getConversation(ConversationId structs.Identifier) (structs
 	ChatRetrieved := structs.Conversation{
 
 		ConversationId: ConversationId,
-		UserConnected: thisUserConnected,
-		UserHosting:   thisUserHosting,
-		ChatName:      thisChatName,
+		UserConnected:  thisUserConnected,
+		UserHosting:    thisUserHosting,
+		ChatName:       thisChatName,
 	}
 
 	return ChatRetrieved, nil

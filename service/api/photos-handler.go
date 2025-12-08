@@ -1,16 +1,16 @@
 package api
 
 import (
-	"github.com/SynthWaveVegan/WASAText/service/api/reqcontext"
-	"github.com/julienschmidt/httprouter"
-	"net/http"
-	"github.com/SynthWaveVegan/WASAText/service/structs"
 	"encoding/json"
 	"errors"
+	"github.com/SynthWaveVegan/WASAText/service/api/reqcontext"
+	"github.com/SynthWaveVegan/WASAText/service/structs"
+	"github.com/julienschmidt/httprouter"
 	"log"
+	"net/http"
 )
 
-func (rt * router) SETMYPHOTO(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *router) SETMYPHOTO(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	userId := ps.ByName("userId")
 
@@ -48,9 +48,7 @@ func (rt * router) SETMYPHOTO(w http.ResponseWriter, r *http.Request, ps httprou
 	log.Println("Profile Photo updated successfully")
 }
 
-
-
-func (rt * router) SETGROUPPHOTO(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *router) SETGROUPPHOTO(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	groupId := ps.ByName("groupId")
 

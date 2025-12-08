@@ -1,18 +1,17 @@
 package api
 
 import (
-	"github.com/SynthWaveVegan/WASAText/service/api/reqcontext"
-	"github.com/julienschmidt/httprouter"
-	"net/http"
-	"github.com/SynthWaveVegan/WASAText/service/structs"
 	"encoding/json"
 	"errors"
+	"github.com/SynthWaveVegan/WASAText/service/api/reqcontext"
+	"github.com/SynthWaveVegan/WASAText/service/structs"
+	"github.com/julienschmidt/httprouter"
 	"log"
+	"net/http"
 )
 
-func (rt * router) COMMENTMESSAGE(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *router) COMMENTMESSAGE(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	
 	userId := ps.ByName("userId")
 	messageId := ps.ByName("commentId")
 
@@ -57,16 +56,16 @@ func (rt * router) COMMENTMESSAGE(w http.ResponseWriter, r *http.Request, ps htt
 
 	w.WriteHeader(http.StatusCreated)
 	log.Println("Message commented successfully")
-	
+
 }
 
-func (rt * router) UNCOMMENTMESSAGE(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *router) UNCOMMENTMESSAGE(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	userId := ps.ByName("userId")
 	messageId := ps.ByName("messageId")
 	commentId := ps.ByName("commentId")
 
-	if userId == "" || messageId == "" || commentId == ""{
+	if userId == "" || messageId == "" || commentId == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("something went wrong: ", err)
 		return
@@ -80,7 +79,7 @@ func (rt * router) UNCOMMENTMESSAGE(w http.ResponseWriter, r *http.Request, ps h
 		return
 	}
 
-	err := rt.db.uncommentMessage(commentId) 
+	err := rt.db.uncommentMessage(commentId)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("something went wrong: ", err)

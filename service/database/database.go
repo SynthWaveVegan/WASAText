@@ -67,7 +67,7 @@ type AppDatabase interface {
 	commentMessage(CommentBody string, MessageId structs.Identifier, UploaderId structs.Identifier) (structs.Comment, error)
 	//insertComment(CommentId structs.Identifier, MessageId structs.Identifier, CommentBody string, Date string) error
 	uncommentMessage(CommentId structs.Identifier) error
-	
+
 	addToGroup(GroupName string, AddUserId structs.Identifier) error
 	//createGroup(GroupName string, UserId structs.Identifier) (structs.Group, error)
 	leaveGroup(GroupId structs.Identifier, UserId structs.Identifier) error
@@ -133,13 +133,13 @@ func New(db *sql.DB) (AppDatabase, error) {
 		FOREIGN KEY (UserHosting) REFERENCES user(UserId)
 
 	)`
-	/*	photoQuery := `CREATE TABLE IF NOT EXISTS photo (
-		PhotoId VARCHAR(11) NOT NULL PRIMARY KEY,
-		UploaderId VARCHAR(11) NOT NULL,
-		Date TEXT,
-		PhotoPath TEXT,
-		FOREIGN KEY (UploaderId) REFERENCES user(UserId)
-	)`*/
+		/*	photoQuery := `CREATE TABLE IF NOT EXISTS photo (
+			PhotoId VARCHAR(11) NOT NULL PRIMARY KEY,
+			UploaderId VARCHAR(11) NOT NULL,
+			Date TEXT,
+			PhotoPath TEXT,
+			FOREIGN KEY (UploaderId) REFERENCES user(UserId)
+		)`*/
 
 		groupQuery := `CREATE TABLE IF NOT EXISTS groups (
 		GroupId VARCHAR(11) NOT NULL PRIMARY KEY,

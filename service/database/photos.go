@@ -1,4 +1,6 @@
-/*package database
+package database
+
+/*
 
 import (
 	// "database/sql"
@@ -108,3 +110,5 @@ func (db *appdbimpl) forwardPhoto(OldPhotoId structs.Identifier, UploaderId stru
 	return forwardedPhoto, nil
 
 }
+
+*/

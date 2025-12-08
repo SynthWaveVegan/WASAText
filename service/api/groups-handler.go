@@ -1,16 +1,16 @@
 package api
 
 import (
-	"github.com/SynthWaveVegan/WASAText/service/api/reqcontext"
-	"github.com/julienschmidt/httprouter"
-	"net/http"
-	"github.com/SynthWaveVegan/WASAText/service/structs"
 	"encoding/json"
 	"errors"
+	"github.com/SynthWaveVegan/WASAText/service/api/reqcontext"
+	"github.com/SynthWaveVegan/WASAText/service/structs"
+	"github.com/julienschmidt/httprouter"
 	"log"
+	"net/http"
 )
 
-func (rt * router) ADDTOGROUP(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *router) ADDTOGROUP(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	groupId := ps.ByName("groupId")
 	userId := ps.ByName("userId")
@@ -44,13 +44,12 @@ func (rt * router) ADDTOGROUP(w http.ResponseWriter, r *http.Request, ps httprou
 	log.Println("User added to group successfully")
 }
 
-func (rt * router) LEAVEGROUP(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *router) LEAVEGROUP(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	userId := ps.ByName("userId")
 	groupId := ps.ByName("groupId")
-	
 
-	if userId == "" || groupId == ""{
+	if userId == "" || groupId == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("something went wrong: ", err)
 		return
@@ -64,7 +63,7 @@ func (rt * router) LEAVEGROUP(w http.ResponseWriter, r *http.Request, ps httprou
 		return
 	}
 
-	err := rt.db.leaveGroup(groupid, userId) 
+	err := rt.db.leaveGroup(groupid, userId)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("something went wrong: ", err)
@@ -75,7 +74,7 @@ func (rt * router) LEAVEGROUP(w http.ResponseWriter, r *http.Request, ps httprou
 	log.Println("Group deleted successfully")
 }
 
-func (rt * router) SETGROUPNAME(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *router) SETGROUPNAME(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	groupId := ps.ByName("groupId")
 	if groupId == "" {

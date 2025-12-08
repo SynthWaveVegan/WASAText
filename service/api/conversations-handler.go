@@ -1,16 +1,16 @@
 package api
 
 import (
-	"github.com/SynthWaveVegan/WASAText/service/api/reqcontext"
-	"github.com/julienschmidt/httprouter"
-	"net/http"
-	"github.com/SynthWaveVegan/WASAText/service/structs"
 	"encoding/json"
 	"errors"
+	"github.com/SynthWaveVegan/WASAText/service/api/reqcontext"
+	"github.com/SynthWaveVegan/WASAText/service/structs"
+	"github.com/julienschmidt/httprouter"
 	"log"
+	"net/http"
 )
 
-func (rt * router) GETCONVERSATION(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *router) GETCONVERSATION(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	conversationId := ps.ByName("conversationId")
 
@@ -36,7 +36,7 @@ func (rt * router) GETCONVERSATION(w http.ResponseWriter, r *http.Request, ps ht
 	log.Println("Conversation retrieved successfully")
 }
 
-func (rt * router) CREATECONVERSATION(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *router) CREATECONVERSATION(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	conversationId := ps.ByName("conversationId")
 	userId := ps.ByName("userId")
@@ -89,10 +89,10 @@ func (rt * router) CREATECONVERSATION(w http.ResponseWriter, r *http.Request, ps
 
 	w.WriteHeader(http.StatusCreated)
 	log.Println("Conversation created successfully")
-	
+
 }
 
-func (rt * router) GETMYCONVERSATIONS(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *router) GETMYCONVERSATIONS(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	userId := ps.ByName("userId")
 
@@ -126,5 +126,4 @@ func (rt * router) GETMYCONVERSATIONS(w http.ResponseWriter, r *http.Request, ps
 	w.WriteHeader(http.StatusOK)
 	log.Println("Conversations retrieved successfully")
 
-	
 }

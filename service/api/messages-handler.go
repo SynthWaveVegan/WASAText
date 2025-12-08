@@ -1,18 +1,17 @@
 package api
 
 import (
-	"github.com/SynthWaveVegan/WASAText/service/api/reqcontext"
-	"github.com/julienschmidt/httprouter"
-	"net/http"
-	"github.com/SynthWaveVegan/WASAText/service/structs"
 	"encoding/json"
 	"errors"
+	"github.com/SynthWaveVegan/WASAText/service/api/reqcontext"
+	"github.com/SynthWaveVegan/WASAText/service/structs"
+	"github.com/julienschmidt/httprouter"
 	"log"
+	"net/http"
 )
 
-func (rt * router) SENDMESSAGE(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *router) SENDMESSAGE(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	
 	userId := ps.ByName("userId")
 	conversationId := ps.ByName("conversationId")
 
@@ -36,7 +35,7 @@ func (rt * router) SENDMESSAGE(w http.ResponseWriter, r *http.Request, ps httpro
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("something went wrong: ", err)
 		return
-	} else if MediaType != "Text" && MediaType != "Photo"{
+	} else if MediaType != "Text" && MediaType != "Photo" {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("something went wrong: ", err)
 		return
@@ -69,16 +68,16 @@ func (rt * router) SENDMESSAGE(w http.ResponseWriter, r *http.Request, ps httpro
 
 	w.WriteHeader(http.StatusCreated)
 	log.Println("Message sent successfully")
-	
+
 }
 
-func (rt * router) FORWARDMESSAGE(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *router) FORWARDMESSAGE(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	userId := ps.ByName("userId")
 	messageId := ps.ByName("messageId")
 	conversationId := ps.ByName("conversationId")
 
-	if userId == "" || messageId == "" || conversationId == ""{
+	if userId == "" || messageId == "" || conversationId == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("something went wrong: ", err)
 		return
@@ -119,16 +118,16 @@ func (rt * router) FORWARDMESSAGE(w http.ResponseWriter, r *http.Request, ps htt
 
 	w.WriteHeader(http.StatusCreated)
 	log.Println("Message forwarded successfully")
-	
+
 }
 
-func (rt * router) DELETEMESSAGE(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *router) DELETEMESSAGE(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	userId := ps.ByName("userId")
 	messageId := ps.ByName("messageId")
 	conversationId := ps.ByName("conversationId")
 
-	if userId == "" || messageId == "" || conversationId == ""{
+	if userId == "" || messageId == "" || conversationId == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("something went wrong: ", err)
 		return
@@ -142,7 +141,7 @@ func (rt * router) DELETEMESSAGE(w http.ResponseWriter, r *http.Request, ps http
 		return
 	}
 
-	err := rt.db.deleteMessage(messageId) 
+	err := rt.db.deleteMessage(messageId)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("something went wrong: ", err)

@@ -103,7 +103,6 @@ func (db *appdbimpl) addToGroup(GroupName string, AddUserId structs.Identifier) 
 	var checkId bool
 	var GroupId structs.Identifier
 
-	
 	if err != nil {
 		return err
 	}
@@ -121,8 +120,6 @@ func (db *appdbimpl) addToGroup(GroupName string, AddUserId structs.Identifier) 
 
 		return nil
 	}
-	
-	
 
 	err := db.c.QueryRow(`SELECT COUNT(*) FROM userGroup WHERE GroupId = ? AND UserId = ?`, GroupId, AddUserId).Scan(&counter)
 
@@ -187,14 +184,14 @@ func (db *appdbimpl) removeUserFromGroup(GroupId structs.Identifier, UserId stru
 
 func (db *appdbimpl) setGroupPhoto(photoLink string, GroupId structs.Identifier) error {
 	_, err = db.c.Exec(`UPDATE groups SET GroupPhoto = ? WHERE Groupid = ?`, photoLink, groupId)
-	
+
 	return err
 }
 
 func (db *appdbimpl) CheckGroupExist(Groupname string) (string, bool, error) {
 
 	var GroupId string
-	
+
 	err := db.c.QueryRow(`SELECT GroupId FROM groups WHERE GroupName = ?`, Groupname).Scan(&GroupId)
 
 	if err != nil {

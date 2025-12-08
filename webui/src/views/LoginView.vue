@@ -1,26 +1,6 @@
 <script>
-export default {
-  data() {
-    return {
-      username: ''
-    }
-  },
-  methods: {
-    loadmenu() {
-      if (this.username.trim() !== '') {
-        this.$router.push({ name: 'home', query: { username: this.username } })
-      } else {
-        alert('Please insert your nickname.')
-        this.username = localStorage.setItem('username')
-      }
-      
-    }
-  },
-  mounted() {
-    console.log('Componente montato!')
-		
-	}
-}
+
+
 </script>
 
 <template>

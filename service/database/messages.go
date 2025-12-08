@@ -90,7 +90,7 @@ func (db *appdbimpl) forwardMessage(OldMessageId structs.Identifier, UploaderId 
 		UploaderId:  UploaderId,
 		MessageId:   thisMessageId,
 		Date:        messageDate,
-		MediaType:   MediaType
+		MediaType:   MediaType,
 	}
 
 	return forwardedMessage, nil
