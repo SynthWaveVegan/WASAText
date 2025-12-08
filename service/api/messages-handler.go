@@ -2,7 +2,7 @@ package api
 
 import (
 	"encoding/json"
-	"errors"
+	//"errors"
 	"github.com/SynthWaveVegan/WASAText/service/api/reqcontext"
 	"github.com/SynthWaveVegan/WASAText/service/structs"
 	"github.com/julienschmidt/httprouter"
@@ -56,6 +56,7 @@ func (rt *_router) SENDMESSAGE(w http.ResponseWriter, r *http.Request, ps httpro
 		Id: userId,
 	}
 
+	
 	NewMessage, err := rt.db.SendMessage(MessageBody, UserId, MediaType)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)

@@ -2,7 +2,7 @@ package api
 
 import (
 	"encoding/json"
-	"errors"
+	//"errors"
 	"github.com/SynthWaveVegan/WASAText/service/api/reqcontext"
 	"github.com/SynthWaveVegan/WASAText/service/structs"
 	"github.com/julienschmidt/httprouter"
@@ -37,7 +37,11 @@ func (rt *_router) SETMYPHOTO(w http.ResponseWriter, r *http.Request, ps httprou
 		return
 	}
 
-	err := rt.db.SetMyPhoto(userId, PhotoPath)
+	UserId := structs.Identifier{
+		Id: userId,
+	}
+
+	err = rt.db.SetMyPhoto(UserId, PhotoPath)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("something went wrong: ", err)
@@ -75,7 +79,11 @@ func (rt *_router) SETGROUPPHOTO(w http.ResponseWriter, r *http.Request, ps http
 		return
 	}
 
-	err := rt.db.SetGroupPhoto(PhotoPath, groupId)
+	GroupId := structs.Identifier{
+		Id: groupId,
+	}
+
+	err = rt.db.SetGroupPhoto(PhotoPath, GroupId)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("something went wrong: ", err)

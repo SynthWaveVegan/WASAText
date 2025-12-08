@@ -2,7 +2,7 @@ package api
 
 import (
 	"encoding/json"
-	"errors"
+	//"errors"
 	"github.com/SynthWaveVegan/WASAText/service/api/reqcontext"
 	"github.com/SynthWaveVegan/WASAText/service/structs"
 	"github.com/julienschmidt/httprouter"
