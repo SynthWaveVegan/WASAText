@@ -10,7 +10,7 @@ import (
 	"net/http"
 )
 
-func (rt *router) SETMYPHOTO(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) SETMYPHOTO(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	userId := ps.ByName("userId")
 
@@ -48,7 +48,7 @@ func (rt *router) SETMYPHOTO(w http.ResponseWriter, r *http.Request, ps httprout
 	log.Println("Profile Photo updated successfully")
 }
 
-func (rt *router) SETGROUPPHOTO(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) SETGROUPPHOTO(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	groupId := ps.ByName("groupId")
 

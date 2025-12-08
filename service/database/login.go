@@ -1,11 +1,11 @@
 package database
 
 import (
-	"database/sql"
-	"errors"
+	//"database/sql"
+	//"errors"
 	// "fmt"
 	"github.com/SynthWaveVegan/WASAText/service/structs"
-	"log"
+	//"log"
 )
 
 func (db *appdbimpl) DoLogin(username string) (structs.Identifier, error) {

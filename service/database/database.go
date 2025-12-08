@@ -42,14 +42,14 @@ import (
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
 
-	//TODO
+	
 	DoLogin(Username string) (structs.Identifier, error)
 	//checkValidId(checkingId string, startId string) (bool, error)
 	//checkUserExist(Username string) (string, bool, error)
 
-	getConversation(ConversationId structs.Identifier) (structs.Conversation, error)
-	getMyConversations(UserHosting structs.Identifier) ([]structs.Identifier, error)
-	createConversation(UserHosting structs.Identifier, UserConnected structs.Identifier) (structs.Conversation, error)
+	GetConversation(ConversationId structs.Identifier) (structs.Conversation, error)
+	GetMyConversations(UserHosting structs.Identifier) ([]structs.Identifier, error)
+	CreateConversation(UserHosting structs.Identifier, UserConnectedName string) (structs.Conversation, error)
 
 	SetMyUsername(mode string, newName string, UserId string) error
 	//CreateUser(Username string, UserId string) error
@@ -60,21 +60,23 @@ type AppDatabase interface {
 	//insertPhoto(PhotoId string, Path string, UploaderId string, Date string) (error)
 
 	//insertMessage(MessageBody string, Comments []structs.Comment, UploaderUserid structs.Identifier, MessageId structs.Identifier, Date string) (error)
-	sendMessage(MessageBody string, UploaderId structs.Identifier) (structs.Message, error)
-	forwardMessage(OldMessageId structs.Identifier, UploaderId structs.Identifier) (structs.Message, error)
-	deleteMessage(MessageId structs.Identifier) error
+	SendMessage(MessageBody string, UploaderId structs.Identifier, MediaType string) (structs.Message, error)
+	ForwardMessage(OldMessageId structs.Identifier, UploaderId structs.Identifier) (structs.Message, error)
+	DeleteMessage(MessageId structs.Identifier) error
 
-	commentMessage(CommentBody string, MessageId structs.Identifier, UploaderId structs.Identifier) (structs.Comment, error)
+	CommentMessage(CommentBody string, MessageId structs.Identifier, UploaderId structs.Identifier) (structs.Comment, error)
 	//insertComment(CommentId structs.Identifier, MessageId structs.Identifier, CommentBody string, Date string) error
-	uncommentMessage(CommentId structs.Identifier) error
+	UncommentMessage(CommentId structs.Identifier) error
 
-	addToGroup(GroupName string, AddUserId structs.Identifier) error
+	AddToGroup(GroupName string, AddUserId structs.Identifier) error
 	//createGroup(GroupName string, UserId structs.Identifier) (structs.Group, error)
-	leaveGroup(GroupId structs.Identifier, UserId structs.Identifier) error
-	setGroupName(mode string, newName string, GroupId structs.Identifier) error
+	LeaveGroup(GroupId structs.Identifier, UserId structs.Identifier) error
+	SetGroupName(mode string, newName string, GroupId structs.Identifier) error
 
 	SetMyPhoto(userId structs.Identifier, photoLink string) error
-	setGroupPhoto(photoLink string, GroupId structs.Identifier) error
+	SetGroupPhoto(photoLink string, GroupId structs.Identifier) error
+
+	//GetUserIdByName(Username string) (structs.Identifier, error)
 
 	Ping() error
 }

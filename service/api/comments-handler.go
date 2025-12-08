@@ -10,16 +10,24 @@ import (
 	"net/http"
 )
 
-func (rt *router) COMMENTMESSAGE(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) COMMENTMESSAGE(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	userId := ps.ByName("userId")
-	messageId := ps.ByName("commentId")
+	messageId := ps.ByName("messageId")
 
-	if userId == "" || commentId == "" {
+	if userId == "" || messageId == "" {
 		w.WriteHeader(http.StatusBadRequest)
-		ctx.Logger.Error("something went wrong: ", err)
+		ctx.Logger.Error("no userId or messageId retrieved")
 		return
 	}
+
+	MessageId := structs.Identifier{
+		Id: messageId,
+	}
+	UserId := structs.Identifier{
+		Id: userId,
+	}
+
 
 	authorization := r.Header.Get("Authorization")
 
@@ -40,7 +48,7 @@ func (rt *router) COMMENTMESSAGE(w http.ResponseWriter, r *http.Request, ps http
 	}
 	defer r.Body.Close()
 
-	Newcomment, err := rt.db.commentMessage(CommentBody, messageId, userId)
+	NewComment, err := rt.db.CommentMessage(CommentBody, MessageId, UserId)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("something went wrong: ", err)
@@ -59,7 +67,7 @@ func (rt *router) COMMENTMESSAGE(w http.ResponseWriter, r *http.Request, ps http
 
 }
 
-func (rt *router) UNCOMMENTMESSAGE(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) UNCOMMENTMESSAGE(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	userId := ps.ByName("userId")
 	messageId := ps.ByName("messageId")
@@ -67,7 +75,7 @@ func (rt *router) UNCOMMENTMESSAGE(w http.ResponseWriter, r *http.Request, ps ht
 
 	if userId == "" || messageId == "" || commentId == "" {
 		w.WriteHeader(http.StatusBadRequest)
-		ctx.Logger.Error("something went wrong: ", err)
+		ctx.Logger.Error("no userId or messageId retrieved")
 		return
 	}
 
@@ -78,8 +86,11 @@ func (rt *router) UNCOMMENTMESSAGE(w http.ResponseWriter, r *http.Request, ps ht
 		ctx.Logger.Error("user is not allowed")
 		return
 	}
+	CommentId := structs.Identifier{
+		Id: commentId,
+	}
 
-	err := rt.db.uncommentMessage(commentId)
+	err := rt.db.UncommentMessage(CommentId)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("something went wrong: ", err)

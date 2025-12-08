@@ -10,16 +10,21 @@ import (
 	"net/http"
 )
 
-func (rt *router) GETCONVERSATION(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) GETCONVERSATION(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	conversationId := ps.ByName("conversationId")
 
 	if conversationId == "" {
 		w.WriteHeader(http.StatusBadRequest)
-		ctx.Logger.Error("something went wrong: ", err)
+		ctx.Logger.Error("no conversationid retrieved")
 		return
 	}
-	ThisConversation, err := rt.db.getConversation(conversationId)
+	
+	ConversationId := structs.Identifier{
+		Id: conversationId,
+	}
+
+	ThisConversation, err := rt.db.GetConversation(ConversationId)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("something went wrong: ", err)
@@ -36,14 +41,14 @@ func (rt *router) GETCONVERSATION(w http.ResponseWriter, r *http.Request, ps htt
 	log.Println("Conversation retrieved successfully")
 }
 
-func (rt *router) CREATECONVERSATION(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) CREATECONVERSATION(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	conversationId := ps.ByName("conversationId")
 	userId := ps.ByName("userId")
 
 	if conversationId == "" || userId == "" {
 		w.WriteHeader(http.StatusBadRequest)
-		ctx.Logger.Error("something went wrong: ", err)
+		ctx.Logger.Error("no userId or conversationId retrieved")
 		return
 	}
 
@@ -53,6 +58,10 @@ func (rt *router) CREATECONVERSATION(w http.ResponseWriter, r *http.Request, ps 
 		w.WriteHeader(http.StatusForbidden)
 		ctx.Logger.Error("user is not allowed")
 		return
+	}
+
+	UserId := structs.Identifier{
+		Id: userId,
 	}
 
 	var UserNameConnected string
@@ -65,15 +74,7 @@ func (rt *router) CREATECONVERSATION(w http.ResponseWriter, r *http.Request, ps 
 	}
 	defer r.Body.Close()
 
-	UserConnected, err := db.getUserIdByName(UserNameConnected)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		ctx.Logger.Error("something went wrong: ", err)
-		return
-
-	}
-
-	NewConversation, err := rt.db.createConversation(userId, UserConnected)
+	NewConversation, err := rt.db.CreateConversation(UserId, UserNameConnected)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("something went wrong: ", err)
@@ -92,13 +93,13 @@ func (rt *router) CREATECONVERSATION(w http.ResponseWriter, r *http.Request, ps 
 
 }
 
-func (rt *router) GETMYCONVERSATIONS(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) GETMYCONVERSATIONS(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	userId := ps.ByName("userId")
 
 	if userId == "" {
 		w.WriteHeader(http.StatusBadRequest)
-		ctx.Logger.Error("something went wrong: ", err)
+		ctx.Logger.Error("no userId retrieved")
 		return
 	}
 
@@ -110,7 +111,11 @@ func (rt *router) GETMYCONVERSATIONS(w http.ResponseWriter, r *http.Request, ps 
 		return
 	}
 
-	MyConversations, err := rt.db.getMyConversations(userId)
+	UserId := structs.Identifier{
+		Id: userId,
+	}
+
+	MyConversations, err := rt.db.GetMyConversations(UserId)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("something went wrong: ", err)

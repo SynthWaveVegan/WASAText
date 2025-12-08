@@ -10,7 +10,7 @@ import (
 	"net/http"
 )
 
-func (rt *router) DOLOGIN(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) DOLOGIN(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	var username string
 

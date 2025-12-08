@@ -18,7 +18,7 @@ func (db *appdbimpl) insertComment(CommentId structs.Identifier, MessageId struc
 	return err
 }
 
-func (db *appdbimpl) commentMessage(CommentBody string, MessageId structs.Identifier, UploaderId structs.Identifier) (structs.Comment, error) {
+func (db *appdbimpl) CommentMessage(CommentBody string, MessageId structs.Identifier, UploaderId structs.Identifier) (structs.Comment, error) {
 
 	var thisCommentId structs.Identifier
 	var checkId = false
@@ -54,7 +54,7 @@ func (db *appdbimpl) commentMessage(CommentBody string, MessageId structs.Identi
 
 }
 
-func (db *appdbimpl) uncommentMessage(CommentId structs.Identifier) error {
+func (db *appdbimpl) UncommentMessage(CommentId structs.Identifier) error {
 	_, err := db.c.Exec(`DELETE FROM comment WHERE CommentId = ?`, CommentId)
 	return err
 }

@@ -9,15 +9,6 @@ type User struct {
 	UserId   Identifier
 }
 
-type Message struct {
-	MessageBody string
-	Comments    []structs.Comment
-	UploaderId  Identifier
-	MessageId   Identifier
-	Date        string
-	MediaType   string
-}
-
 type Comment struct {
 	CommentId   Identifier
 	MessageId   Identifier
@@ -26,11 +17,20 @@ type Comment struct {
 	UploaderId  Identifier
 }
 
+type Message struct {
+	MessageBody string
+	Comments    []Comment
+	UploaderId  Identifier
+	MessageId   Identifier
+	Date        string
+	MediaType   string
+}
+
 type Group struct {
 	GroupId    Identifier
 	GroupName  string
-	Users      []structs.User
-	Messages   []structs.Message
+	Users      []User
+	Messages   []Message
 }
 
 type Conversation struct {

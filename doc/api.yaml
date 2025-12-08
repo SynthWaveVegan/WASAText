@@ -45,7 +45,7 @@ paths:
         
         - $ref: "#/components/parameters/groupId"
 
-      operationId: setGroupPhoto
+      operationId: SetGroupPhoto
       requestBody:
         content:
           application/json:
@@ -87,7 +87,7 @@ paths:
 
         - $ref: "#/components/parameters/groupId"
 
-      operationId: setGroupName
+      operationId: SetGroupName
       requestBody:
         content:
           application/json:
@@ -120,7 +120,7 @@ paths:
         - $ref: "#/components/parameters/userId"
         - $ref: "#/components/parameters/groupId"
         
-      operationId: deleteGroup
+      operationId: DeleteGroup
       responses:
         "204":
           description: group removed succesfully
@@ -145,7 +145,7 @@ paths:
           - $ref: "#/components/parameters/userId"
           - $ref: "#/components/parameters/groupId"
         
-        operationId: addToGroup
+        operationId: AddToGroup
         responses:
           "204":
             description: user added to group succesfully
@@ -173,7 +173,7 @@ paths:
         - $ref: "#/components/parameters/userId"
         - $ref: "#/components/parameters/conversationId"
 
-      operationId: sendMessage
+      operationId: SendMessage
       requestBody:
         content:
           application/json: 
@@ -207,7 +207,7 @@ paths:
         - $ref: "#/components/parameters/messageId"
         - $ref: "#/components/parameters/conversationId"
         
-      operationId: deleteMessage
+      operationId: DeleteMessage
       responses:
         "204":
           description: message removed succesfully
@@ -233,7 +233,7 @@ paths:
         - $ref: "#/components/parameters/messageId"
         - $ref: "#/components/parameters/conversationId"
         
-      operationId: forwardMessage
+      operationId: ForwardMessage
       requestBody:
         content:
           application/json: 
@@ -267,7 +267,7 @@ paths:
         - $ref: "#/components/parameters/userId"
         - $ref: "#/components/parameters/messageId"
 
-      operationId: commentMessage
+      operationId: CommentMessage
       requestBody:
         content:
           application/json:
@@ -301,7 +301,7 @@ paths:
         - $ref: "#/components/parameters/messageId
         - $ref: "#/components/parameters/commentId"
 
-      operationId: uncommentMessage
+      operationId: UncommentMessage
       responses:
         "204":
           description: comment removed succesfully
@@ -326,7 +326,7 @@ paths:
 
           - $ref: "#/components/parameters/userId"
 
-      operationId: getMyConversations
+      operationId: GetMyConversations
       requestBody:
         content:
           application/json:
@@ -358,7 +358,7 @@ paths:
           - $ref: "#/components/parameters/conversationId"
           - $ref: "#/components/parameters/userId"
 
-        operationId: getConversation
+        operationId: GetConversation
         requestBody:
           content:
             application/json:
@@ -387,7 +387,7 @@ paths:
         - $ref: "#/components/parameters/userId"
         - $ref: "#/components/parameters/conversationId"
 
-      operationId: createConversation
+      operationId: CreateConversation
       requestBody:
         content:
           application/json:
@@ -415,7 +415,7 @@ paths:
       description: |-
         if the user does not exist it will be created
         else it will be logged in; either way the userId is returned
-      operationId: doLogin
+      operationId: DoLogin
       requestBody:
         description: Username to be used for loggin in
         content:
@@ -457,7 +457,7 @@ paths:
 
         - $ref: "#/components/parameters/userId"
 
-      operationId: setMyUsername
+      operationId: SetMyUsername
       requestBody:
         description: creates/changes your own username
         content:
@@ -489,7 +489,7 @@ paths:
 
         - $ref: "#/components/parameters/userId"
         
-      operationId: setMyPhoto
+      operationId: SetMyPhoto
       requestBody:
         content:
           application/json:

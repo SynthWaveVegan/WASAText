@@ -1,14 +1,14 @@
 package database
 
 import (
-	"database/sql"
-	"errors"
+	//"database/sql"
+	//"errors"
 	// "fmt"
 	"github.com/SynthWaveVegan/WASAText/service/structs"
 	"log"
 )
 
-func (db *appdbimpl) createConversation(UserHosting structs.Identifier, UserConnected structs.Identifier) (structs.Conversation, error) {
+func (db *appdbimpl) CreateConversation(UserHosting structs.Identifier, UserConnectedName string) (structs.Conversation, error) {
 
 	ConversationId, err := generateIdentifier("S")
 	if err != nil {
@@ -22,30 +22,28 @@ func (db *appdbimpl) createConversation(UserHosting structs.Identifier, UserConn
 		return structs.Conversation{}, err
 	}
 
-	var ChatName string
-
-	err = db.c.Query(`SELECT Username FROM user WHERE UserId = ?`, UserConnected).Scan(&ChatName)
+	UserConnected, err := db.GetUserIdByName(UserConnectedName)
 	if err != nil {
 		return structs.Conversation{}, err
 	}
 
-	_, err := db.c.Exec(`INSERT INTO conversation (ConversationId, UserHosting, UserConnected) VALUES (?, ?, ?)`, ConversationId.Id, UserHosting, UserConnected)
+	_, err = db.c.Exec(`INSERT INTO conversation (ConversationId, UserHosting, UserConnected) VALUES (?, ?, ?)`, ConversationId.Id, UserHosting, UserConnected)
 	if err != nil {
 		return structs.Conversation{}, err
 	}
 
 	NewChat := structs.Conversation{
 
-		ConversationId: ConversationId.Id,
+		ConversationId: ConversationId,
 		UserConnected:  UserConnected,
 		UserHosting:    UserHosting,
-		ChatName:       ChatName,
+		ChatName:       UserConnectedName,
 	}
 
 	return NewChat, nil
 }
 
-func (db *appdbimpl) getConversation(ConversationId structs.Identifier) (structs.Conversation, error) {
+func (db *appdbimpl) GetConversation(ConversationId structs.Identifier) (structs.Conversation, error) {
 
 	var thisUserHosting structs.Identifier
 	var thisUserConnected structs.Identifier
@@ -71,7 +69,7 @@ func (db *appdbimpl) getConversation(ConversationId structs.Identifier) (structs
 
 }
 
-func (db *appdbimpl) getMyConversations(UserHosting structs.Identifier) ([]structs.Identifier, error) {
+func (db *appdbimpl) GetMyConversations(UserHosting structs.Identifier) ([]structs.Identifier, error) {
 
 	var ChatStream []structs.Identifier
 	var ConversationId structs.Identifier

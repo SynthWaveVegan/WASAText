@@ -17,7 +17,7 @@ func (db *appdbimpl) insertMessage(MessageBody string, UploaderId structs.Identi
 	return err
 }
 
-func (db *appdbimpl) sendMessage(MessageBody string, UploaderId structs.Identifier, MediaType string) (structs.Message, error) {
+func (db *appdbimpl) SendMessage(MessageBody string, UploaderId structs.Identifier, MediaType string) (structs.Message, error) {
 
 	var thisMessageId structs.Identifier
 	var checkId = false
@@ -49,13 +49,13 @@ func (db *appdbimpl) sendMessage(MessageBody string, UploaderId structs.Identifi
 		UploaderId:  UploaderId,
 		MessageId:   thisMessageId,
 		Date:        messageDate,
-		MediaType:   MediaTypem,
+		MediaType:   MediaType,
 	}
 
 	return newMessage, nil
 }
 
-func (db *appdbimpl) forwardMessage(OldMessageId structs.Identifier, UploaderId structs.Identifier) (structs.Message, error) {
+func (db *appdbimpl) ForwardMessage(OldMessageId structs.Identifier, UploaderId structs.Identifier) (structs.Message, error) {
 
 	var MessageBody string
 	var MediaType string
@@ -96,7 +96,7 @@ func (db *appdbimpl) forwardMessage(OldMessageId structs.Identifier, UploaderId 
 	return forwardedMessage, nil
 }
 
-func (db *appdbimpl) deleteMessage(MessageId structs.Identifier) error {
+func (db *appdbimpl) DeleteMessage(MessageId structs.Identifier) error {
 	_, err := db.c.Exec(`DELETE FROM message WHERE MessageId = ?`, MessageId)
 	return err
 }

@@ -10,10 +10,16 @@ import (
 	"net/http"
 )
 
-func (rt *router) ADDTOGROUP(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) ADDTOGROUP(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	groupId := ps.ByName("groupId")
 	userId := ps.ByName("userId")
+
+	if userId == "" || groupId == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		ctx.Logger.Error("no groupId or userId retrieved")
+		return
+	}
 
 	authorization := r.Header.Get("Authorization")
 
@@ -33,7 +39,11 @@ func (rt *router) ADDTOGROUP(w http.ResponseWriter, r *http.Request, ps httprout
 	}
 	defer r.Body.Close()
 
-	err := rt.db.addToGroup(GroupName, userId)
+	UserId := structs.Identifier{
+		Id: userId,
+	}
+
+	err = rt.db.AddToGroup(GroupName, UserId)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("something went wrong: ", err)
@@ -44,14 +54,14 @@ func (rt *router) ADDTOGROUP(w http.ResponseWriter, r *http.Request, ps httprout
 	log.Println("User added to group successfully")
 }
 
-func (rt *router) LEAVEGROUP(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) LEAVEGROUP(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	userId := ps.ByName("userId")
 	groupId := ps.ByName("groupId")
 
 	if userId == "" || groupId == "" {
 		w.WriteHeader(http.StatusBadRequest)
-		ctx.Logger.Error("something went wrong: ", err)
+		ctx.Logger.Error("no userId or groupId retrieved")
 		return
 	}
 
@@ -63,7 +73,15 @@ func (rt *router) LEAVEGROUP(w http.ResponseWriter, r *http.Request, ps httprout
 		return
 	}
 
-	err := rt.db.leaveGroup(groupid, userId)
+	UserId := structs.Identifier{
+		Id: userId,
+	}
+
+	GroupId := structs.Identifier{
+		Id: groupId,
+	}
+
+	err := rt.db.LeaveGroup(GroupId, UserId)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("something went wrong: ", err)
@@ -74,7 +92,7 @@ func (rt *router) LEAVEGROUP(w http.ResponseWriter, r *http.Request, ps httprout
 	log.Println("Group deleted successfully")
 }
 
-func (rt *router) SETGROUPNAME(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) SETGROUPNAME(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	groupId := ps.ByName("groupId")
 	if groupId == "" {
@@ -92,7 +110,11 @@ func (rt *router) SETGROUPNAME(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 	defer r.Body.Close()
 
-	err := rt.db.setGroupName("Update", GroupName, groupId)
+	GroupId := structs.Identifier{
+		Id: groupId,
+	}
+
+	err = rt.db.SetGroupName("Update", GroupName, GroupId)
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)

@@ -38,7 +38,7 @@ func (db *appdbimpl) createGroup(GroupName string, UserId structs.Identifier) (s
 	}
 	Users = append(Users, CreatorUser)
 
-	err := db.setGroupName("New", GroupName, thisGroupId)
+	err = db.SetGroupName("New", GroupName, thisGroupId)
 
 	if err != nil {
 		return structs.Group{}, err
@@ -58,7 +58,7 @@ func (db *appdbimpl) createGroup(GroupName string, UserId structs.Identifier) (s
 
 }
 
-func (db *appdbimpl) setGroupName(mode string, newName string, GroupId structs.Identifier) error {
+func (db *appdbimpl) SetGroupName(mode string, newName string, GroupId structs.Identifier) error {
 
 	var counter int
 	validName := checkValidName(newName)
@@ -81,12 +81,12 @@ func (db *appdbimpl) setGroupName(mode string, newName string, GroupId structs.I
 
 		case "New":
 
-			err := db.insertGroup(GroupId, newName, "")
+			err = db.insertGroup(GroupId, newName, "")
 			return nil
 
 		case "Update":
 
-			_, err := db.c.Exec(`UPDATE groups SET GroupName = ? WHERE GroupId = ?`, newName, GroupId)
+			_, err = db.c.Exec(`UPDATE groups SET GroupName = ? WHERE GroupId = ?`, newName, GroupId)
 			return nil
 
 		default:
@@ -97,15 +97,13 @@ func (db *appdbimpl) setGroupName(mode string, newName string, GroupId structs.I
 
 }
 
-func (db *appdbimpl) addToGroup(GroupName string, AddUserId structs.Identifier) error {
+func (db *appdbimpl) AddToGroup(GroupName string, AddUserId structs.Identifier) error {
 
 	var counter int
 	var checkId bool
-	var GroupId structs.Identifier
+	var GroupId string
 
-	if err != nil {
-		return err
-	}
+	
 
 	GroupId, checkId, err := db.CheckGroupExist(GroupName)
 	if err != nil {
@@ -113,7 +111,7 @@ func (db *appdbimpl) addToGroup(GroupName string, AddUserId structs.Identifier) 
 	}
 	if checkId == false {
 		NewGroup, err := db.createGroup(GroupName, AddUserId)
-		err := db.insertUserinGroup(NewGroup.GroupId, AddUserId)
+		err = db.insertUserinGroup(NewGroup.GroupId, AddUserId)
 		if err != nil {
 			return err
 		}
@@ -121,7 +119,7 @@ func (db *appdbimpl) addToGroup(GroupName string, AddUserId structs.Identifier) 
 		return nil
 	}
 
-	err := db.c.QueryRow(`SELECT COUNT(*) FROM userGroup WHERE GroupId = ? AND UserId = ?`, GroupId, AddUserId).Scan(&counter)
+	err = db.c.QueryRow(`SELECT COUNT(*) FROM userGroup WHERE GroupId = ? AND UserId = ?`, GroupId, AddUserId).Scan(&counter)
 
 	if err != nil {
 		return err
@@ -132,7 +130,12 @@ func (db *appdbimpl) addToGroup(GroupName string, AddUserId structs.Identifier) 
 	}
 
 	if counter == 0 {
-		err := db.insertUserinGroup(GroupId, AddUserId)
+
+		thisGroupId := structs.Identifier{
+			Id: GroupId,
+		}
+
+		err = db.insertUserinGroup(thisGroupId, AddUserId)
 		if err != nil {
 			return err
 		}
@@ -150,7 +153,7 @@ func (db *appdbimpl) insertUserinGroup(GroupId structs.Identifier, AddUserId str
 	return err
 }
 
-func (db *appdbimpl) leaveGroup(GroupId structs.Identifier, UserId structs.Identifier) error {
+func (db *appdbimpl) LeaveGroup(GroupId structs.Identifier, UserId structs.Identifier) error {
 
 	var counter int
 
@@ -182,8 +185,8 @@ func (db *appdbimpl) removeUserFromGroup(GroupId structs.Identifier, UserId stru
 	return err
 }
 
-func (db *appdbimpl) setGroupPhoto(photoLink string, GroupId structs.Identifier) error {
-	_, err = db.c.Exec(`UPDATE groups SET GroupPhoto = ? WHERE Groupid = ?`, photoLink, groupId)
+func (db *appdbimpl) SetGroupPhoto(photoLink string, GroupId structs.Identifier) error {
+	_, err := db.c.Exec(`UPDATE groups SET GroupPhoto = ? WHERE Groupid = ?`, photoLink, GroupId)
 
 	return err
 }

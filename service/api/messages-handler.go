@@ -10,14 +10,14 @@ import (
 	"net/http"
 )
 
-func (rt *router) SENDMESSAGE(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) SENDMESSAGE(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	userId := ps.ByName("userId")
 	conversationId := ps.ByName("conversationId")
 
 	if userId == "" || conversationId == "" {
 		w.WriteHeader(http.StatusBadRequest)
-		ctx.Logger.Error("something went wrong: ", err)
+		ctx.Logger.Error("no userId or conversationId retrieved")
 		return
 	}
 
@@ -33,11 +33,11 @@ func (rt *router) SENDMESSAGE(w http.ResponseWriter, r *http.Request, ps httprou
 
 	if MediaType == "" {
 		w.WriteHeader(http.StatusBadRequest)
-		ctx.Logger.Error("something went wrong: ", err)
+		ctx.Logger.Error("no mediatype retrieved")
 		return
 	} else if MediaType != "Text" && MediaType != "Photo" {
 		w.WriteHeader(http.StatusBadRequest)
-		ctx.Logger.Error("something went wrong: ", err)
+		ctx.Logger.Error("mediatype not valid for use")
 		return
 	}
 
@@ -52,7 +52,11 @@ func (rt *router) SENDMESSAGE(w http.ResponseWriter, r *http.Request, ps httprou
 	}
 	defer r.Body.Close()
 
-	NewMessage, err := rt.db.sendMessage(MessageBody, userId, MediaType)
+	UserId := structs.Identifier{
+		Id: userId,
+	}
+
+	NewMessage, err := rt.db.SendMessage(MessageBody, UserId, MediaType)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("something went wrong: ", err)
@@ -71,7 +75,7 @@ func (rt *router) SENDMESSAGE(w http.ResponseWriter, r *http.Request, ps httprou
 
 }
 
-func (rt *router) FORWARDMESSAGE(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) FORWARDMESSAGE(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	userId := ps.ByName("userId")
 	messageId := ps.ByName("messageId")
@@ -79,7 +83,7 @@ func (rt *router) FORWARDMESSAGE(w http.ResponseWriter, r *http.Request, ps http
 
 	if userId == "" || messageId == "" || conversationId == "" {
 		w.WriteHeader(http.StatusBadRequest)
-		ctx.Logger.Error("something went wrong: ", err)
+		ctx.Logger.Error("no userId or messageId or conversationId retrieved")
 		return
 	}
 
@@ -102,7 +106,11 @@ func (rt *router) FORWARDMESSAGE(w http.ResponseWriter, r *http.Request, ps http
 	}
 	defer r.Body.Close()
 
-	ForwardedMessage, err := rt.db.forwardMessage(OldMessageId, userId)
+	UserId := structs.Identifier{
+		Id: userId,
+	}
+
+	ForwardedMessage, err := rt.db.ForwardMessage(OldMessageId, UserId)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("something went wrong: ", err)
@@ -121,7 +129,7 @@ func (rt *router) FORWARDMESSAGE(w http.ResponseWriter, r *http.Request, ps http
 
 }
 
-func (rt *router) DELETEMESSAGE(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) DELETEMESSAGE(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	userId := ps.ByName("userId")
 	messageId := ps.ByName("messageId")
@@ -129,7 +137,7 @@ func (rt *router) DELETEMESSAGE(w http.ResponseWriter, r *http.Request, ps httpr
 
 	if userId == "" || messageId == "" || conversationId == "" {
 		w.WriteHeader(http.StatusBadRequest)
-		ctx.Logger.Error("something went wrong: ", err)
+		ctx.Logger.Error("no userId or messageId or conversationid retrieved")
 		return
 	}
 
@@ -141,7 +149,11 @@ func (rt *router) DELETEMESSAGE(w http.ResponseWriter, r *http.Request, ps httpr
 		return
 	}
 
-	err := rt.db.deleteMessage(messageId)
+	MessageId := structs.Identifier{
+		Id: messageId,
+	}
+
+	err := rt.db.DeleteMessage(MessageId)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("something went wrong: ", err)

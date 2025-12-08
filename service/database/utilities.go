@@ -85,11 +85,11 @@ func (db *appdbimpl) getUsernamebyId(UserId structs.Identifier) (string, error) 
 	return username, nil
 }
 
-func (db *appdbimpl) getUserIdByName(Username string) (structs.Identifier, error) {
+func (db *appdbimpl) GetUserIdByName(Username string) (structs.Identifier, error) {
 	var userId structs.Identifier
 	err := db.c.QueryRow(`SELECT UserId FROM user WHERE Username = ?`, Username).Scan(&userId)
 	if err != nil {
-		return "", err
+		return structs.Identifier{}, err
 	}
 	return userId, nil
 }
