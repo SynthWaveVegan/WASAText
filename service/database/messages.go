@@ -9,27 +9,22 @@ import (
 	// "os"
 	// "path/filepath"
 	"time"
+	"context"
 )
 
 func (db *appdbimpl) insertMessage(MessageBody string, UploaderId structs.Identifier, MessageId structs.Identifier, Date string, MediaType string) error {
-	_, err := db.c.Exec(`INSERT INTO message (MessageId, MessageBody,  Date, UploaderId, MediaType) VALUES (?, ?, ?, ?, ?)`, MessageId, MessageBody, Date, UploaderId, MediaType)
+	_, err := db.c.ExecContext(context.Background(),`INSERT INTO message (MessageId, MessageBody,  Date, UploaderId, MediaType) VALUES (?, ?, ?, ?, ?)`, MessageId, MessageBody, Date, UploaderId, MediaType)
 
 	return err
 }
 
 func (db *appdbimpl) SendMessage(MessageBody string, UploaderId structs.Identifier, MediaType string) (structs.Message, error) {
 
-	var thisMessageId structs.Identifier
-	var checkId = false
+	thisMessageId := generateIdentifier("M")
 
-	thisMessageId, err := generateIdentifier("M")
-	if err != nil {
-		return structs.Message{}, err
-	}
+	checkId, err := db.checkValidId(thisMessageId.Id, "M")
 
-	checkId, err = db.checkValidId(thisMessageId.Id, "M")
-
-	if checkId == false {
+	if !checkId {
 		return structs.Message{}, err
 	}
 	if err != nil {
@@ -60,14 +55,11 @@ func (db *appdbimpl) ForwardMessage(OldMessageId structs.Identifier, UploaderId 
 	var MessageBody string
 	var MediaType string
 
-	thisMessageId, err := generateIdentifier("M")
-	if err != nil {
-		return structs.Message{}, err
-	}
+	thisMessageId := generateIdentifier("M")
 
 	checkId, err := db.checkValidId(thisMessageId.Id, "M")
 
-	if checkId == false {
+	if !checkId {
 		return structs.Message{}, err
 	}
 	if err != nil {
@@ -76,8 +68,15 @@ func (db *appdbimpl) ForwardMessage(OldMessageId structs.Identifier, UploaderId 
 
 	messageDate := time.Now().UTC().Format(time.RFC3339)
 
-	err = db.c.QueryRow(`SELECT MessageBody FROM message WHERE MessageId = ?`, OldMessageId).Scan(&MessageBody)
-	err = db.c.QueryRow(`SELECT MediaType FROM message WHERE MessageId = ?`, OldMessageId).Scan(&MediaType)
+	err = db.c.QueryRowContext(context.Background(),`SELECT MessageBody FROM message WHERE MessageId = ?`, OldMessageId).Scan(&MessageBody)
+	if err != nil {
+			return structs.Message{}, err
+		}
+
+	err = db.c.QueryRowContext(context.Background(),`SELECT MediaType FROM message WHERE MessageId = ?`, OldMessageId).Scan(&MediaType)
+	if err != nil {
+			return structs.Message{}, err
+		}
 
 	err = db.insertMessage(MessageBody, UploaderId, thisMessageId, messageDate, MediaType)
 	if err != nil {
@@ -97,6 +96,6 @@ func (db *appdbimpl) ForwardMessage(OldMessageId structs.Identifier, UploaderId 
 }
 
 func (db *appdbimpl) DeleteMessage(MessageId structs.Identifier) error {
-	_, err := db.c.Exec(`DELETE FROM message WHERE MessageId = ?`, MessageId)
+	_, err := db.c.ExecContext(context.Background(),`DELETE FROM message WHERE MessageId = ?`, MessageId)
 	return err
 }

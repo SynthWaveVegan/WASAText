@@ -6,20 +6,19 @@ import (
 	"fmt"
 	"github.com/SynthWaveVegan/WASAText/service/structs"
 	// "log"
-	"math/rand"
-	"time"
+	"crypto/rand"
+    "math/big"
+	"context"
+	
 )
 
 // startId: U(user) M(message) C(conversation) G(group) T(comment) P(photo) E(error)
-func generateIdentifier(startId string) (structs.Identifier, error) {
-
-	const lenght = 9
-
-	rand.Seed(time.Now().UnixNano())
+func generateIdentifier(startId string) structs.Identifier {
 
 	var randomInt string
 	for i := 0; i < 9; i++ {
-		digit := rand.Intn(10)
+		digitBig, _ := rand.Int(rand.Reader, big.NewInt(10))
+		digit := int(digitBig.Int64())
 		randomInt += fmt.Sprintf("%d", digit)
 	}
 
@@ -27,7 +26,7 @@ func generateIdentifier(startId string) (structs.Identifier, error) {
 		Id: ("@" + startId + randomInt),
 	}
 
-	return newId, nil
+	return newId
 }
 
 func (db *appdbimpl) checkValidId(checkingId string, startId string) (bool, error) {
@@ -36,19 +35,19 @@ func (db *appdbimpl) checkValidId(checkingId string, startId string) (bool, erro
 	var err error
 	switch startId {
 	case "U":
-		err = db.c.QueryRow(`SELECT COUNT(*) FROM user WHERE UserId = ?`, checkingId).Scan(&countCheck)
+		err = db.c.QueryRowContext(context.Background(),`SELECT COUNT(*) FROM user WHERE UserId = ?`, checkingId).Scan(&countCheck)
 
 	case "S":
-		err = db.c.QueryRow(`SELECT COUNT(*) FROM conversation WHERE ConversationId = ?`, checkingId).Scan(&countCheck)
+		err = db.c.QueryRowContext(context.Background(),`SELECT COUNT(*) FROM conversation WHERE ConversationId = ?`, checkingId).Scan(&countCheck)
 
 	case "M":
-		err = db.c.QueryRow(`SELECT COUNT(*) FROM message WHERE MessageId = ?`, checkingId).Scan(&countCheck)
+		err = db.c.QueryRowContext(context.Background(),`SELECT COUNT(*) FROM message WHERE MessageId = ?`, checkingId).Scan(&countCheck)
 
 	case "G":
-		err = db.c.QueryRow(`SELECT COUNT(*) FROM group WHERE GroupId = ?`, checkingId).Scan(&countCheck)
+		err = db.c.QueryRowContext(context.Background(),`SELECT COUNT(*) FROM group WHERE GroupId = ?`, checkingId).Scan(&countCheck)
 
 	case "C":
-		err = db.c.QueryRow(`SELECT COUNT(*) FROM comment WHERE CommentId = ?`, checkingId).Scan(&countCheck)
+		err = db.c.QueryRowContext(context.Background(),`SELECT COUNT(*) FROM comment WHERE CommentId = ?`, checkingId).Scan(&countCheck)
 
 	//case "P":
 	//	err = db.c.QueryRow(`SELECT COUNT(*) FROM photo WHERE PhotoId = ?`, checkingId).Scan(&countCheck)
@@ -78,7 +77,7 @@ func checkValidName(checkingName string) bool {
 
 func (db *appdbimpl) getUsernamebyId(UserId structs.Identifier) (string, error) {
 	var username string
-	err := db.c.QueryRow(`SELECT Username FROM user WHERE UserId = ?`, UserId).Scan(&username)
+	err := db.c.QueryRowContext(context.Background(),`SELECT Username FROM user WHERE UserId = ?`, UserId).Scan(&username)
 	if err != nil {
 		return "", err
 	}
@@ -87,7 +86,7 @@ func (db *appdbimpl) getUsernamebyId(UserId structs.Identifier) (string, error) 
 
 func (db *appdbimpl) GetUserIdByName(Username string) (structs.Identifier, error) {
 	var userId structs.Identifier
-	err := db.c.QueryRow(`SELECT UserId FROM user WHERE Username = ?`, Username).Scan(&userId)
+	err := db.c.QueryRowContext(context.Background(),`SELECT UserId FROM user WHERE Username = ?`, Username).Scan(&userId)
 	if err != nil {
 		return structs.Identifier{}, err
 	}

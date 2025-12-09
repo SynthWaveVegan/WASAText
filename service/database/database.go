@@ -37,6 +37,7 @@ import (
 	"github.com/SynthWaveVegan/WASAText/service/structs"
 	"log"
 	// "time"
+	"context"
 )
 
 // AppDatabase is the high level interface for the DB
@@ -94,7 +95,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 
 	// Check if table exists. If not, the database is empty, and we need to create the structure
 	var tableName string
-	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='example_table';`).Scan(&tableName)
+	err := db.QueryRowContext(context.Background(),`SELECT name FROM sqlite_master WHERE type='table' AND name='example_table';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
 
 		userQuery := `CREATE TABLE IF NOT EXISTS user (
@@ -163,7 +164,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 
 func execQueries(db *sql.DB, tables ...string) error {
 	for _, el := range tables {
-		_, err := db.Exec(el)
+		_, err := db.ExecContext(context.Background(), el)
 
 		if err != nil {
 
@@ -173,5 +174,5 @@ func execQueries(db *sql.DB, tables ...string) error {
 	return nil
 }
 func (db *appdbimpl) Ping() error {
-	return db.c.Ping()
+	return db.c.PingContext(context.Background())
 }

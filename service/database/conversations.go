@@ -6,19 +6,18 @@ import (
 	// "fmt"
 	"github.com/SynthWaveVegan/WASAText/service/structs"
 	"log"
+	"context"
 )
 
 func (db *appdbimpl) CreateConversation(UserHosting structs.Identifier, UserConnectedName string) (structs.Conversation, error) {
 
-	ConversationId, err := generateIdentifier("S")
-	if err != nil {
-		return structs.Conversation{}, err
-	}
+	ConversationId := generateIdentifier("S")
+	
 	validId, err := db.checkValidId(ConversationId.Id, "S")
 	if err != nil {
 		return structs.Conversation{}, err
 	}
-	if validId == false {
+	if !validId {
 		return structs.Conversation{}, err
 	}
 
@@ -27,7 +26,7 @@ func (db *appdbimpl) CreateConversation(UserHosting structs.Identifier, UserConn
 		return structs.Conversation{}, err
 	}
 
-	_, err = db.c.Exec(`INSERT INTO conversation (ConversationId, UserHosting, UserConnected) VALUES (?, ?, ?)`, ConversationId.Id, UserHosting, UserConnected)
+	_, err = db.c.ExecContext(context.Background(),`INSERT INTO conversation (ConversationId, UserHosting, UserConnected) VALUES (?, ?, ?)`, ConversationId.Id, UserHosting, UserConnected)
 	if err != nil {
 		return structs.Conversation{}, err
 	}
@@ -48,7 +47,7 @@ func (db *appdbimpl) GetConversation(ConversationId structs.Identifier) (structs
 	var thisUserHosting structs.Identifier
 	var thisUserConnected structs.Identifier
 
-	err := db.c.QueryRow(`SELECT (UserHosting, UserConnected) FROM conversation WHERE ConversationId = ?`, ConversationId).Scan(&thisUserHosting, &thisUserConnected)
+	err := db.c.QueryRowContext(context.Background(),`SELECT (UserHosting, UserConnected) FROM conversation WHERE ConversationId = ?`, ConversationId).Scan(&thisUserHosting, &thisUserConnected)
 	if err != nil {
 		return structs.Conversation{}, err
 	}
@@ -74,7 +73,7 @@ func (db *appdbimpl) GetMyConversations(UserHosting structs.Identifier) ([]struc
 	var ChatStream []structs.Identifier
 	var ConversationId structs.Identifier
 
-	rows, err := db.c.Query(`SELECT ConversationId FROM conversation WHERE UserHosting = ?`, UserHosting)
+	rows, err := db.c.QueryContext(context.Background(),`SELECT ConversationId FROM conversation WHERE UserHosting = ?`, UserHosting)
 	if err != nil {
 		log.Fatal(err)
 	}

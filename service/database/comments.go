@@ -9,26 +9,23 @@ import (
 	// "os"
 	// "path/filepath"
 	"time"
+	"context"
 )
 
 func (db *appdbimpl) insertComment(CommentId structs.Identifier, MessageId structs.Identifier, CommentBody string, Date string, UploaderId structs.Identifier) error {
 
-	_, err := db.c.Exec(`INSERT INTO comment(CommentId, MessageId, CommentBody, Date, UploaderId) VALUES (?, ?, ?, ?, ?)`, CommentId, MessageId, CommentBody, Date, UploaderId)
+	_, err := db.c.ExecContext(context.Background(),`INSERT INTO comment(CommentId, MessageId, CommentBody, Date, UploaderId) VALUES (?, ?, ?, ?, ?)`, CommentId, MessageId, CommentBody, Date, UploaderId)
 
 	return err
 }
 
 func (db *appdbimpl) CommentMessage(CommentBody string, MessageId structs.Identifier, UploaderId structs.Identifier) (structs.Comment, error) {
 
-	var thisCommentId structs.Identifier
-	var checkId = false
 
-	thisCommentId, err := generateIdentifier("C")
-	if err != nil {
-		return structs.Comment{}, err
-	}
-	checkId, err = db.checkValidId(thisCommentId.Id, "C")
-	if checkId == false {
+	thisCommentId := generateIdentifier("C")
+	
+	checkId, err := db.checkValidId(thisCommentId.Id, "C")
+	if !checkId {
 		return structs.Comment{}, err
 	}
 	if err != nil {
@@ -55,6 +52,6 @@ func (db *appdbimpl) CommentMessage(CommentBody string, MessageId structs.Identi
 }
 
 func (db *appdbimpl) UncommentMessage(CommentId structs.Identifier) error {
-	_, err := db.c.Exec(`DELETE FROM comment WHERE CommentId = ?`, CommentId)
+	_, err := db.c.ExecContext(context.Background(),`DELETE FROM comment WHERE CommentId = ?`, CommentId)
 	return err
 }

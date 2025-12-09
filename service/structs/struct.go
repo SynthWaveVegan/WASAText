@@ -1,41 +1,41 @@
 package structs
 
 type Identifier struct {
-	Id string //'json:"Identifier"'
+	Id string   `json:"Identifier"`
 }
 
 type User struct {
-	Username string
-	UserId   Identifier
+	Username string       `json:"Username"`
+	UserId   Identifier   `json:"userId"`
 }
 
 type Comment struct {
-	CommentId   Identifier
-	MessageId   Identifier
-	CommentBody string
-	Date        string
-	UploaderId  Identifier
+	CommentId   Identifier  `json:"commentId"`
+	MessageId   Identifier  `json:"messageId"`
+	CommentBody string      `json:"CommentBody"`
+	Date        string      `json:"Date"`
+	UploaderId  Identifier  `json:"UploaderId"`
 }
 
 type Message struct {
-	MessageBody string
-	Comments    []Comment
-	UploaderId  Identifier
-	MessageId   Identifier
-	Date        string
-	MediaType   string
+	MessageBody string       `json:"MessageBody"`
+	Comments    []Comment    `json:"Comments"`
+	UploaderId  Identifier   `json:"UploaderId"`
+	MessageId   Identifier   `json:"messageId"`
+	Date        string       `json:"Date"`
+	MediaType   string       `json:"MediaType"`
 }
 
 type Group struct {
-	GroupId    Identifier
-	GroupName  string
-	Users      []User
-	Messages   []Message
+	GroupId    Identifier  `json:"groupId"`
+	GroupName  string      `json:"GroupName"`
+	Users      []User      `json:"Users"`
+	Messages   []Message   `json:"Messages"`
 }
 
 type Conversation struct {
-	ConversationId Identifier
-	UserConnected  Identifier
-	UserHosting    Identifier
-	ChatName       string
+	ConversationId Identifier  `json:"conversationId"`
+	UserConnected  Identifier  `json:"UserConnected"`
+	UserHosting    Identifier  `json:"userHosting"`
+	ChatName       string      `json:"ChatName"`
 }

@@ -18,12 +18,12 @@ func (db *appdbimpl) DoLogin(username string) (structs.Identifier, error) {
 	if err != nil {
 		return structs.Identifier{}, err
 	}
-	if checkId == true {
+	if checkId {
 		return structs.Identifier{Id: userId}, nil
 	}
-	if checkId == false {
+	if !checkId {
 
-		newId, err := generateIdentifier("U")
+		newId := generateIdentifier("U")
 
 		newUserId := newId.Id
 
@@ -33,7 +33,7 @@ func (db *appdbimpl) DoLogin(username string) (structs.Identifier, error) {
 
 		validId, err := db.checkValidId(newUserId, "U")
 
-		if validId == false {
+		if !validId {
 			return structs.Identifier{}, err
 		}
 		if err != nil {

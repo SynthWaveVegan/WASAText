@@ -596,7 +596,7 @@ components:
           pattern: "^[a-z0-9]*?$"
           minLength: 1
           maxLength: 12
-        UserId:
+        userId:
           $ref: "#/components/schemas/Identifier"
 
     Message:
@@ -616,7 +616,7 @@ components:
             $ref: "#/components/schemas/Comment"
         UploaderId:
           $ref: "#/components/schemas/Identifier"
-        MessageId:
+        messageId:
           $ref: "#/components/schemas/Identifier"
         Date:
           type: string
@@ -635,9 +635,9 @@ components:
       description: comment of a message
       type: object
       properties:
-        CommentId:
+        commentId:
           $ref: "#/components/schemas/Identifier"
-        MessageId:
+        messageId:
           $ref: "#/components/schemas/Identifier"
         CommentBody:
           type: string
@@ -660,7 +660,7 @@ components:
       description: group conversation of multiple users
       type: object
       properties:
-        GroupId:
+        groupId:
           $ref: "#/components/schemas/Identifier"
         GroupName:
           type: string
@@ -683,7 +683,7 @@ components:
       description: conversation on the platform
       type: object
       properties:
-        ConversationId:
+        conversationId:
           $ref: "#/components/schemas/Identifier"
         UserConnected:
           $ref: "#/components/schemas/Identifier"

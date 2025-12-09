@@ -6,6 +6,7 @@ import (
 	// "fmt"
 	"github.com/SynthWaveVegan/WASAText/service/structs"
 	"log"
+	"context"
 )
 
 func (db *appdbimpl) SetMyUsername(mode string, newName string, userId string) error {
@@ -13,7 +14,7 @@ func (db *appdbimpl) SetMyUsername(mode string, newName string, userId string) e
 	var counter int
 	validName := checkValidName(newName)
 
-	err := db.c.QueryRow(`SELECT COUNT(*) FROM user WHERE Username = ?`, newName).Scan(&counter)
+	err := db.c.QueryRowContext(context.Background(),`SELECT COUNT(*) FROM user WHERE Username = ?`, newName).Scan(&counter)
 	if err != nil {
 		return err
 	}
@@ -21,11 +22,11 @@ func (db *appdbimpl) SetMyUsername(mode string, newName string, userId string) e
 		log.Printf("username taken")
 		return nil
 	}
-	if validName == false {
+	if !validName {
 		log.Printf("username invalid")
 		return nil
 	}
-	if counter == 0 && validName == true {
+	if counter == 0 && validName {
 
 		switch mode {
 
@@ -36,7 +37,7 @@ func (db *appdbimpl) SetMyUsername(mode string, newName string, userId string) e
 
 		case "Update":
 
-			_, err := db.c.Exec(`UPDATE user SET Username = ? WHERE UserId = ?`, newName, userId)
+			_, err := db.c.ExecContext(context.Background(),`UPDATE user SET Username = ? WHERE UserId = ?`, newName, userId)
 			return err
 
 		default:
@@ -48,13 +49,13 @@ func (db *appdbimpl) SetMyUsername(mode string, newName string, userId string) e
 }
 
 func (db *appdbimpl) CreateUser(username string, userId string, UserPhoto string) error {
-	_, err := db.c.Exec(`INSERT INTO user (UserId, Username, UserPhoto) VALUES (?, ?, ?)`, userId, username, UserPhoto)
+	_, err := db.c.ExecContext(context.Background(),`INSERT INTO user (UserId, Username, UserPhoto) VALUES (?, ?, ?)`, userId, username, UserPhoto)
 	return err
 }
 
 func (db *appdbimpl) GetUser(UserId structs.Identifier) (structs.User, error) {
 	var username string
-	err := db.c.QueryRow(`SELECT Username FROM user WHERE UserId = ?`, UserId).Scan(&username)
+	err := db.c.QueryRowContext(context.Background(),`SELECT Username FROM user WHERE UserId = ?`, UserId).Scan(&username)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return structs.User{}, err
@@ -76,7 +77,7 @@ func (db *appdbimpl) CheckUserExist(username string) (string, bool, error) {
 
 	var userId string
 	//questo controlla se esiste username nella table user e ritorna il corrispondente userId
-	err := db.c.QueryRow(`SELECT UserId FROM user WHERE Username = ?`, username).Scan(&userId)
+	err := db.c.QueryRowContext(context.Background(),`SELECT UserId FROM user WHERE Username = ?`, username).Scan(&userId)
 
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -91,6 +92,6 @@ func (db *appdbimpl) CheckUserExist(username string) (string, bool, error) {
 }
 
 func (db *appdbimpl) SetMyPhoto(userId structs.Identifier, photoLink string) error {
-	_, err := db.c.Exec(`UPDATE user SET UserPhoto = ? WHERE Userid = ?`, photoLink, userId)
+	_, err := db.c.ExecContext(context.Background(),`UPDATE user SET UserPhoto = ? WHERE Userid = ?`, photoLink, userId)
 	return err
 }

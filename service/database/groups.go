@@ -6,11 +6,11 @@ import (
 	// "fmt"
 	"github.com/SynthWaveVegan/WASAText/service/structs"
 	"log"
-	// "tim"
+	"context"
 )
 
 func (db *appdbimpl) insertGroup(GroupId structs.Identifier, GroupName string, PhotoPath string) error {
-	_, err := db.c.Exec(`INSERT INTO groups (GroupId, GroupName, GroupPhoto) VALUES (?, ?, ?)`, GroupId, GroupName, PhotoPath)
+	_, err := db.c.ExecContext(context.Background(),`INSERT INTO groups (GroupId, GroupName, GroupPhoto) VALUES (?, ?, ?)`, GroupId, GroupName, PhotoPath)
 	return err
 }
 
@@ -19,16 +19,13 @@ func (db *appdbimpl) createGroup(GroupName string, UserId structs.Identifier) (s
 	var Users []structs.User
 	var Messages []structs.Message
 
-	thisGroupId, err := generateIdentifier("G")
-	if err != nil {
-		return structs.Group{}, err
-	}
+	thisGroupId  := generateIdentifier("G")
 
 	validId, err := db.checkValidId(thisGroupId.Id, "G")
 	if err != nil {
 		return structs.Group{}, err
 	}
-	if validId == false {
+	if !validId {
 		return structs.Group{}, err
 	}
 
@@ -39,12 +36,14 @@ func (db *appdbimpl) createGroup(GroupName string, UserId structs.Identifier) (s
 	Users = append(Users, CreatorUser)
 
 	err = db.SetGroupName("New", GroupName, thisGroupId)
-
 	if err != nil {
 		return structs.Group{}, err
 	}
 
 	err = db.insertGroup(thisGroupId, GroupName, "")
+	if err != nil {
+		return structs.Group{}, err
+	}
 
 	newGroup := structs.Group{
 
@@ -63,7 +62,7 @@ func (db *appdbimpl) SetGroupName(mode string, newName string, GroupId structs.I
 	var counter int
 	validName := checkValidName(newName)
 
-	err := db.c.QueryRow(`SELECT COUNT(*) FROM groups WHERE GroupName = ?`, newName).Scan(&counter)
+	err := db.c.QueryRowContext(context.Background(),`SELECT COUNT(*) FROM groups WHERE GroupName = ?`, newName).Scan(&counter)
 	if err != nil {
 		return err
 	}
@@ -71,22 +70,28 @@ func (db *appdbimpl) SetGroupName(mode string, newName string, GroupId structs.I
 		log.Printf("name taken")
 		return nil
 	}
-	if validName == false {
+	if !validName {
 		log.Printf("name invalid")
 		return nil
 	}
-	if counter == 0 && validName == true {
+	if counter == 0 && validName {
 
 		switch mode {
 
 		case "New":
 
 			err = db.insertGroup(GroupId, newName, "")
+			if err != nil {
+				return err
+			}
 			return nil
 
 		case "Update":
 
-			_, err = db.c.Exec(`UPDATE groups SET GroupName = ? WHERE GroupId = ?`, newName, GroupId)
+			_, err = db.c.ExecContext(context.Background(),`UPDATE groups SET GroupName = ? WHERE GroupId = ?`, newName, GroupId)
+			if err != nil {
+				return err
+			}
 			return nil
 
 		default:
@@ -109,8 +114,12 @@ func (db *appdbimpl) AddToGroup(GroupName string, AddUserId structs.Identifier) 
 	if err != nil {
 		return err
 	}
-	if checkId == false {
+	if !checkId {
 		NewGroup, err := db.createGroup(GroupName, AddUserId)
+		if err != nil {
+			return err
+		}
+
 		err = db.insertUserinGroup(NewGroup.GroupId, AddUserId)
 		if err != nil {
 			return err
@@ -119,7 +128,7 @@ func (db *appdbimpl) AddToGroup(GroupName string, AddUserId structs.Identifier) 
 		return nil
 	}
 
-	err = db.c.QueryRow(`SELECT COUNT(*) FROM userGroup WHERE GroupId = ? AND UserId = ?`, GroupId, AddUserId).Scan(&counter)
+	err = db.c.QueryRowContext(context.Background(),`SELECT COUNT(*) FROM userGroup WHERE GroupId = ? AND UserId = ?`, GroupId, AddUserId).Scan(&counter)
 
 	if err != nil {
 		return err
@@ -148,7 +157,7 @@ func (db *appdbimpl) AddToGroup(GroupName string, AddUserId structs.Identifier) 
 
 func (db *appdbimpl) insertUserinGroup(GroupId structs.Identifier, AddUserId structs.Identifier) error {
 
-	_, err := db.c.Exec(`INSERT INTO userGroup (GroupId, UserId) VALUES (?, ?)`, GroupId, AddUserId)
+	_, err := db.c.ExecContext(context.Background(),`INSERT INTO userGroup (GroupId, UserId) VALUES (?, ?)`, GroupId, AddUserId)
 
 	return err
 }
@@ -157,7 +166,7 @@ func (db *appdbimpl) LeaveGroup(GroupId structs.Identifier, UserId structs.Ident
 
 	var counter int
 
-	err := db.c.QueryRow(`SELECT COUNT(*) FROM userGroup WHERE GroupId = ? AND UserId = ?`, GroupId, UserId).Scan(&counter)
+	err := db.c.QueryRowContext(context.Background(),`SELECT COUNT(*) FROM userGroup WHERE GroupId = ? AND UserId = ?`, GroupId, UserId).Scan(&counter)
 
 	if err != nil {
 		return err
@@ -180,13 +189,13 @@ func (db *appdbimpl) LeaveGroup(GroupId structs.Identifier, UserId structs.Ident
 }
 
 func (db *appdbimpl) removeUserFromGroup(GroupId structs.Identifier, UserId structs.Identifier) error {
-	_, err := db.c.Exec(`DELETE FROM userGroup WHERE GroupId = ? AND UserId = ?`, GroupId, UserId)
+	_, err := db.c.ExecContext(context.Background(),`DELETE FROM userGroup WHERE GroupId = ? AND UserId = ?`, GroupId, UserId)
 
 	return err
 }
 
 func (db *appdbimpl) SetGroupPhoto(photoLink string, GroupId structs.Identifier) error {
-	_, err := db.c.Exec(`UPDATE groups SET GroupPhoto = ? WHERE Groupid = ?`, photoLink, GroupId)
+	_, err := db.c.ExecContext(context.Background(),`UPDATE groups SET GroupPhoto = ? WHERE Groupid = ?`, photoLink, GroupId)
 
 	return err
 }
@@ -195,7 +204,7 @@ func (db *appdbimpl) CheckGroupExist(Groupname string) (string, bool, error) {
 
 	var GroupId string
 
-	err := db.c.QueryRow(`SELECT GroupId FROM groups WHERE GroupName = ?`, Groupname).Scan(&GroupId)
+	err := db.c.QueryRowContext(context.Background(),`SELECT GroupId FROM groups WHERE GroupName = ?`, Groupname).Scan(&GroupId)
 
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
