@@ -641,10 +641,9 @@ components:
           $ref: "#/components/schemas/Identifier"
         CommentBody:
           type: string
-          example: ciao
           pattern: "^[a-z0-9]*?$"
           minLenght: 1
-          maxLenght: 50
+          maxLenght: 1
         Date:
           type: string
           format: date-time
