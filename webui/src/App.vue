@@ -31,7 +31,7 @@ export default {}
 					<ul class="nav flex-column">
 						
 						<li class="nav-item">
-							<RouterLink to="/link2" class="nav-link">
+							<RouterLink to="/profile" class="nav-link">
 								<svg class="feather"><use href="/feather-sprite-v4.29.0.svg#layout"/></svg>
 								Profile
 							</RouterLink>
@@ -39,7 +39,7 @@ export default {}
 						<li class="nav-item">
 							<RouterLink to="/link2" class="nav-link">
 								<svg class="feather"><use href="/feather-sprite-v4.29.0.svg#key"/></svg>
-								Menu item 2
+								Search
 							</RouterLink>
 						</li>
 					</ul>

@@ -1,18 +1,20 @@
 <script>
-export default {
-    data() {
-    return {
-      username: ''
-    }
-  },
-  methods: {
+import { ref, onMounted } from 'vue';
 
-  },
-  mounted() {
-    this.username = localStorage.getItem('username')
+export default {
+  setup() {
+    const username = ref('');
+
+    onMounted(() => {
+      username.value = localStorage.getItem('username');
+    });
+
+    return {
+      username
+    };
   }
 }
-</script> 
+</script>
 
 <template>
     <div>
