@@ -14,7 +14,6 @@ func (db *appdbimpl) DoLogin(username string) (structs.Identifier, error) {
 	var userId string
 
 	userId, checkId, err := db.CheckUserExist(username)
-
 	if err != nil {
 		return structs.Identifier{}, err
 	}
@@ -24,21 +23,23 @@ func (db *appdbimpl) DoLogin(username string) (structs.Identifier, error) {
 	if !checkId {
 
 		newId := generateIdentifier("U")
-
-		newUserId := newId.Id
-
 		if err != nil {
 			return structs.Identifier{}, err
 		}
 
+		newUserId := newId.Id
+
+		
+
 		validId, err := db.checkValidId(newUserId, "U")
+		if err != nil {
+			return structs.Identifier{}, err
+		}
 
 		if !validId {
 			return structs.Identifier{}, err
 		}
-		if err != nil {
-			return structs.Identifier{}, err
-		}
+		
 
 		err = db.SetMyUsername("New", username, newUserId)
 		if err != nil {

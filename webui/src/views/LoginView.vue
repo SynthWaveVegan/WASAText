@@ -1,66 +1,46 @@
 <script setup>
-  import ErrorMsg from '../components/ErrorMsg.vue'
-  import {useRouter} from 'vue-router'
-  import axios from '../services/axios.js'
-  import {ref} from 'vue' 
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import axios from '../services/axios.js'
 
-  const router = useRouter();
+const router = useRouter()
 
-  const User = ref({
-    Username: '',
-    UserId: ''
-  })
+const User = ref({
+  Username: '',
+  UserId: ''
+})
 
-  const Authorization = ref(null)
-  
-  
-  const doLogin = async () => {
+const doLogin = async () => {
+  try {
+    //  LOGIN SENZA Authorization
+    const response = await axios.post('/login', {
+      Username: User.value.Username
+    })
 
-    try {
-      
-      const response = await axios.post('/login', {
-        Username: User.Username
-      });
-      const config = {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }
-      
-      User.UserId = response.data.Identifier
+    //  Salvo l’ID ricevuto
+    User.value.UserId = response.data.Identifier
 
-      localStorage.setItem('userId', User.UserId);
-      localStorage.setItem('username', User.Username);
-      localStorage.setItem('Authorization', `Bearer ${User.UserId}`);
+    localStorage.setItem('userId', User.value.UserId)
+    localStorage.setItem('username', User.value.Username)
 
-      router.push("/home")
+    //  Imposto Authorization SOLO DOPO il login
+    axios.defaults.headers.common['Authorization'] = User.value.UserId
 
-      axios.defaults.headers['Authorization'] = `Bearer ${User.UserId}`;
-
-    } catch (e) {
-      console.error(e)
-      alert('Errore durante il login: ' + e.message)
-    }
-  };
-  //const doLogin = () => {
-    
-    //router.push("/home")
-  //}
-
-  
-  
-
+    router.push('/home')
+  } catch (e) {
+    console.error(e)
+    alert('Errore durante il login: ' + e.message)
+  }
+}
 </script>
 
 <template>
   <div class="text-center">
-    <div class="text-center">Login</div>
+    <div>Login</div>
     <input v-model="User.Username" placeholder="Type here" />
-    <button type="button" class="btn btn-primary" @click="doLogin">Go</button>
+    <button class="btn btn-primary" @click="doLogin">Go</button>
   </div>
 </template>
-
-
 
 <style>
 </style>
