@@ -15,16 +15,18 @@ const doLogin = async () => {
     //  LOGIN SENZA Authorization
     const response = await axios.post('/login', {
       Username: User.value.Username
-    })
+      }, { headers: {
+        'Content-Type': 'application/json',
+      }})
 
     //  Salvo l’ID ricevuto
     User.value.UserId = response.data.Identifier
 
-    localStorage.setItem('userId', User.value.UserId)
-    localStorage.setItem('username', User.value.Username)
+    localStorage.setItem('userId', User.UserId)
+    localStorage.setItem('username', User.Username)
 
     //  Imposto Authorization SOLO DOPO il login
-    axios.defaults.headers.common['Authorization'] = User.value.UserId
+    axios.defaults.headers.common['Authorization'] = User.UserId
 
     router.push('/home')
   } catch (e) {

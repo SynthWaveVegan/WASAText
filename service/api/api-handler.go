@@ -23,8 +23,8 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.DELETE("/users/{userId}/conversations/{conversationId}/messages/{messageId}", rt.wrap(rt.DELETEMESSAGE))
 	rt.router.PUT("/users/{userId}/conversations/{conversationId}/messages/{messageId}", rt.wrap(rt.FORWARDMESSAGE))
 
-	rt.router.POST("/users/{userId}/messages/{messageId}comments", rt.wrap(rt.COMMENTMESSAGE))
-	rt.router.DELETE("/users/{userId}/messages/{messageId}comments/{commentId}", rt.wrap(rt.UNCOMMENTMESSAGE))
+	rt.router.POST("/users/{userId}/messages/{messageId}/comments", rt.wrap(rt.COMMENTMESSAGE))
+	rt.router.DELETE("/users/{userId}/messages/{messageId}/comments/{commentId}", rt.wrap(rt.UNCOMMENTMESSAGE))
 
 	rt.router.GET("/users/{userId}/conversations", rt.wrap(rt.GETMYCONVERSATIONS))
 	rt.router.GET("/users/{userId}/conversations/{conversationId}", rt.wrap(rt.GETCONVERSATION))

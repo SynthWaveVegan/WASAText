@@ -4,17 +4,17 @@ import (
 	"encoding/json"
 	//"errors"
 	"github.com/SynthWaveVegan/WASAText/service/api/reqcontext"
-	//"github.com/SynthWaveVegan/WASAText/service/structs"
+	"github.com/SynthWaveVegan/WASAText/service/structs"
 	"github.com/julienschmidt/httprouter"
-	"log"
+	//"log"
 	"net/http"
 )
 
 func (rt *_router) DOLOGIN(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	var username string
+	var user structs.User
 
-	err := json.NewDecoder(r.Body).Decode(&username)
+	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.Error("something went wrong: ", err)
@@ -23,7 +23,10 @@ func (rt *_router) DOLOGIN(w http.ResponseWriter, r *http.Request, ps httprouter
 	}
 	defer r.Body.Close()
 
-	userId, err := rt.db.DoLogin(username)
+	
+
+
+	userId, err := rt.db.DoLogin(user.Username)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.Error("something went wrong: ", err)
@@ -31,6 +34,8 @@ func (rt *_router) DOLOGIN(w http.ResponseWriter, r *http.Request, ps httprouter
 	}
 
 	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	log.Println("User logged in successfully")
 	err = json.NewEncoder(w).Encode(userId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -38,6 +43,5 @@ func (rt *_router) DOLOGIN(w http.ResponseWriter, r *http.Request, ps httprouter
 		return
 	}
 
-	w.WriteHeader(http.StatusCreated)
-	log.Println("User logged in successfully")
+	
 }

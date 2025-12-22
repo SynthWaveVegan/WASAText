@@ -5,7 +5,7 @@ type Identifier struct {
 }
 
 type User struct {
-	Username string       `json:"Username"`
+	Username string       `json:"Name"`
 	UserId   Identifier   `json:"userId"`
 }
 
@@ -28,7 +28,7 @@ type Message struct {
 
 type Group struct {
 	GroupId    Identifier  `json:"groupId"`
-	GroupName  string      `json:"GroupName"`
+	GroupName  string      `json:"Name"`
 	Users      []User      `json:"Users"`
 	Messages   []Message   `json:"Messages"`
 }
@@ -37,5 +37,5 @@ type Conversation struct {
 	ConversationId Identifier  `json:"conversationId"`
 	UserConnected  Identifier  `json:"UserConnected"`
 	UserHosting    Identifier  `json:"userHosting"`
-	ChatName       string      `json:"ChatName"`
+	ChatName       string      `json:"Name"`
 }

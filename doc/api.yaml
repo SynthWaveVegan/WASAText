@@ -55,7 +55,7 @@ paths:
               properties:
                 photoUrl:
                   type: string
-                  format: uri
+                  format: url
                   minLength: 10
                   maxLength: 2048
                   pattern: '^https?://.*$'
@@ -92,7 +92,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Group/GroupName"
+              $ref: "#/components/schemas/Name"
       responses:
         "204":
           description: group name updated succesfully
@@ -182,6 +182,10 @@ paths:
       responses:
         "201":
           description: message created succesfully
+          content:
+            application/json: 
+              schema:
+                $ref: "#/components/schemas/Message" 
         "400":
           $ref: "#/components/responses/BadRequest"
         "403":
@@ -242,6 +246,10 @@ paths:
       responses:
         "201":
           description: message forwarded succesfully
+          content:
+            application/json: 
+              schema:
+                $ref: "#/components/schemas/Message"
         "400":
           $ref: "#/components/responses/BadRequest"
         "403":
@@ -276,6 +284,10 @@ paths:
       responses:
         "201":
           description: comment created succesfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Comment"
         "400":
           $ref: "#/components/responses/BadRequest"
         "403":
@@ -363,7 +375,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Conversations"
+                $ref: "#/components/schemas/Conversation"
         "400":
           $ref: "#/components/responses/BadRequest"
         "403":
@@ -393,6 +405,10 @@ paths:
       responses:
         "201":
           description: conversation created succesfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Conversation"
         "400":
           $ref: "#/components/responses/BadRequest"
         "403":
@@ -418,7 +434,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/User/Username"
+              $ref: "#/components/schemas/Name"
 
         required: true
 
@@ -496,7 +512,7 @@ paths:
               properties:
                 photoUrl:
                   type: string
-                  format: uri
+                  format: url
                   minLength: 10
                   maxLength: 2048
                   pattern: '^https?://.*$'
@@ -572,6 +588,14 @@ components:
 
   schemas:
 
+    Name:
+      type: string
+      example: filippohd
+      pattern: "^[a-z0-9]*?$"
+      minLength: 1
+      maxLength: 12
+
+
     Identifier:
       title: identifier
       description: alphanumerical identifier for a resource
@@ -588,11 +612,7 @@ components:
       type: object
       properties:
         Username:
-          type: string
-          example: filippohd
-          pattern: "^[a-z0-9]*?$"
-          minLength: 1
-          maxLength: 12
+          $ref: "#/components/schemas/Name"
         userId:
           $ref: "#/components/schemas/Identifier"
 
@@ -659,11 +679,7 @@ components:
         groupId:
           $ref: "#/components/schemas/Identifier"
         GroupName:
-          type: string
-          example: gruppohd
-          pattern: "^[a-z0-9]*?$"
-          minLength: 1
-          maxLength: 12
+          $ref: "#/components/schemas/Name"
         Users:
           type: array
           items:
@@ -673,6 +689,11 @@ components:
           items:
             $ref: "#/components/schemas/Message"
         
+    ConversationList:
+      title: ConversationList
+      type: array
+      items:
+        ref: "#/components/schemas/Comment"
 
     Conversation:
       title: conversation
@@ -686,11 +707,6 @@ components:
         UserHosting:
           $ref: "#/components/schemas/Identifier"
         ChatName:    
-          type: string
-          description: the name of the conversation is the same as the user connected
-          example: gruppohd
-          pattern: "^[a-z0-9]*?$"
-          minLength: 1
-          maxLength: 12 
+          $ref: "#/components/schemas/Name" 
 
             
