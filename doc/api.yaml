@@ -457,6 +457,34 @@ paths:
 
           
   /users/{userId}:
+
+    get:
+      security:
+      - bearerAuth: []
+      tags:
+        -  User
+      summary: gets the user profile
+      description: |-
+        retrieves the elements
+        of the user profile
+      parameters:
+      - $ref: "#/components/parameters/userId"
+      operationId: GETUSER
+      responses:
+        "200":
+          description: conversation retrieved succesfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+
     put:
       security:
         - bearerAuth: []
@@ -476,7 +504,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/User/Username"
+              $ref: "#/components/schemas/Name"
       responses:
         "204":
           description: username updated succesfully
@@ -507,16 +535,8 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              required: [photoUrl]
-              properties:
-                photoUrl:
-                  type: string
-                  format: url
-                  minLength: 10
-                  maxLength: 2048
-                  pattern: '^https?://.*$'
-                  description: New photo URL for the user
+              $ref: "#/components/schemas/Photo"
+              
       responses:
         "204":
           description: user photo updated succesfully
@@ -575,26 +595,62 @@ components:
     
       BadRequest:
         description: syntax of the request was not compliant with docs, check parameters
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Error'
     
       Forbidden:
         description: server will not accept request due to lacking of client permissions
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Error'
     
       NotFound:
         description: resource not found
 
       InternalServerError:
         description: the server encountered an error while processing the request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Error'
 
 
   schemas:
 
-    Name:
-      type: string
-      example: filippohd
-      pattern: "^[a-z0-9]*?$"
-      minLength: 1
-      maxLength: 12
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
 
+    Photo:
+      type: object
+      required: [photoUrl]
+      properties:
+        photoUrl:
+          type: string
+          format: url
+          minLength: 10
+          maxLength: 2048
+          pattern: '^https?://.*$'
+          description: New photo URL for the user
+
+    Name:
+      type: object
+      properties:
+        name:
+          type: string
+          example: filippohd
+          pattern: "^[a-z0-9]*?$"
+          minLength: 1
+          maxLength: 12
+      required:
+        - name
 
     Identifier:
       title: identifier
@@ -615,6 +671,8 @@ components:
           $ref: "#/components/schemas/Name"
         userId:
           $ref: "#/components/schemas/Identifier"
+        UserPhoto:
+          $ref: "#/components/schemas/Photo"
 
     Message:
       title: message
@@ -625,8 +683,8 @@ components:
           type: string
           example: ciao
           pattern: "^[a-z0-9]*?$"
-          minLenght: 1
-          maxLenght: 50
+          minLength: 1
+          maxLength: 50
         Comments:
           type: array
           items:
@@ -659,8 +717,8 @@ components:
         CommentBody:
           type: string
           pattern: "^[a-z0-9]*?$"
-          minLenght: 1
-          maxLenght: 1
+          minLength: 1
+          maxLength: 1
         Date:
           type: string
           format: date-time
@@ -691,9 +749,14 @@ components:
         
     ConversationList:
       title: ConversationList
-      type: array
-      items:
-        ref: "#/components/schemas/Comment"
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Conversation"
+      required: 
+        - items
 
     Conversation:
       title: conversation

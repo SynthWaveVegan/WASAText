@@ -12,32 +12,31 @@ const User = ref({
 
 const doLogin = async () => {
   try {
-    //  LOGIN SENZA Authorization
+    
     const response = await axios.post('/login', {
       Username: User.value.Username
-      }, { headers: {
-        'Content-Type': 'application/json',
-      }})
+    }, { headers: {
+      'Content-Type': 'application/json',
+    }})
 
-    //  Salvo l’ID ricevuto
     User.value.UserId = response.data.Identifier
+    localStorage.setItem('userId', User.value.UserId)  
+    localStorage.setItem('username', User.value.Username)  
 
-    localStorage.setItem('userId', User.UserId)
-    localStorage.setItem('username', User.Username)
-
-    //  Imposto Authorization SOLO DOPO il login
-    axios.defaults.headers.common['Authorization'] = User.UserId
+    axios.defaults.headers.common['Authorization'] = User.value.UserId
 
     router.push('/home')
+
   } catch (e) {
     console.error(e)
-    alert('Errore durante il login: ' + e.message)
+    alert('Error: ' + e.message)
   }
 }
 </script>
 
 <template>
   <div class="text-center">
+  <img src="../WASAText/images/textlogo.jpg"></img>
     <div>Login</div>
     <input v-model="User.Username" placeholder="Type here" />
     <button class="btn btn-primary" @click="doLogin">Go</button>

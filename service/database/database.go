@@ -53,6 +53,7 @@ type AppDatabase interface {
 	CreateConversation(UserHosting structs.Identifier, UserConnectedName string) (structs.Conversation, error)
 
 	SetMyUsername(mode string, newName string, UserId string) error
+	GetUser(UserId structs.Identifier) (structs.User, error)
 	//CreateUser(Username string, UserId string) error
 	//checkUserExist(Username string) (string, bool, error)
 

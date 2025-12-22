@@ -4,11 +4,41 @@ import (
 	"encoding/json"
 	//"errors"
 	"github.com/SynthWaveVegan/WASAText/service/api/reqcontext"
-	//"github.com/SynthWaveVegan/WASAText/service/structs"
+	"github.com/SynthWaveVegan/WASAText/service/structs"
 	"github.com/julienschmidt/httprouter"
 	"log"
 	"net/http"
 )
+
+func (rt *_router) GETUSER(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+
+	userId := ps.ByName("userId")
+	if userId == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	ThisUserId := structs.Identifier{
+		Id: userId,
+	}
+
+
+	ThisUser, err := rt.db.GetUser(ThisUserId)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		ctx.Logger.Error("something went wrong: ", err)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(w).Encode(ThisUser)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.Error("something went wrong: ", err)
+	}
+
+	w.WriteHeader(http.StatusOK)
+	log.Println("User retrieved successfully")
+}
 
 func (rt *_router) SETMYUSERNAME(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 

@@ -1,25 +1,27 @@
 <script>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted } from 'vue'
+import axios from '../services/axios.js'
 
-export default {
-  setup() {
-    const username = ref('');
+const username = ref(localStorage.getItem('username')); 
+const userid = ref(localStorage.getItem('userId')); 
+const getUser = async () => {
+  try {
 
-    onMounted(() => {
-      username.value = localStorage.getItem('username');
-    });
-
-    return {
-      username
-    };
+    const response = await axios.get(`/users/${this.userId}`)
+  } catch (e) {
+    console.error(e)
+    alert('Error: ' + e.message)
   }
 }
+
+onMounted(() => {
+  refresh();
+});
 </script>
 
 <template>
-    <div>
-        <h1>Benvenuto, {{ this.username }}<</h1>
-    </div>
+    
+  
     
 
 </template>

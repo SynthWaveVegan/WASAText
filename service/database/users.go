@@ -54,7 +54,10 @@ func (db *appdbimpl) CreateUser(username string, userId string, UserPhoto string
 }
 
 func (db *appdbimpl) GetUser(UserId structs.Identifier) (structs.User, error) {
+
+	var userphoto string
 	var username string
+
 	err := db.c.QueryRowContext(context.Background(),`SELECT Username FROM user WHERE UserId = ?`, UserId).Scan(&username)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -64,9 +67,20 @@ func (db *appdbimpl) GetUser(UserId structs.Identifier) (structs.User, error) {
 		}
 	}
 
+	err = db.c.QueryRowContext(context.Background(),`SELECT UserPhoto FROM user WHERE UserId = ?`, UserId).Scan(&userphoto)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return structs.User{}, err
+		} else {
+			return structs.User{}, err
+		}
+	}
+	
+
 	UserFound := structs.User{
 		Username: username,
 		UserId:   UserId,
+		UserPhoto: userphoto,
 	}
 
 	return UserFound, nil
@@ -78,7 +92,6 @@ func (db *appdbimpl) CheckUserExist(username string) (string, bool, error) {
 	var userId string
 	//questo controlla se esiste username nella table user e ritorna il corrispondente userId
 	err := db.c.QueryRowContext(context.Background(),`SELECT UserId FROM user WHERE Username = ?`, username).Scan(&userId)
-
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return "", false, nil
@@ -95,3 +108,4 @@ func (db *appdbimpl) SetMyPhoto(userId structs.Identifier, photoLink string) err
 	_, err := db.c.ExecContext(context.Background(),`UPDATE user SET UserPhoto = ? WHERE Userid = ?`, photoLink, userId)
 	return err
 }
+

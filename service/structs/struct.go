@@ -7,6 +7,7 @@ type Identifier struct {
 type User struct {
 	Username string       `json:"Name"`
 	UserId   Identifier   `json:"userId"`
+	UserPhoto string      `json:"UserPhoto"`
 }
 
 type Comment struct {

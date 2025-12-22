@@ -6,7 +6,7 @@ import (
 	"github.com/SynthWaveVegan/WASAText/service/api/reqcontext"
 	"github.com/SynthWaveVegan/WASAText/service/structs"
 	"github.com/julienschmidt/httprouter"
-	//"log"
+	"log"
 	"net/http"
 )
 
@@ -22,8 +22,6 @@ func (rt *_router) DOLOGIN(w http.ResponseWriter, r *http.Request, ps httprouter
 
 	}
 	defer r.Body.Close()
-
-	
 
 
 	userId, err := rt.db.DoLogin(user.Username)
