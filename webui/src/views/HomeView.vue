@@ -6,7 +6,8 @@ import axios from '../services/axios.js'
 const errormsg = ref(null);
 const loading = ref(false);
 const some_data = ref(null);
-const username = ref(localStorage.getItem('username'));  // Rendiamo reattivo il valore
+const username = ref(localStorage.getItem('username')); 
+const UserId = ref(localStorage.getItem('userId'));   // Rendiamo reattivo il valore
 
 // Funzione per fare il refresh
 const refresh = async () => {
@@ -21,6 +22,17 @@ const refresh = async () => {
   loading.value = false;
 };
 
+const getMyConversations = async () => {
+  try {
+    const response = await axios.get(`/users/${UserId.value}/conversations`, {
+      
+    })
+
+    axios.defaults.headers.common['Authorization'] = UserId.value
+  } catch (e) {
+    alert(e)
+  }
+}
 // Chiamata alla funzione refresh quando il componente viene montato
 onMounted(() => {
   refresh();

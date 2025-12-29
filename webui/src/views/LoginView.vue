@@ -13,8 +13,7 @@ const User = reactive({
 })
 
 const doLogin = async () => {
-  console.log('Tentativo login con username:', User.Username)
-
+  
   try {
     const response = await axios.post('/login', {
       Name: User.Username

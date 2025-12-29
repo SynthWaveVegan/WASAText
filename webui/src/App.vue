@@ -44,6 +44,12 @@ export default {}
 								Search
 							</RouterLink>
 						</li>
+						<li class="nav-item">
+							<RouterLink to="/home" class="nav-link">
+								<svg class="feather"><use href="/feather-sprite-v4.29.0.svg#home"/></svg>
+								Home
+							</RouterLink>
+						</li>
 					</ul>
 
 					<h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase">

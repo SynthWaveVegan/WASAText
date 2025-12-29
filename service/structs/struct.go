@@ -40,3 +40,4 @@ type Conversation struct {
 	UserHosting    Identifier  `json:"userHosting"`
 	ChatName       string      `json:"Name"`
 }
+

@@ -458,33 +458,6 @@ paths:
           
   /users/{userId}:
 
-    get:
-      security:
-      - bearerAuth: []
-      tags:
-        -  User
-      summary: gets the user profile
-      description: |-
-        retrieves the elements
-        of the user profile
-      parameters:
-      - $ref: "#/components/parameters/userId"
-      operationId: GETUSER
-      responses:
-        "200":
-          description: conversation retrieved succesfully
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/User"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "500":
-          $ref: "#/components/responses/InternalServerError"
-
-
     put:
       security:
         - bearerAuth: []
@@ -649,8 +622,7 @@ components:
           pattern: "^[a-z0-9]*?$"
           minLength: 1
           maxLength: 16
-      required:
-        - name
+      
 
     Identifier:
       title: identifier

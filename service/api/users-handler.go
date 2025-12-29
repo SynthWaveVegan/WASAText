@@ -48,8 +48,12 @@ func (rt *_router) SETMYUSERNAME(w http.ResponseWriter, r *http.Request, ps http
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+	type RequestBody struct {
+    	Name string `json:"Name"`
+	}
 
-	var username string
+	var username RequestBody
+
 	err := json.NewDecoder(r.Body).Decode(&username)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -67,7 +71,7 @@ func (rt *_router) SETMYUSERNAME(w http.ResponseWriter, r *http.Request, ps http
 		return
 	}
 
-	err = rt.db.SetMyUsername("Update", username, userId)
+	err = rt.db.SetMyUsername("Update", username.Name, userId)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("6 something went wrong: ", err)
