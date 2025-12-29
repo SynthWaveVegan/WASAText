@@ -53,7 +53,7 @@ func (rt *_router) SETMYUSERNAME(w http.ResponseWriter, r *http.Request, ps http
 	err := json.NewDecoder(r.Body).Decode(&username)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		ctx.Logger.Error("something went wrong: ", err)
+		ctx.Logger.Error("5 something went wrong: ", err)
 		return
 
 	}
@@ -70,7 +70,7 @@ func (rt *_router) SETMYUSERNAME(w http.ResponseWriter, r *http.Request, ps http
 	err = rt.db.SetMyUsername("Update", username, userId)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		ctx.Logger.Error("something went wrong: ", err)
+		ctx.Logger.Error("6 something went wrong: ", err)
 		return
 	}
 

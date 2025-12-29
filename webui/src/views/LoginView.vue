@@ -1,42 +1,45 @@
 <script setup>
-import { ref } from 'vue'
+import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from '../services/axios.js'
+import vuelogo from '@/assets/images/Vue.js_Logo_2.svg.png'
+
 
 const router = useRouter()
 
-const User = ref({
+const User = reactive({
   Username: '',
   UserId: ''
 })
 
 const doLogin = async () => {
+  console.log('Tentativo login con username:', User.Username)
+
   try {
-    
     const response = await axios.post('/login', {
-      Username: User.value.Username
-    }, { headers: {
-      'Content-Type': 'application/json',
-    }})
+      Name: User.Username
+    })
 
-    User.value.UserId = response.data.Identifier
-    localStorage.setItem('userId', User.value.UserId)  
-    localStorage.setItem('username', User.value.Username)  
+    User.UserId = response.data.Identifier
 
-    axios.defaults.headers.common['Authorization'] = User.value.UserId
+    localStorage.setItem('userId', User.UserId)
+    localStorage.setItem('username', User.Username)
 
+    axios.defaults.headers.common['Authorization'] = User.UserId
     router.push('/home')
 
   } catch (e) {
-    console.error(e)
-    alert('Error: ' + e.message)
+    alert(e)
   }
 }
 </script>
 
 <template>
   <div class="text-center">
-  <img src="../WASAText/images/textlogo.jpg"></img>
+    <div class="container mt-4 text-center">
+      <img :src="vuelogo" class="img-fluid mb-3" style="max-width: 180px;"></img>
+    </div>
+    <div><strong>WASATEXT</strong></div>
     <div>Login</div>
     <input v-model="User.Username" placeholder="Type here" />
     <button class="btn btn-primary" @click="doLogin">Go</button>
@@ -44,4 +47,5 @@ const doLogin = async () => {
 </template>
 
 <style>
+  
 </style>

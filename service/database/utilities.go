@@ -5,7 +5,7 @@ import (
 	// "errors"
 	"fmt"
 	"github.com/SynthWaveVegan/WASAText/service/structs"
-	// "log"
+	"log"
 	"crypto/rand"
     "math/big"
 	"context"
@@ -30,54 +30,55 @@ func generateIdentifier(startId string) structs.Identifier {
 }
 
 func (db *appdbimpl) checkValidId(checkingId string, startId string) (bool, error) {
-
 	var countCheck int
 	var err error
+
+	// Seleziona la query giusta in base al tipo di ID
 	switch startId {
 	case "U":
-		err = db.c.QueryRowContext(context.Background(),`SELECT COUNT(*) FROM user WHERE UserId = ?`, checkingId).Scan(&countCheck)
-
+		err = db.c.QueryRowContext(context.Background(), `SELECT COUNT(*) FROM users WHERE UserId = ?`, checkingId).Scan(&countCheck)
 	case "S":
-		err = db.c.QueryRowContext(context.Background(),`SELECT COUNT(*) FROM conversation WHERE ConversationId = ?`, checkingId).Scan(&countCheck)
-
+		err = db.c.QueryRowContext(context.Background(), `SELECT COUNT(*) FROM conversation WHERE ConversationId = ?`, checkingId).Scan(&countCheck)
 	case "M":
-		err = db.c.QueryRowContext(context.Background(),`SELECT COUNT(*) FROM message WHERE MessageId = ?`, checkingId).Scan(&countCheck)
-
+		err = db.c.QueryRowContext(context.Background(), `SELECT COUNT(*) FROM message WHERE MessageId = ?`, checkingId).Scan(&countCheck)
 	case "G":
-		err = db.c.QueryRowContext(context.Background(),`SELECT COUNT(*) FROM group WHERE GroupId = ?`, checkingId).Scan(&countCheck)
-
+		err = db.c.QueryRowContext(context.Background(), `SELECT COUNT(*) FROM group WHERE GroupId = ?`, checkingId).Scan(&countCheck)
 	case "C":
-		err = db.c.QueryRowContext(context.Background(),`SELECT COUNT(*) FROM comment WHERE CommentId = ?`, checkingId).Scan(&countCheck)
-
-	//case "P":
-	//	err = db.c.QueryRow(`SELECT COUNT(*) FROM photo WHERE PhotoId = ?`, checkingId).Scan(&countCheck)
-
+		err = db.c.QueryRowContext(context.Background(), `SELECT COUNT(*) FROM comment WHERE CommentId = ?`, checkingId).Scan(&countCheck)
 	default:
-		return false, err
+		// Se startId non è valido, restituisci errore
+		return false, fmt.Errorf("invalid startId value: %s", startId)
 	}
 
+	// Gestione degli errori generici
 	if err != nil {
-		return false, err
+		return false, fmt.Errorf("database query failed: %w", err)
 	}
 
+	// Se il count è 0, l'ID è disponibile (non esiste nel DB)
 	if countCheck == 0 {
 		return true, nil
 	}
 
-	return false, err
-
+	// Se l'ID esiste già, restituisci false
+	return false, nil
 }
 
+
 func checkValidName(checkingName string) bool {
-	if len([]rune(checkingName)) <= 12 && len([]rune(checkingName)) >= 1 {
+	
+	log.Printf("Nome utente ricevuto: '%s'", checkingName)
+	if len([]rune(checkingName)) >= 1 && len([]rune(checkingName)) <= 16 {
 		return true
 	}
+
+	log.Printf("Invalid username length: '%s'. Length must be between 1 and 16 characters.", checkingName)
 	return false
 }
 
 func (db *appdbimpl) getUsernamebyId(UserId structs.Identifier) (string, error) {
 	var username string
-	err := db.c.QueryRowContext(context.Background(),`SELECT Username FROM user WHERE UserId = ?`, UserId).Scan(&username)
+	err := db.c.QueryRowContext(context.Background(),`SELECT Username FROM users WHERE UserId = ?`, UserId).Scan(&username)
 	if err != nil {
 		return "", err
 	}
@@ -86,7 +87,7 @@ func (db *appdbimpl) getUsernamebyId(UserId structs.Identifier) (string, error) 
 
 func (db *appdbimpl) GetUserIdByName(Username string) (structs.Identifier, error) {
 	var userId structs.Identifier
-	err := db.c.QueryRowContext(context.Background(),`SELECT UserId FROM user WHERE Username = ?`, Username).Scan(&userId)
+	err := db.c.QueryRowContext(context.Background(),`SELECT UserId FROM users WHERE Username = ?`, Username).Scan(&userId)
 	if err != nil {
 		return structs.Identifier{}, err
 	}

@@ -17,7 +17,7 @@ func (rt *_router) DOLOGIN(w http.ResponseWriter, r *http.Request, ps httprouter
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		ctx.Logger.Error("something went wrong: ", err)
+		ctx.Logger.Error("1 something went wrong: ", err)
 		return
 
 	}
@@ -27,7 +27,7 @@ func (rt *_router) DOLOGIN(w http.ResponseWriter, r *http.Request, ps httprouter
 	userId, err := rt.db.DoLogin(user.Username)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		ctx.Logger.Error("something went wrong: ", err)
+		ctx.Logger.Error("2 something went wrong: ", err)
 		return
 	}
 
@@ -37,7 +37,7 @@ func (rt *_router) DOLOGIN(w http.ResponseWriter, r *http.Request, ps httprouter
 	err = json.NewEncoder(w).Encode(userId)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		ctx.Logger.Error("something went wrong: ", err)
+		ctx.Logger.Error("3 something went wrong: ", err)
 		return
 	}
 

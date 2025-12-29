@@ -444,7 +444,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                $ref: "#/components/schemas/Identifier"
 
         "400":
           $ref: "#/components/responses/BadRequest"
@@ -648,7 +648,7 @@ components:
           example: filippohd
           pattern: "^[a-z0-9]*?$"
           minLength: 1
-          maxLength: 12
+          maxLength: 16
       required:
         - name
 

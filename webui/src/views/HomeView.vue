@@ -24,6 +24,7 @@ const refresh = async () => {
 // Chiamata alla funzione refresh quando il componente viene montato
 onMounted(() => {
   refresh();
+  
 });
 </script>
 
@@ -31,7 +32,7 @@ onMounted(() => {
   <div>
     <div
       class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-      <h1 class="h2">Benvenuto, {{ username }}!</h1>  <!-- Ora username è reattivo -->
+      <h1 class="h2">Welcome, {{ username }}!</h1>  <!-- Ora username è reattivo -->
       
       <div class="btn-toolbar mb-2 mb-md-0">
         <div class="btn-group me-2">

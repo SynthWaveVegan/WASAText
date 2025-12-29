@@ -12,6 +12,8 @@ export default {}
 	</div>
 	
 	<div v-else>
+
+	<div>
 	<header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
 		<span class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6">WASATEXT</span>
 		<button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,7 +39,7 @@ export default {}
 							</RouterLink>
 						</li>
 						<li class="nav-item">
-							<RouterLink to="/link2" class="nav-link">
+							<RouterLink to="/search" class="nav-link">
 								<svg class="feather"><use href="/feather-sprite-v4.29.0.svg#key"/></svg>
 								Search
 							</RouterLink>
@@ -49,7 +51,7 @@ export default {}
 					</h6>
 					<ul class="nav flex-column">
 						<li class="nav-item">
-							<RouterLink to="/" class="nav-link">
+							<RouterLink to="/login" class="nav-link">
 								<svg class="feather"><use href="/feather-sprite-v4.29.0.svg#home"/></svg>
 								LogOut
 							</RouterLink>
@@ -58,6 +60,7 @@ export default {}
 					</ul>
 				</div>
 			</nav>
+			</div>
 
 			<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
 				<RouterView />

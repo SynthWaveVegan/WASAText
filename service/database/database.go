@@ -99,7 +99,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 	err := db.QueryRowContext(context.Background(),`SELECT name FROM sqlite_master WHERE type='table' AND name='example_table';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
 
-		userQuery := `CREATE TABLE IF NOT EXISTS user (
+		userQuery := `CREATE TABLE IF NOT EXISTS users (
 		          UserId VARCHAR(11) NOT NULL PRIMARY KEY,
 		          Username VARCHAR(16) NOT NULL,
 				  UserPhoto TEXT
