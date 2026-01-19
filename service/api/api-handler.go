@@ -23,7 +23,7 @@ func (rt *_router) Handler() http.Handler {
 
 	rt.router.GET("/users/:userId/conversations", rt.wrap(rt.GETMYCONVERSATIONS))
 	rt.router.GET("/users/:userId/conversations/:conversationId", rt.wrap(rt.GETCONVERSATION))
-	rt.router.POST("/users/:userId/conversations/:conversationId", rt.wrap(rt.CREATECONVERSATION))
+	rt.router.POST("/users/:userId/conversations", rt.wrap(rt.CREATECONVERSATION))
 
 	rt.router.POST("/login", rt.wrap(rt.DOLOGIN))
 	rt.router.PUT("/users/:userId", rt.wrap(rt.SETMYUSERNAME))

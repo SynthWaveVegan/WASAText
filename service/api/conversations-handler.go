@@ -43,12 +43,12 @@ func (rt *_router) GETCONVERSATION(w http.ResponseWriter, r *http.Request, ps ht
 
 func (rt *_router) CREATECONVERSATION(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	conversationId := ps.ByName("conversationId")
+	
 	userId := ps.ByName("userId")
 
-	if conversationId == "" || userId == "" {
+	if userId == "" {
 		w.WriteHeader(http.StatusBadRequest)
-		ctx.Logger.Error("no userId or conversationId retrieved")
+		ctx.Logger.Error("no userId retrieved")
 		return
 	}
 

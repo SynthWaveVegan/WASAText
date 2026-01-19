@@ -7,6 +7,8 @@ const errormsg = ref(null);
 const loading = ref(false);
 const some_data = ref(null);
 const username = ref(localStorage.getItem('username')); 
+const ConversationId = ref(null);
+const ConversationName = ref(null);
 const UserId = ref(localStorage.getItem('userId'));   // Rendiamo reattivo il valore
 
 // Funzione per fare il refresh
@@ -21,7 +23,27 @@ const refresh = async () => {
   }
   loading.value = false;
 };
+const createConversation = async () => {
+  try {
+    const response = await axios.post(`/users/${UserId.value}/conversations`, {
+      Name: ConversationName
+    })
 
+    ConversationId = response.data.Identifier
+  } catch (e) {
+    alert(e)
+  }
+}
+
+const getConversation = async () => {
+  try {
+    const response = await axios.get(`/users/${UserId.value}/conversations/${ConversationId.value}`, {
+
+    })
+  } catch (e) {
+    alert(e)
+  }
+}
 const getMyConversations = async () => {
   try {
     const response = await axios.get(`/users/${UserId.value}/conversations`, {

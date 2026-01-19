@@ -20,14 +20,16 @@ const SetMyUsername = async () => {
   console.log("ok 1")
   console.log(UserId);
   try {
+    axios.defaults.headers.common['Authorization'] = UserId.value
+
     const response = await axios.put(`/users/${UserId.value}`, {
       Name: newUsername.value
     })
     console.log("ok 2")
     
     localStorage.setItem('username', newUsername.value)
+    username.value = ref(newUsername)  
     console.log("ok 3")
-    axios.defaults.headers.common['Authorization'] = UserId.value
     
     editing.value = false
     
