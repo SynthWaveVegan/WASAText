@@ -18,7 +18,7 @@ const username = ref(localStorage.getItem('username'));
 
 const SetMyUsername = async () => {
   console.log("ok 1")
-  
+  console.log(UserId);
   try {
     const response = await axios.put(`/users/${UserId.value}`, {
       Name: newUsername.value
