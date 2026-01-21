@@ -86,10 +86,14 @@ func (db *appdbimpl) getUsernamebyId(UserId structs.Identifier) (string, error) 
 }
 
 func (db *appdbimpl) GetUserIdByName(Username string) (structs.Identifier, error) {
-	var userId structs.Identifier
+	var userId string
 	err := db.c.QueryRowContext(context.Background(),`SELECT UserId FROM users WHERE Username = ?`, Username).Scan(&userId)
 	if err != nil {
 		return structs.Identifier{}, err
 	}
-	return userId, nil
+
+	UserId := structs.Identifier{
+		Id: userId,
+	}
+	return UserId, nil
 }

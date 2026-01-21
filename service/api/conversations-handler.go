@@ -64,20 +64,25 @@ func (rt *_router) CREATECONVERSATION(w http.ResponseWriter, r *http.Request, ps
 		Id: userId,
 	}
 
-	var UserNameConnected string
-	err := json.NewDecoder(r.Body).Decode(&UserNameConnected)
+	type RequestBody struct {
+    	Name string `json:"Name"`
+	}
+
+	var username RequestBody
+	
+	err := json.NewDecoder(r.Body).Decode(&username)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		ctx.Logger.Error("something went wrong: ", err)
+		ctx.Logger.Error("1 something went wrong: ", err)
 		return
 
 	}
 	defer r.Body.Close()
 
-	NewConversation, err := rt.db.CreateConversation(UserId, UserNameConnected)
+	NewConversation, err := rt.db.CreateConversation(UserId, username.Name)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		ctx.Logger.Error("something went wrong: ", err)
+		ctx.Logger.Error("2 something went wrong: ", err)
 		return
 	}
 
@@ -85,7 +90,7 @@ func (rt *_router) CREATECONVERSATION(w http.ResponseWriter, r *http.Request, ps
 	err = json.NewEncoder(w).Encode(NewConversation)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		ctx.Logger.Error("something went wrong: ", err)
+		ctx.Logger.Error("3 something went wrong: ", err)
 	}
 
 	w.WriteHeader(http.StatusCreated)

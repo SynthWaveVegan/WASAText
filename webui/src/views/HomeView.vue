@@ -1,15 +1,19 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from '../services/axios.js'
+import { reactive } from 'vue'
 
 // Dichiara le variabili reattive
 const errormsg = ref(null);
 const loading = ref(false);
 const some_data = ref(null);
 const username = ref(localStorage.getItem('username')); 
-const ConversationId = ref(null);
-const ConversationName = ref(null);
 const UserId = ref(localStorage.getItem('userId'));   // Rendiamo reattivo il valore
+
+const Conversation = reactive({
+  Name: '',
+  Id: ''
+})
 
 // Funzione per fare il refresh
 const refresh = async () => {
@@ -24,12 +28,21 @@ const refresh = async () => {
   loading.value = false;
 };
 const createConversation = async () => {
+
+  axios.defaults.headers.common['Authorization'] = UserId.value
+
   try {
     const response = await axios.post(`/users/${UserId.value}/conversations`, {
-      Name: ConversationName
+      Name: Conversation.Name
     })
 
-    ConversationId = response.data.Identifier
+    Conversation.Id = response.data.Identifier
+
+    localStorage.setItem('conversationId', Conversation.Id)
+    
+    axios.defaults.headers.common['Authorization'] = UserId
+
+
   } catch (e) {
     alert(e)
   }
@@ -69,6 +82,10 @@ onMounted(() => {
       <h1 class="h2">Welcome, {{ username }}!</h1>  <!-- Ora username è reattivo -->
       
       <div class="btn-toolbar mb-2 mb-md-0">
+        <div>
+          <input v-model="Conversation.Name" placeholder="Search User..." />
+          <button class="btn btn-primary" @click="createConversation">Go</button></div>
+        </div>
         <div class="btn-group me-2">
           <button type="button" class="btn btn-sm btn-outline-secondary" @click="refresh">
             Refresh
@@ -82,12 +99,13 @@ onMounted(() => {
             New
           </button>
         </div>
-      </div>
       
     </div>
+      
 
     <ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
   </div>
+  
 </template>
 
 <style>

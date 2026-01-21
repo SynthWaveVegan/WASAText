@@ -35,7 +35,7 @@ type Group struct {
 }
 
 type Conversation struct {
-	ConversationId Identifier  `json:"conversationId"`
+	ConversationId Identifier  `json:"Identifier"`
 	UserConnected  Identifier  `json:"UserConnected"`
 	UserHosting    Identifier  `json:"userHosting"`
 	ChatName       string      `json:"Name"`

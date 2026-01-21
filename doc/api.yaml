@@ -344,7 +344,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Conversation"
+              $ref: "#/components/schemas/Name"
       responses:
         "201":
           description: conversation created succesfully

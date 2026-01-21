@@ -26,7 +26,7 @@ func (db *appdbimpl) CreateConversation(UserHosting structs.Identifier, UserConn
 		return structs.Conversation{}, err
 	}
 
-	_, err = db.c.ExecContext(context.Background(),`INSERT INTO conversation (ConversationId, UserHosting, UserConnected) VALUES (?, ?, ?)`, ConversationId.Id, UserHosting, UserConnected)
+	_, err = db.c.ExecContext(context.Background(),`INSERT INTO conversation (ConversationId, UserHosting, UserConnected) VALUES (?, ?, ?)`, ConversationId.Id, UserHosting.Id, UserConnected.Id)
 	if err != nil {
 		return structs.Conversation{}, err
 	}
