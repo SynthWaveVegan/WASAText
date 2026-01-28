@@ -65,9 +65,9 @@ func (rt *_router) CREATECONVERSATION(w http.ResponseWriter, r *http.Request, ps
 	}
 
 	type RequestBody struct {
-    	Name string `json:"Name"`
+    Name string `json:"name"`
 	}
-
+	
 	var username RequestBody
 	
 	err := json.NewDecoder(r.Body).Decode(&username)
@@ -87,13 +87,14 @@ func (rt *_router) CREATECONVERSATION(w http.ResponseWriter, r *http.Request, ps
 	}
 
 	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+
 	err = json.NewEncoder(w).Encode(NewConversation)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		ctx.Logger.Error("3 something went wrong: ", err)
+    	ctx.Logger.Error("3 something went wrong: ", err)
+    	return
 	}
 
-	w.WriteHeader(http.StatusCreated)
 	log.Println("Conversation created successfully")
 
 }
