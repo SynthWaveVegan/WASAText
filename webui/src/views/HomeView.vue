@@ -11,8 +11,10 @@ const username = ref(localStorage.getItem('username'));
 const UserId = ref(localStorage.getItem('userId'));  
 
 const Conversation = reactive({
-  Name: '',
-  Id: ''
+  
+  Id: '',
+
+  Name: ''
 })
 
 const conversations = ref([]);
@@ -29,12 +31,16 @@ const refresh = async () => {
   }
   loading.value = false;
 };
+
+
 const openConversation = (id) => {
 
   router.push(`/conversation/${id}`);
   localStorage.setItem('conversationId', id);
 
 }
+
+
 const createConversation = async () => {
   axios.defaults.headers.common['Authorization'] = UserId.value
 
@@ -49,8 +55,8 @@ const createConversation = async () => {
     Conversation.Id = response.data.Identifier.Identifier
 
     conversations.value.push({
-      id: Conversation.Id,
-      name: Conversation.Name
+      Id: Conversation.Id,
+      Name: Conversation.Name
     });
 
     localStorage.setItem('conversationId', Conversation.Id)
@@ -72,20 +78,35 @@ const getConversation = async () => {
     alert(e)
   }
 }
-const getMyConversations = async () => {
-  try {
-    const response = await axios.get(`/users/${UserId.value}/conversations`, {
-      
-    })
 
-    axios.defaults.headers.common['Authorization'] = UserId.value
+
+const getMyConversations = async () => {
+  loading.value = true;
+  errormsg.value = null;
+
+  try {
+    // Effettua la chiamata GET per ottenere le conversazioni
+    const response = await axios.get(`/users/${UserId.value}/conversations`);
+    
+    // Salva la lista delle conversazioni nella variabile reattiva
+    conversations.value = response.data;  // Assegna la risposta alla lista delle conversazioni
+
+    // Imposta l'Authorization per tutte le richieste future
+    axios.defaults.headers.common['Authorization'] = UserId.value;
+
+    console.log('Conversations loaded:', conversations.value); // Log per verificare la risposta
   } catch (e) {
-    alert(e)
+    // Gestione degli errori
+    console.error(e);
+    errormsg.value = 'Errore nel recuperare le conversazioni';
   }
-}
+
+  loading.value = false;
+};
 // Chiamata alla funzione refresh quando il componente viene montato
 onMounted(() => {
-  refresh();
+  
+  getMyConversations();
   
 });
 </script>
@@ -132,7 +153,7 @@ onMounted(() => {
           @click="openConversation(Conversation.id)"
         >
           <div class="card-body">
-            <h5 class="card-title text-center">{{ Conversation.name }}</h5>
+            <h5 class="card-title text-center">{{ Conversation.Name }}</h5>
           </div>
         </div>
       </div>

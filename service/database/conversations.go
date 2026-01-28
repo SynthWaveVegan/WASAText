@@ -73,7 +73,7 @@ func (db *appdbimpl) GetMyConversations(UserHosting structs.Identifier) ([]struc
 	var ChatStream []structs.Identifier
 	var ConversationId structs.Identifier
 
-	rows, err := db.c.QueryContext(context.Background(),`SELECT ConversationId FROM conversation WHERE UserHosting = ?`, UserHosting)
+	rows, err := db.c.QueryContext(context.Background(),`SELECT ConversationId FROM conversation WHERE UserHosting = ?`, UserHosting.Id)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -81,7 +81,7 @@ func (db *appdbimpl) GetMyConversations(UserHosting structs.Identifier) ([]struc
 
 	for rows.Next() {
 
-		err = rows.Scan(&ConversationId)
+		err = rows.Scan(&ConversationId.Id)
 		if err != nil {
 			return nil, err
 		}
