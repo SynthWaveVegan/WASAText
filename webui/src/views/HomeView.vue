@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import axios from '../services/axios.js'
 import { reactive } from 'vue'
+import Chat from '../components/Chat.vue'
 
 
 const errormsg = ref(null);
@@ -10,7 +11,12 @@ const some_data = ref(null);
 const username = ref(localStorage.getItem('username')); 
 const UserId = ref(localStorage.getItem('userId'));  
 
-
+const Conversations = reactive({
+  conversationId: '',
+  UserHosting: '',
+  UserConnected: '',
+  ChatName: ''
+})
 
 const conversations = ref([]);
 
@@ -29,7 +35,14 @@ const refresh = async () => {
 
 const createConversation = async () => {
   try {
-    const response = await axios.post(`/users/${UserId}/conversations`)
+    const response = await axios.post(`/users/${UserId}/conversations`, {
+      ChatName: username
+    })
+    Conversations.conversationId = response.data.conversationId
+    Conversations.UserHosting = response.data.UserHosting
+    Conversations.UserConnected = response.data.UserConnected
+    Conversations.ChatName = response.data.ChatName
+
   } catch(e){
     alert(e)
   }
