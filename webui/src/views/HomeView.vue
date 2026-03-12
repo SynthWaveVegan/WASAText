@@ -11,7 +11,7 @@ const some_data = ref(null);
 const username = ref(localStorage.getItem('username')); 
 const UserId = ref(localStorage.getItem('userId'));  
 
-const Conversations = reactive({
+const Conversation = reactive({
   conversationId: '',
   UserHosting: '',
   UserConnected: '',
@@ -38,10 +38,10 @@ const createConversation = async () => {
     const response = await axios.post(`/users/${UserId}/conversations`, {
       ChatName: username
     })
-    Conversations.conversationId = response.data.conversationId
-    Conversations.UserHosting = response.data.UserHosting
-    Conversations.UserConnected = response.data.UserConnected
-    Conversations.ChatName = response.data.ChatName
+    Conversation.conversationId = response.data.conversationId
+    Conversation.UserHosting = response.data.UserHosting
+    Conversation.UserConnected = response.data.UserConnected
+    Conversation.ChatName = response.data.ChatName
 
   } catch(e){
     alert(e)
@@ -72,8 +72,8 @@ onMounted(() => {
       
       <div class="btn-toolbar mb-2 mb-md-0">
         <div>
-          <input placeholder="Search User..." />
-          <button class="btn btn-primary">Go</button></div>
+          <input v-model="Conversation.ChatName" placeholder="Search User..." />
+          <button class="btn btn-primary" @click="createConversation">Go</button></div>
         </div>
         <div class="btn-group me-2">
           <button type="button" class="btn btn-sm btn-outline-secondary" @click="refresh">
