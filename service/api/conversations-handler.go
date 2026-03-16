@@ -59,7 +59,7 @@ func (rt *_router) CREATECONVERSATION(w http.ResponseWriter, r *http.Request, ps
 		ctx.Logger.Error("user is not allowed")
 		return
 	}
-
+	
 	UserId := structs.Identifier{
 		Id: userId,
 	}

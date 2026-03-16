@@ -35,23 +35,32 @@ const refresh = async () => {
 
 const createConversation = async () => {
   try {
-    const response = await axios.post(`/users/${UserId}/conversations`, {
-      ChatName: username
+    axios.defaults.headers.common['Authorization'] = UserId.value
+
+    const response = await axios.post(`/users/${UserId.value}/conversations`, {
+      Name: Conversation.ChatName
     })
-    Conversation.conversationId = response.data.conversationId
-    Conversation.UserHosting = response.data.UserHosting
-    Conversation.UserConnected = response.data.UserConnected
-    Conversation.ChatName = response.data.ChatName
+    
+    const newConversation = {
+        conversationId: response.data.conversationId,
+        UserHosting: response.data.UserHosting,
+        UserConnected: response.data.UserConnected,
+        ChatName: response.data.ChatName
+      };
+
+      console.log(newConversation)
+      // Aggiunta della nuova conversazione alla lista
+      
+      conversations.value.push(newConversation);
 
   } catch(e){
-    alert(e)
+    alert(e.response ? e.response.data : e.message)
   }
 }
 
 const openConversation = (id) => {
 
-  router.push(`/conversation/${id}`);
-  localStorage.setItem('conversationId', id);
+  
 
 }
 
@@ -89,6 +98,12 @@ onMounted(() => {
           </button>
         </div>
       
+    </div>
+    <div class="container">
+      <div v-for="conv in conversations">
+        {{ conv }}
+      </div>
+
     </div>
       
 
