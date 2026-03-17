@@ -9,6 +9,24 @@ import (
 	"context"
 )
 
+func (db *appdbimpl) CheckConversation(UserHosting string, UserConnected string) (structs.Identifier, bool, error) {
+
+	var counter int
+	err := db.c.QueryRowContext(context.Background(), `SELECT COUNT(*) FROM conversation WHERE UserHosting = ? AND UserConnected = ?`, UserHosting, UserConnected).Scan(&counter)
+	if err != nil {
+		return structs.Identifier{}, false, err
+	}
+	if counter != 0 {
+		var ConversationId structs.Identifier
+		err := db.c.QueryRowContext(context.Background(),`SELECT ConversationId FROM conversation WHERE UserHosting = ? AND UserConnected = ?`, UserHosting, UserConnected).Scan(&ConversationId)
+			if err != nil {
+				return structs.Identifier{}, false, err
+			}
+		return ConversationId, false, nil
+	}
+
+	return structs.Identifier{}, true, nil
+}
 func (db *appdbimpl) CreateConversation(UserHosting structs.Identifier, UserConnectedName string) (structs.Conversation, error) {
 
 	ConversationId := generateIdentifier("S")
@@ -25,6 +43,21 @@ func (db *appdbimpl) CreateConversation(UserHosting structs.Identifier, UserConn
 	if err != nil {
 		return structs.Conversation{}, err
 	}
+
+	OtherConversationId, ChatNotExist, err := db.CheckConversation(UserHosting.Id, UserConnected.Id)
+	if err != nil {
+		return structs.Conversation{}, err
+	}
+
+	if ChatNotExist == false {
+		OldChat, err := db.GetConversation(OtherConversationId)
+		if err != nil {
+			return structs.Conversation{}, err
+		}
+
+		return OldChat, nil
+	}
+
 
 	_, err = db.c.ExecContext(context.Background(),`INSERT INTO conversation (ConversationId, UserHosting, UserConnected) VALUES (?, ?, ?)`, ConversationId.Id, UserHosting.Id, UserConnected.Id)
 	if err != nil {

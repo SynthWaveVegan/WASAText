@@ -42,13 +42,13 @@ const createConversation = async () => {
     })
     
     const newConversation = {
-        conversationId: response.data.conversationId,
-        UserHosting: response.data.UserHosting,
-        UserConnected: response.data.UserConnected,
-        ChatName: response.data.ChatName
+        conversationId: response.data.Identifier.Identifier,
+        UserHosting: response.data.userHosting.Identifier,
+        UserConnected: response.data.UserConnected.Identifier,
+        ChatName: response.data.Name
       };
 
-      console.log(newConversation)
+      console.log(response.data)
       // Aggiunta della nuova conversazione alla lista
       
       conversations.value.push(newConversation);
@@ -101,7 +101,7 @@ onMounted(() => {
     </div>
     <div class="container">
       <div v-for="conv in conversations">
-        {{ conv }}
+        {{ conv.ChatName }}
       </div>
 
     </div>
