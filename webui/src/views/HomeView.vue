@@ -97,15 +97,23 @@ onMounted(() => {
             New
           </button>
         </div>
-      
-    </div>
-    <div class="container">
-      <div v-for="conv in conversations">
-        {{ conv.ChatName }}
       </div>
-
-    </div>
       
+    <div class="container mt-4">
+      <div class="row">
+        <div class="col-12">
+          <div v-for="conv in conversations">
+            <div class="card mb-3">
+              <div class="card-body">
+                <h5 class="card-title" @click="openConversation(conv.conversationId)">
+                  {{ conv.ChatName }}
+                </h5>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
 
