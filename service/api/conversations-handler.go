@@ -27,14 +27,14 @@ func (rt *_router) GETCONVERSATION(w http.ResponseWriter, r *http.Request, ps ht
 	ThisConversation, err := rt.db.GetConversation(ConversationId)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		ctx.Logger.Error("something went wrong: ", err)
+		ctx.Logger.Error("1 something went wrong: ", err)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(ThisConversation)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		ctx.Logger.Error("something went wrong: ", err)
+		ctx.Logger.Error("2 something went wrong: ", err)
 	}
 
 	w.WriteHeader(http.StatusOK)

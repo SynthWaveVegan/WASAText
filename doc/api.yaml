@@ -781,5 +781,9 @@ components:
           $ref: "#/components/schemas/Identifier"
         ChatName:    
           $ref: "#/components/schemas/Name" 
+        Messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/Message"
 
             

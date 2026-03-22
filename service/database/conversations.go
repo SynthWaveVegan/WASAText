@@ -33,6 +33,8 @@ func (db *appdbimpl) CheckConversation(UserHosting string, UserConnected string)
 }
 func (db *appdbimpl) CreateConversation(UserHosting structs.Identifier, UserConnectedName string) (structs.Conversation, error) {
 
+	var Messages []structs.Message
+
 	ConversationId := generateIdentifier("S")
 	
 	validId, err := db.checkValidId(ConversationId.Id, "S")
@@ -74,6 +76,7 @@ func (db *appdbimpl) CreateConversation(UserHosting structs.Identifier, UserConn
 		UserConnected:  UserConnected,
 		UserHosting:    UserHosting,
 		ChatName:       UserConnectedName,
+		Messages:       Messages,
 	}
 
 	return NewChat, nil
@@ -81,24 +84,51 @@ func (db *appdbimpl) CreateConversation(UserHosting structs.Identifier, UserConn
 
 func (db *appdbimpl) GetConversation(ConversationId structs.Identifier) (structs.Conversation, error) {
 
-	var thisUserHosting structs.Identifier
-	var thisUserConnected structs.Identifier
+	var thisUserHostingId string
+	var thisUserConnectedId string
 
-	err := db.c.QueryRowContext(context.Background(),`SELECT (UserHosting, UserConnected) FROM conversation WHERE ConversationId = ?`, ConversationId).Scan(&thisUserHosting, &thisUserConnected)
+	err := db.c.QueryRowContext(context.Background(),`SELECT UserHosting, UserConnected FROM conversation WHERE ConversationId = ?`, ConversationId.Id).Scan(&thisUserHostingId, &thisUserConnectedId)
 	if err != nil {
 		return structs.Conversation{}, err
 	}
+
+	thisUserHosting := structs.Identifier{
+		Id: thisUserHostingId,
+	}
+	thisUserConnected := structs.Identifier{
+		Id: thisUserConnectedId,
+	}
+
 
 	thisChatName, err := db.getUsernamebyId(thisUserConnected)
 	if err != nil {
 		return structs.Conversation{}, err
 	}
+		
+	rows, err := db.c.QueryContext( context.Background(),`SELECT MessageId, MessageBody, UploaderId FROM message WHERE conversationId = ?`,conversationId.Id)
+	if err != nil {
+		return structs.Conversation{}, err
+	}
+	defer rows.Close()
+
+	var messages []structs.Message
+
+	for rows.Next() {
+		var msg structs.Message
+		err := rows.Scan(&msg.MessageId, &msg.MessageBody, &msg.UploaderId)
+		if err != nil {
+			return structs.Conversation{}, err
+		}
+		messages = append(messages, msg)
+	}
+
 	ChatRetrieved := structs.Conversation{
 
 		ConversationId: ConversationId,
 		UserConnected:  thisUserConnected,
 		UserHosting:    thisUserHosting,
 		ChatName:       thisChatName,
+		Messages:       messages,
 	}
 
 	return ChatRetrieved, nil

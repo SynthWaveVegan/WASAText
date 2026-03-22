@@ -39,5 +39,6 @@ type Conversation struct {
 	UserConnected  Identifier  `json:"UserConnected"`
 	UserHosting    Identifier  `json:"userHosting"`
 	ChatName       string      `json:"Name"`
+	Messages      []Message    `json:"Messages"`
 }
 

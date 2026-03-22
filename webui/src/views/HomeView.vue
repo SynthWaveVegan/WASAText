@@ -10,6 +10,8 @@ const loading = ref(false);
 const some_data = ref(null);
 const username = ref(localStorage.getItem('username')); 
 const UserId = ref(localStorage.getItem('userId'));  
+const selectedConversation = ref(null)
+const Messages = ref([]);
 
 const Conversation = reactive({
   conversationId: '',
@@ -58,12 +60,50 @@ const createConversation = async () => {
   }
 }
 
-const openConversation = (id) => {
-
+const getConversation = async (id) => {
   
+  try{
+    axios.defaults.headers.common['Authorization'] = UserId.value
+    const response = await axios.get(`/users/${UserId.value}/conversations/${id}`)
+
+        
+    const thisConversation = {
+        conversationId: response.data.Identifier.Identifier,
+        UserHosting: response.data.userHosting.Identifier,
+        UserConnected: response.data.UserConnected.Identifier,
+        ChatName: response.data.Name,
+        Messages: response.data.Messages
+      };
+    
+    return thisConversation
+
+
+  }catch(e){
+    alert(e)
+  }
 
 }
 
+const openConversation = async (id) => {
+
+
+  loading.value = true
+  selectedConversation.value = null
+
+  try {
+    const data = await getConversation(id)
+    selectedConversation.value = data
+    messages.value = response.data.Messages
+  } catch (e) {
+    alert(e)
+  } finally {
+    loading.value = false
+  }
+}
+
+const sendMessage = async () => {
+
+}
 
 // Chiamata alla funzione refresh quando il componente viene montato
 onMounted(() => {
@@ -102,16 +142,45 @@ onMounted(() => {
     <div class="container mt-4">
       <div class="row">
         <div class="col-12">
-          <div v-for="conv in conversations">
+          <div v-for="conv in conversations" :key="conv.conversationId">
             <div class="card mb-3">
               <div class="card-body">
-                <h5 class="card-title" @click="openConversation(conv.conversationId)">
+                <h5 class="card-title">
                   {{ conv.ChatName }}
                 </h5>
+                <button class="btn btn-primary" @click="openConversation(conv.conversationId)">Open</button>
               </div>
             </div>
           </div>
         </div>
+      </div>
+    </div>
+    <div class="col-8">
+      <div v-if="loading">Loading...</div>
+
+      <div v-else-if="selectedConversation">
+        <div class="col-8 d-flex flex-column" style="height: 500px; border: 1px solid #ccc;">
+          <div class="p-2 border-bottom">
+            <h5>{{ selectedConversation.chatName }}</h5>
+          </div>
+          <div class="flex-grow-1 overflow-auto p-2">
+            <div v-for="msg in messages" :key="msg.id" class="mb-2">
+              <div>
+                <strong>{{ msg.sender }}</strong>
+              </div>
+            <div>{{ msg.text }}</div>
+          </div>
+      </div>
+      <div class="p-2 border-top d-flex">
+        <input v-model="newMessage" class="form-control me-2" placeholder="Write..." />
+        <button @click="sendMessage">Send</button>
+      </div>
+
+  </div>
+      </div>
+
+      <div v-else>
+        
       </div>
     </div>
 

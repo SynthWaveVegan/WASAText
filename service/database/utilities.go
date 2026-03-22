@@ -78,7 +78,7 @@ func checkValidName(checkingName string) bool {
 
 func (db *appdbimpl) getUsernamebyId(UserId structs.Identifier) (string, error) {
 	var username string
-	err := db.c.QueryRowContext(context.Background(),`SELECT Username FROM users WHERE UserId = ?`, UserId).Scan(&username)
+	err := db.c.QueryRowContext(context.Background(),`SELECT Username FROM users WHERE UserId = ?`, UserId.Id).Scan(&username)
 	if err != nil {
 		return "", err
 	}
