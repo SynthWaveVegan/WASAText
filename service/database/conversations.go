@@ -89,6 +89,7 @@ func (db *appdbimpl) GetConversation(ConversationId structs.Identifier) (structs
 
 	err := db.c.QueryRowContext(context.Background(),`SELECT UserHosting, UserConnected FROM conversation WHERE ConversationId = ?`, ConversationId.Id).Scan(&thisUserHostingId, &thisUserConnectedId)
 	if err != nil {
+		log.Println("ERROR QUERY 1:", err)
 		return structs.Conversation{}, err
 	}
 
@@ -105,8 +106,9 @@ func (db *appdbimpl) GetConversation(ConversationId structs.Identifier) (structs
 		return structs.Conversation{}, err
 	}
 		
-	rows, err := db.c.QueryContext( context.Background(),`SELECT MessageId, MessageBody, UploaderId FROM message WHERE conversationId = ?`,conversationId.Id)
+	rows, err := db.c.QueryContext( context.Background(),`SELECT MessageId, MessageBody, UploaderId FROM message WHERE ConversationId = ?`,ConversationId.Id)
 	if err != nil {
+		log.Println("ERROR QUERY 2:", err)
 		return structs.Conversation{}, err
 	}
 	defer rows.Close()

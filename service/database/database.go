@@ -62,8 +62,8 @@ type AppDatabase interface {
 	//insertPhoto(PhotoId string, Path string, UploaderId string, Date string) (error)
 
 	//insertMessage(MessageBody string, Comments []structs.Comment, UploaderUserid structs.Identifier, MessageId structs.Identifier, Date string) (error)
-	SendMessage(MessageBody string, UploaderId structs.Identifier, MediaType string) (structs.Message, error)
-	ForwardMessage(OldMessageId structs.Identifier, UploaderId structs.Identifier) (structs.Message, error)
+	SendMessage(MessageBody string, UploaderId structs.Identifier, MediaType string, ConversationId structs.Identifier) (structs.Message, error)
+	ForwardMessage(OldMessageId structs.Identifier, UploaderId structs.Identifier, ConversationId structs.Identifier) (structs.Message, error)
 	DeleteMessage(MessageId structs.Identifier) error
 
 	CommentMessage(CommentBody string, MessageId structs.Identifier, UploaderId structs.Identifier) (structs.Comment, error)
@@ -110,6 +110,8 @@ func New(db *sql.DB) (AppDatabase, error) {
 		Date TEXT,
 		UploaderId VARCHAR(11) NOT NULL,
 		MediaType TEXT,
+		ConversationId VARCHAR(11) NOT NULL,
+		FOREIGN KEY (ConversationId) REFERENCES conversation(ConversationId),
 		FOREIGN KEY (UploaderId) REFERENCES user(UserId)
 	)`
 		commentQuery := `CREATE TABLE IF NOT EXISTS comment (

@@ -56,8 +56,12 @@ func (rt *_router) SENDMESSAGE(w http.ResponseWriter, r *http.Request, ps httpro
 		Id: userId,
 	}
 
+	ConversationId := structs.Identifier{
+		Id: conversationId,
+	}
+
 	
-	NewMessage, err := rt.db.SendMessage(MessageBody, UserId, MediaType)
+	NewMessage, err := rt.db.SendMessage(MessageBody, UserId, MediaType, ConversationId)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("something went wrong: ", err)
@@ -111,7 +115,11 @@ func (rt *_router) FORWARDMESSAGE(w http.ResponseWriter, r *http.Request, ps htt
 		Id: userId,
 	}
 
-	ForwardedMessage, err := rt.db.ForwardMessage(OldMessageId, UserId)
+	ConversationId := structs.Identifier{
+		Id: conversationId,
+	}
+
+	ForwardedMessage, err := rt.db.ForwardMessage(OldMessageId, UserId, ConversationId)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("something went wrong: ", err)

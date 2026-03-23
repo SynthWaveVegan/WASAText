@@ -12,13 +12,15 @@ import (
 	"context"
 )
 
-func (db *appdbimpl) insertMessage(MessageBody string, UploaderId structs.Identifier, MessageId structs.Identifier, Date string, MediaType string) error {
-	_, err := db.c.ExecContext(context.Background(),`INSERT INTO message (MessageId, MessageBody,  Date, UploaderId, MediaType) VALUES (?, ?, ?, ?, ?)`, MessageId, MessageBody, Date, UploaderId, MediaType)
+func (db *appdbimpl) insertMessage(MessageBody string, UploaderId structs.Identifier, MessageId structs.Identifier, Date string, MediaType string, ConversationId structs.Identifier) error {
+	_, err := db.c.ExecContext(context.Background(),
+	`INSERT INTO message (MessageId, MessageBody,  Date, UploaderId, MediaType, ConversationId) VALUES (?, ?, ?, ?, ?, ?)`, 
+	MessageId.Id, MessageBody, Date, UploaderId.Id, MediaType, ConversationId.Id)
 
 	return err
 }
 
-func (db *appdbimpl) SendMessage(MessageBody string, UploaderId structs.Identifier, MediaType string) (structs.Message, error) {
+func (db *appdbimpl) SendMessage(MessageBody string, UploaderId structs.Identifier, MediaType string, ConversationId structs.Identifier) (structs.Message, error) {
 
 	thisMessageId := generateIdentifier("M")
 
@@ -33,7 +35,7 @@ func (db *appdbimpl) SendMessage(MessageBody string, UploaderId structs.Identifi
 
 	messageDate := time.Now().UTC().Format(time.RFC3339)
 
-	err = db.insertMessage(MessageBody, UploaderId, thisMessageId, messageDate, MediaType)
+	err = db.insertMessage(MessageBody, UploaderId, thisMessageId, messageDate, MediaType, ConversationId)
 	if err != nil {
 		return structs.Message{}, err
 	}
@@ -45,12 +47,13 @@ func (db *appdbimpl) SendMessage(MessageBody string, UploaderId structs.Identifi
 		MessageId:   thisMessageId,
 		Date:        messageDate,
 		MediaType:   MediaType,
+		ConversationId: ConversationId,
 	}
 
 	return newMessage, nil
 }
 
-func (db *appdbimpl) ForwardMessage(OldMessageId structs.Identifier, UploaderId structs.Identifier) (structs.Message, error) {
+func (db *appdbimpl) ForwardMessage(OldMessageId structs.Identifier, UploaderId structs.Identifier, ConversationId structs.Identifier) (structs.Message, error) {
 
 	var MessageBody string
 	var MediaType string
@@ -78,7 +81,7 @@ func (db *appdbimpl) ForwardMessage(OldMessageId structs.Identifier, UploaderId 
 			return structs.Message{}, err
 		}
 
-	err = db.insertMessage(MessageBody, UploaderId, thisMessageId, messageDate, MediaType)
+	err = db.insertMessage(MessageBody, UploaderId, thisMessageId, messageDate, MediaType, ConversationId)
 	if err != nil {
 		return structs.Message{}, err
 	}
@@ -90,6 +93,7 @@ func (db *appdbimpl) ForwardMessage(OldMessageId structs.Identifier, UploaderId 
 		MessageId:   thisMessageId,
 		Date:        messageDate,
 		MediaType:   MediaType,
+		ConversationId: ConversationId,
 	}
 
 	return forwardedMessage, nil

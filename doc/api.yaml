@@ -714,6 +714,8 @@ components:
           type: string
           enum: [text, photo]
           description: Type of media in the message
+        ConversationId:
+          $ref: "#/components/schemas/Identifier"
 
     Comment:
       title: comment

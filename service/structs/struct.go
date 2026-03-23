@@ -19,12 +19,13 @@ type Comment struct {
 }
 
 type Message struct {
-	MessageBody string       `json:"MessageBody"`
-	Comments    []Comment    `json:"Comments"`
-	UploaderId  Identifier   `json:"UploaderId"`
-	MessageId   Identifier   `json:"messageId"`
-	Date        string       `json:"Date"`
-	MediaType   string       `json:"MediaType"`
+	MessageBody    string        `json:"MessageBody"`
+	Comments       []Comment     `json:"Comments"`
+	UploaderId     Identifier    `json:"UploaderId"`
+	MessageId      Identifier    `json:"messageId"`
+	Date           string        `json:"Date"`
+	MediaType      string        `json:"MediaType"`
+	ConversationId Identifier    `json:"ConversationId"`
 }
 
 type Group struct {
