@@ -178,7 +178,7 @@ paths:
         content:
           application/json: 
             schema:
-              $ref: "#/components/schemas/Message" 
+              $ref: "#/components/schemas/Message/MessageBody" 
       responses:
         "201":
           description: message created succesfully

@@ -214,6 +214,6 @@ func (db *appdbimpl) CheckGroupExist(Groupname string) (string, bool, error) {
 		}
 	} else {
 		return GroupId, true, nil
-	}
+	} 
 
 }

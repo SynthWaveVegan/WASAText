@@ -106,7 +106,8 @@ func (db *appdbimpl) GetConversation(ConversationId structs.Identifier) (structs
 		return structs.Conversation{}, err
 	}
 		
-	rows, err := db.c.QueryContext( context.Background(),`SELECT MessageId, MessageBody, UploaderId FROM message WHERE ConversationId = ?`,ConversationId.Id)
+	rows, err := db.c.QueryContext( context.Background(),`SELECT 
+	MessageId, MessageBody, Date, UploaderId, MediaType FROM message WHERE ConversationId = ?`, ConversationId.Id)
 	if err != nil {
 		log.Println("ERROR QUERY 2:", err)
 		return structs.Conversation{}, err

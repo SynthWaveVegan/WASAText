@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import axios from '../services/axios.js'
 import { reactive } from 'vue'
-import Chat from '../components/Chat.vue'
+
 
 
 const errormsg = ref(null);
@@ -12,6 +12,11 @@ const username = ref(localStorage.getItem('username'));
 const UserId = ref(localStorage.getItem('userId'));  
 const selectedConversation = ref(null)
 const Messages = ref([]);
+
+const Message = reactive({
+  MessageBody: '',
+  MessageId: ''
+})
 
 const Conversation = reactive({
   conversationId: '',
@@ -47,7 +52,8 @@ const createConversation = async () => {
         conversationId: response.data.Identifier.Identifier,
         UserHosting: response.data.userHosting.Identifier,
         UserConnected: response.data.UserConnected.Identifier,
-        ChatName: response.data.Name
+        ChatName: response.data.Name,
+        Messages: response.data.Messages
       };
 
       console.log(response.data)
@@ -93,7 +99,7 @@ const openConversation = async (id) => {
   try {
     const data = await getConversation(id)
     selectedConversation.value = data
-    messages.value = response.data.Messages
+    Messages.value = data.Messages 
   } catch (e) {
     alert(e)
   } finally {
@@ -102,7 +108,19 @@ const openConversation = async (id) => {
 }
 
 const sendMessage = async () => {
+  try{
+    axios.defaults.headers.common['Authorization'] = UserId.value
+    axios.defaults.headers.common['MediaType'] = "Text"
+    const response = await axios.post(`/users/${UserId.value}/conversations${openConversation.id}/messages`, {
+      MessageBody: Message.MessageBody
+    })
 
+    const newMessage = {
+      
+    }
+  }catch(e){
+    alert(e)
+  }
 }
 
 // Chiamata alla funzione refresh quando il componente viene montato
@@ -172,7 +190,7 @@ onMounted(() => {
           </div>
       </div>
       <div class="p-2 border-top d-flex">
-        <input v-model="newMessage" class="form-control me-2" placeholder="Write..." />
+        <input v-model="Message.MessageBody" class="form-control me-2" placeholder="Write..." />
         <button @click="sendMessage">Send</button>
       </div>
 
