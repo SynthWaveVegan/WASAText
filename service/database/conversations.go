@@ -9,28 +9,31 @@ import (
 	"context"
 )
 
-func (db *appdbimpl) CheckConversation(UserHosting string, UserConnected string) (structs.Identifier, bool, error) {
+func (db *appdbimpl) ConversationExists(user1, user2 string) (bool, error) {
+	var exists bool
 
-	var counter int
-	err := db.c.QueryRowContext(context.Background(), `SELECT COUNT(*) FROM conversation WHERE UserHosting = ? AND UserConnected = ?`, UserHosting, UserConnected).Scan(&counter)
+	query := `
+	SELECT EXISTS (
+		SELECT 1 FROM conversation 
+		WHERE (UserHosting = ? AND UserConnected = ?)
+		   OR (UserHosting = ? AND UserConnected = ?)
+	)
+	`
+
+	err := db.c.QueryRowContext(
+		context.Background(),
+		query,
+		user1, user2,
+		user2, user1,
+	).Scan(&exists)
+
 	if err != nil {
-		return structs.Identifier{}, false, err
-	}
-	if counter != 0 {
-		var Id string
-		err := db.c.QueryRowContext(context.Background(),`SELECT ConversationId FROM conversation WHERE UserHosting = ? AND UserConnected = ?`, UserHosting, UserConnected).Scan(&Id)
-			if err != nil {
-				return structs.Identifier{}, false, err
-			}
-
-			ConversationId := structs.Identifier {
-				Id: Id,
-			}
-		return ConversationId, false, nil
+		return false, err
 	}
 
-	return structs.Identifier{}, true, nil
+	return exists, nil
 }
+
 func (db *appdbimpl) CreateConversation(UserHosting structs.Identifier, UserConnectedName string) (structs.Conversation, error) {
 
 	var Messages []structs.Message
@@ -50,19 +53,15 @@ func (db *appdbimpl) CreateConversation(UserHosting structs.Identifier, UserConn
 		return structs.Conversation{}, err
 	}
 
-	/*OtherConversationId, ChatNotExist, err := db.CheckConversation(UserHosting.Id, UserConnected.Id)
-	if err != nil {
-		return structs.Conversation{}, err
-	}
-
-	if ChatNotExist == false {
-		OldChat, err := db.GetConversation(OtherConversationId)
+	exists, err := db.ConversationExists(UserHosting.Id, UserConnected.Id)
 		if err != nil {
 			return structs.Conversation{}, err
 		}
 
-		return OldChat, nil
-	}*/
+		if exists {
+			return structs.Conversation{}, err
+		}
+
 
 
 	_, err = db.c.ExecContext(context.Background(),`INSERT INTO conversation (ConversationId, UserHosting, UserConnected) VALUES (?, ?, ?)`, ConversationId.Id, UserHosting.Id, UserConnected.Id)
