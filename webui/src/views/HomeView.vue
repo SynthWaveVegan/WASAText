@@ -12,10 +12,15 @@ const username = ref(localStorage.getItem('username'));
 const UserId = ref(localStorage.getItem('userId'));  
 const selectedConversation = ref(null)
 const Messages = ref([]);
+const Comments = ref([]);
 
 const Message = reactive({
   MessageBody: '',
-  MessageId: ''
+  MessageId: '',
+  UploaderId: '',
+  Date: '',
+  MediaType: '',
+  ConversationId: ''
 })
 
 const Conversation = reactive({
@@ -27,7 +32,7 @@ const Conversation = reactive({
 
 const conversations = ref([]);
 
-// Funzione per fare il refresh
+
 const refresh = async () => {
   loading.value = true;
   errormsg.value = null;
@@ -57,7 +62,7 @@ const createConversation = async () => {
       };
 
       console.log(response.data)
-      // Aggiunta della nuova conversazione alla lista
+      
       
       conversations.value.push(newConversation);
 
@@ -90,6 +95,19 @@ const getConversation = async (id) => {
 
 }
 
+const getMyConversations = async () => {
+  try{
+    axios.defaults.headers.common['Authorization'] = UserId.value
+    const response = await axios.get(`/users/${UserId.value}/conversations`)
+    if (response.data.lenght != 0) {
+      conversations.value = response.data
+    }
+    
+  }catch(e){
+    alert(e)
+  }
+}
+
 const openConversation = async (id) => {
 
 
@@ -108,25 +126,62 @@ const openConversation = async (id) => {
 }
 
 const sendMessage = async () => {
-  try{
-    axios.defaults.headers.common['Authorization'] = UserId.value
-    axios.defaults.headers.common['MediaType'] = "Text"
-    const response = await axios.post(`/users/${UserId.value}/conversations${openConversation.id}/messages`, {
-      MessageBody: Message.MessageBody
-    })
-
-    const newMessage = {
-      
+  try {
+    // Verifica che tu abbia i dati necessari per inviare il messaggio
+    if (!Message.MessageBody || !UserId.value || !openConversation.id) {
+      alert("Dati mancanti!");
+      return;
     }
-  }catch(e){
-    alert(e)
-  }
-}
 
+   
+    axios.defaults.headers.common['Authorization'] = UserId.value;
+    axios.defaults.headers.common['MediaType'] = "Text";  
+
+
+    
+
+    const response = await axios.post(`/users/${UserId.value}/conversations/${openConversation.id}/messages`, 
+    {messageBody: Message.MessageBody});
+
+
+    console.log("Messaggio inviato con successo:", response.data);
+
+ 
+    const updatedConversation = await getConversation(openConversation.id);
+
+    
+    Message = {
+      MessageBody: response.data.MessageBody,  
+      MessageId: response.data.MessageId,     
+      UploaderId: response.data.UploaderId, 
+      Date: response.data.Date,                
+      MediaType: response.data.MediaType,    
+      ConversationId: response.data.ConversationId  
+    };
+
+    updatedConversation.Messages.push(Message)
+
+
+
+   
+    Message = {
+      MessageBody: '',
+      MessageId: '',
+      UploaderId: '',
+      Date: '',
+      MediaType: '',
+      ConversationId: ''
+    };
+
+  } catch (e) {
+    console.error(e);
+    alert("Si è verificato un errore durante l'invio del messaggio.");
+  }
+};
 // Chiamata alla funzione refresh quando il componente viene montato
 onMounted(() => {
-  
 
+  //getMyConversations();
   
 });
 </script>
@@ -135,7 +190,7 @@ onMounted(() => {
   <div>
     <div
       class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-      <h1 class="h2">Welcome, {{ username }}!</h1>  <!-- Ora username è reattivo -->
+      <h1 class="h2">Welcome, {{ username }}!</h1>  
       
       <div class="btn-toolbar mb-2 mb-md-0">
         <div>
@@ -184,9 +239,9 @@ onMounted(() => {
           <div class="flex-grow-1 overflow-auto p-2">
             <div v-for="msg in messages" :key="msg.id" class="mb-2">
               <div>
-                <strong>{{ msg.sender }}</strong>
+                <strong>{{ msg.uploaderId }}</strong>
               </div>
-            <div>{{ msg.text }}</div>
+            <div>{{ msg.MessageBody }}</div>
           </div>
       </div>
       <div class="p-2 border-top d-flex">
