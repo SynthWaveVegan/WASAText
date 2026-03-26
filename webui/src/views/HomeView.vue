@@ -114,42 +114,42 @@ const getMyConversations = async () => {
   }
 };
 const openConversation = async (id) => {
-
-
-  loading.value = true
-  selectedConversation.value = null
+  loading.value = true;
+  selectedConversation.value = null;
 
   try {
-    const data = await getConversation(id)
-    selectedConversation.value = data
-    Messages.value = data.Messages 
+    const data = await getConversation(id);
+    console.log("Dati ottenuti da getConversation:", data);  // Log per debug
+
+    // Assicurati di usare 'conversationId' invece di 'id'
+    if (data && data.conversationId) {
+      selectedConversation.value = data;
+      Messages.value = data.Messages;  // Assegna i messaggi
+    } else {
+      console.error("La risposta non contiene un conversationId valido.");
+      alert("Errore: la conversazione non è stata trovata.");
+    }
   } catch (e) {
-    alert(e)
+    alert(e);
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 
 const sendMessage = async () => {
   try {
 
-    
-
-   
     axios.defaults.headers.common['Authorization'] = UserId.value;
     axios.defaults.headers.common['MediaType'] = "Text";  
 
-
-    
-
-    const response = await axios.post(`/users/${UserId.value}/conversations/${openConversation.id}/messages`, 
+    const response = await axios.post(`/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages`, 
     {messageBody: Message.MessageBody});
 
 
     console.log("Messaggio inviato con successo:", response.data);
 
  
-    const updatedConversation = await getConversation(openConversation.id);
+    const updatedConversation = await getConversation(selectedConversation.value.conversationId);
 
     
     Message = {
@@ -239,7 +239,7 @@ onMounted(() => {
             <h5>{{ selectedConversation.chatName }}</h5>
           </div>
           <div class="flex-grow-1 overflow-auto p-2">
-            <div v-for="msg in Messages" :key="msg.id" class="mb-2">
+            <div v-for="msg in Messages" :key="msg.MessageId" class="mb-2">
               <div>
                 <strong>{{ msg.uploaderId }}</strong>
               </div>
