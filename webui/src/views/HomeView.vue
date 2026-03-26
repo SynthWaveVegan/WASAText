@@ -96,18 +96,23 @@ const getConversation = async (id) => {
 }
 
 const getMyConversations = async () => {
-  try{
-    axios.defaults.headers.common['Authorization'] = UserId.value
-    const response = await axios.get(`/users/${UserId.value}/conversations`)
-    if (response.data.lenght != 0) {
-      conversations.value = response.data
-    }
-    
-  }catch(e){
-    alert(e)
-  }
-}
+  try {
+    axios.defaults.headers.common['Authorization'] = UserId.value;
+    const response = await axios.get(`/users/${UserId.value}/conversations`);
 
+    // Verifica che la risposta contenga dati
+    if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+      console.log("Conversazioni recuperate:", response.data);
+      conversations.value = response.data; // Aggiorna la lista delle conversazioni
+    } else {
+      console.log("Nessuna conversazione trovata.");
+      conversations.value = []; // Imposta un array vuoto se non ci sono conversazioni
+    }
+  } catch (e) {
+    console.error("Errore durante il recupero delle conversazioni:", e);
+    alert("Si è verificato un errore durante il recupero delle conversazioni.");
+  }
+};
 const openConversation = async (id) => {
 
 
@@ -127,11 +132,8 @@ const openConversation = async (id) => {
 
 const sendMessage = async () => {
   try {
-    // Verifica che tu abbia i dati necessari per inviare il messaggio
-    if (!Message.MessageBody || !UserId.value || !openConversation.id) {
-      alert("Dati mancanti!");
-      return;
-    }
+
+    
 
    
     axios.defaults.headers.common['Authorization'] = UserId.value;
@@ -181,7 +183,7 @@ const sendMessage = async () => {
 // Chiamata alla funzione refresh quando il componente viene montato
 onMounted(() => {
 
-  //getMyConversations();
+  getMyConversations();
   
 });
 </script>
@@ -237,7 +239,7 @@ onMounted(() => {
             <h5>{{ selectedConversation.chatName }}</h5>
           </div>
           <div class="flex-grow-1 overflow-auto p-2">
-            <div v-for="msg in messages" :key="msg.id" class="mb-2">
+            <div v-for="msg in Messages" :key="msg.id" class="mb-2">
               <div>
                 <strong>{{ msg.uploaderId }}</strong>
               </div>
