@@ -103,7 +103,18 @@ const getMyConversations = async () => {
     // Verifica che la risposta contenga dati
     if (response.data && Array.isArray(response.data) && response.data.length > 0) {
       console.log("Conversazioni recuperate:", response.data);
-      conversations.value = response.data; // Aggiorna la lista delle conversazioni
+      
+      // Recupera i dettagli per ciascuna conversazione
+      const allConversations = await Promise.all(
+        response.data.map(async (conversation) => {
+          const detailedConversation = await getConversation(conversation.Identifier);
+          return detailedConversation;
+        })
+      );
+
+      // Assegna le conversazioni dettagliate
+      conversations.value = allConversations;
+
     } else {
       console.log("Nessuna conversazione trovata.");
       conversations.value = []; // Imposta un array vuoto se non ci sono conversazioni
@@ -113,6 +124,7 @@ const getMyConversations = async () => {
     alert("Si è verificato un errore durante il recupero delle conversazioni.");
   }
 };
+
 const openConversation = async (id) => {
   loading.value = true;
   selectedConversation.value = null;
@@ -124,7 +136,7 @@ const openConversation = async (id) => {
     // Assicurati di usare 'conversationId' invece di 'id'
     if (data && data.conversationId) {
       selectedConversation.value = data;
-      Messages.value = data.Messages;  // Assegna i messaggi
+      Messages.value = data.Messages || [];;  // Assegna i messaggi
     } else {
       console.error("La risposta non contiene un conversationId valido.");
       alert("Errore: la conversazione non è stata trovata.");
@@ -180,6 +192,7 @@ const sendMessage = async () => {
     alert("Si è verificato un errore durante l'invio del messaggio.");
   }
 };
+
 // Chiamata alla funzione refresh quando il componente viene montato
 onMounted(() => {
 

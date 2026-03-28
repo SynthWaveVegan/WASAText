@@ -10,28 +10,57 @@ import (
 )
 
 func (db *appdbimpl) ConversationExists(user1, user2 string) (bool, error) {
-	var exists bool
+    var exists bool
 
-	query := `
-	SELECT EXISTS (
-		SELECT 1 FROM conversation 
-		WHERE (UserHosting = ? AND UserConnected = ?)
-		   OR (UserHosting = ? AND UserConnected = ?)
-	)
-	`
+    // Query per verificare se la conversazione esiste tra due utenti
+    query := `
+    SELECT EXISTS (
+        SELECT 1 FROM conversation 
+        WHERE (UserHosting = ? AND UserConnected = ?)
+           OR (UserHosting = ? AND UserConnected = ?)
+    )
+    `
 
-	err := db.c.QueryRowContext(
-		context.Background(),
-		query,
-		user1, user2,
-		user2, user1,
-	).Scan(&exists)
+    err := db.c.QueryRowContext(
+        context.Background(),
+        query,
+        user1, user2,
+        user2, user1,
+    ).Scan(&exists)
 
-	if err != nil {
-		return false, err
-	}
+    if err != nil {
+        return false, err
+    }
 
-	return exists, nil
+    // Se esiste una conversazione, verifica se ha messaggi o altre informazioni
+    if exists {
+        // Query per verificare se ci sono messaggi associati alla conversazione
+        var messageCount int
+        checkMessagesQuery := `
+        SELECT COUNT(*) FROM message WHERE ConversationId IN (
+            SELECT ConversationId FROM conversation 
+            WHERE (UserHosting = ? AND UserConnected = ?)
+               OR (UserHosting = ? AND UserConnected = ?)
+        )
+        `
+        err := db.c.QueryRowContext(
+            context.Background(),
+            checkMessagesQuery,
+            user1, user2,
+            user2, user1,
+        ).Scan(&messageCount)
+
+        if err != nil {
+            return false, err
+        }
+
+        // Se la conversazione ha 0 messaggi, restituisci false per evitare creazione vuota
+        if messageCount == 0 {
+            return false, nil // La conversazione non ha messaggi, quindi non è valida
+        }
+    }
+
+    return exists, nil
 }
 
 func (db *appdbimpl) CreateConversation(UserHosting structs.Identifier, UserConnectedName string) (structs.Conversation, error) {
@@ -39,6 +68,7 @@ func (db *appdbimpl) CreateConversation(UserHosting structs.Identifier, UserConn
 	var Messages []structs.Message
 
 	ConversationId := generateIdentifier("S")
+	log.Println("Generated Conversation ID:", ConversationId.Id)
 	
 	validId, err := db.checkValidId(ConversationId.Id, "S")
 	if err != nil {
@@ -54,6 +84,7 @@ func (db *appdbimpl) CreateConversation(UserHosting structs.Identifier, UserConn
 	}
 
 	exists, err := db.ConversationExists(UserHosting.Id, UserConnected.Id)
+	log.Println("exist = ", exists)
 		if err != nil {
 			return structs.Conversation{}, err
 		}
@@ -66,7 +97,8 @@ func (db *appdbimpl) CreateConversation(UserHosting structs.Identifier, UserConn
 
 	_, err = db.c.ExecContext(context.Background(),`INSERT INTO conversation (ConversationId, UserHosting, UserConnected) VALUES (?, ?, ?)`, ConversationId.Id, UserHosting.Id, UserConnected.Id)
 	if err != nil {
-		return structs.Conversation{}, err
+    log.Println("Errore nell'inserimento della conversazione:", err)
+    return structs.Conversation{}, err
 	}
 
 	NewChat := structs.Conversation{
