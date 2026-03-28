@@ -37,13 +37,11 @@ func (db *appdbimpl) checkValidId(checkingId string, startId string) (bool, erro
 	switch startId {
 	case "U":
 		err = db.c.QueryRowContext(context.Background(), `SELECT COUNT(*) FROM users WHERE UserId = ?`, checkingId).Scan(&countCheck)
-	case "S":
+	case "C":
 		err = db.c.QueryRowContext(context.Background(), `SELECT COUNT(*) FROM conversation WHERE ConversationId = ?`, checkingId).Scan(&countCheck)
 	case "M":
 		err = db.c.QueryRowContext(context.Background(), `SELECT COUNT(*) FROM message WHERE MessageId = ?`, checkingId).Scan(&countCheck)
-	case "G":
-		err = db.c.QueryRowContext(context.Background(), `SELECT COUNT(*) FROM group WHERE GroupId = ?`, checkingId).Scan(&countCheck)
-	case "C":
+	case "R":
 		err = db.c.QueryRowContext(context.Background(), `SELECT COUNT(*) FROM comment WHERE CommentId = ?`, checkingId).Scan(&countCheck)
 	default:
 		// Se startId non è valido, restituisci errore

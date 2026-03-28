@@ -123,20 +123,18 @@ func New(db *sql.DB) (AppDatabase, error) {
 		FOREIGN KEY (UploaderId) REFERENCES user(UserId),
 		FOREIGN KEY (MessageId) REFERENCES message(MessageId)
 	)`
-		userGroupQuery := `CREATE TABLE IF NOT EXISTS userGroup (
-		GroupId VARCHAR(11) NOT NULL,
+		userChatQuery := `CREATE TABLE IF NOT EXISTS userChat (
+		ConversationId VARCHAR(11) NOT NULL,
 		UserId VARCHAR(11) NOT NULL,
-		PRIMARY KEY (GroupId, UserId),
+		PRIMARY KEY (ConversationId, UserId),
 		FOREIGN KEY (UserId) REFERENCES user(UserId),
-		FOREIGN KEY (GroupId) REFERENCES groups(GroupId)
+		FOREIGN KEY (ConversationId) REFERENCES conversation(ConversationId)
 		
 	)`
 		conversationQuery := `CREATE TABLE IF NOT EXISTS conversation (
 		ConversationId VARCHAR(11) NOT NULL PRIMARY KEY,
-		UserHosting VARCHAR(11) NOT NULL,
-		UserConnected VARCHAR(11) NOT NULL,
-		FOREIGN KEY (UserConnected) REFERENCES user(UserId),
-		FOREIGN KEY (UserHosting) REFERENCES user(UserId)
+		ChatPhoto TEXT,
+		IsGroup BOOLEAN
 
 	)`
 		/*	photoQuery := `CREATE TABLE IF NOT EXISTS photo (
@@ -147,13 +145,13 @@ func New(db *sql.DB) (AppDatabase, error) {
 			FOREIGN KEY (UploaderId) REFERENCES user(UserId)
 		)`*/
 
-		groupQuery := `CREATE TABLE IF NOT EXISTS groups (
+		/*groupQuery := `CREATE TABLE IF NOT EXISTS groups (
 		GroupId VARCHAR(11) NOT NULL PRIMARY KEY,
 		GroupName VARCHAR(16) NOT NULL,
 		GroupPhoto TEXT
-	)`
+	)`*/
 
-		err = execQueries(db, userQuery, messageQuery, commentQuery, userGroupQuery, conversationQuery, groupQuery)
+		err = execQueries(db, userQuery, messageQuery, commentQuery, userChatQuery, conversationQuery)
 		if err != nil {
 			log.Println("Error creating tables: ", err)
 		}

@@ -10,67 +10,29 @@ import (
 )
 
 func (db *appdbimpl) ConversationExists(user1, user2 string) (bool, error) {
+
     var exists bool
 
-    // Query per verificare se la conversazione esiste tra due utenti
-    query := `
-    SELECT EXISTS (
-        SELECT 1 FROM conversation 
-        WHERE (UserHosting = ? AND UserConnected = ?)
-           OR (UserHosting = ? AND UserConnected = ?)
-    )
-    `
+	var ConversationId string
 
-    err := db.c.QueryRowContext(
-        context.Background(),
-        query,
-        user1, user2,
-        user2, user1,
-    ).Scan(&exists)
+	rows, err := db.c.QueryRowContext(context.Background(),`SELECT ConversationId FROM UserChat WHERE UserId = ?`, user1).Scan(&Conversationid)
+	if err != nil {
+		return false, err
+	}
+	defer rows.Close()
 
-    if err != nil {
-        return false, err
-    }
-
-    // Se esiste una conversazione, verifica se ha messaggi o altre informazioni
-    if exists {
-        // Query per verificare se ci sono messaggi associati alla conversazione
-        var messageCount int
-        checkMessagesQuery := `
-        SELECT COUNT(*) FROM message WHERE ConversationId IN (
-            SELECT ConversationId FROM conversation 
-            WHERE (UserHosting = ? AND UserConnected = ?)
-               OR (UserHosting = ? AND UserConnected = ?)
-        )
-        `
-        err := db.c.QueryRowContext(
-            context.Background(),
-            checkMessagesQuery,
-            user1, user2,
-            user2, user1,
-        ).Scan(&messageCount)
-
-        if err != nil {
-            return false, err
-        }
-
-        // Se la conversazione ha 0 messaggi, restituisci false per evitare creazione vuota
-        if messageCount == 0 {
-            return false, nil // La conversazione non ha messaggi, quindi non è valida
-        }
-    }
-
-    return exists, nil
+    
+    
 }
 
 func (db *appdbimpl) CreateConversation(UserHosting structs.Identifier, UserConnectedName string) (structs.Conversation, error) {
 
 	var Messages []structs.Message
 
-	ConversationId := generateIdentifier("S")
+	ConversationId := generateIdentifier("C")
 	log.Println("Generated Conversation ID:", ConversationId.Id)
 	
-	validId, err := db.checkValidId(ConversationId.Id, "S")
+	validId, err := db.checkValidId(ConversationId.Id, "C")
 	if err != nil {
 		return structs.Conversation{}, err
 	}
