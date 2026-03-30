@@ -36,10 +36,9 @@ type Group struct {
 }
 
 type Conversation struct {
-	ConversationId Identifier  `json:"Identifier"`
-	UserConnected  Identifier  `json:"UserConnected"`
-	UserHosting    Identifier  `json:"userHosting"`
-	ChatName       string      `json:"Name"`
-	Messages      []Message    `json:"Messages"`
+	ConversationId Identifier   `json:"Identifier"`
+	Users          []User       `json:"Users"`
+	ChatName       string       `json:"Name"`
+	Messages       []Message    `json:"Messages"`
 }
 

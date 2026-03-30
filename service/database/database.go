@@ -48,7 +48,7 @@ type AppDatabase interface {
 	//checkValidId(checkingId string, startId string) (bool, error)
 	//checkUserExist(Username string) (string, bool, error)
 
-	GetConversation(ConversationId structs.Identifier) (structs.Conversation, error)
+	GetConversation(ConversationId structs.Identifier, currentUserId string) (structs.Conversation, error)
 	GetMyConversations(UserHosting structs.Identifier) ([]structs.Identifier, error)
 	CreateConversation(UserHosting structs.Identifier, UserConnectedName string) (structs.Conversation, error)
 
@@ -127,7 +127,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 		ConversationId VARCHAR(11) NOT NULL,
 		UserId VARCHAR(11) NOT NULL,
 		PRIMARY KEY (ConversationId, UserId),
-		FOREIGN KEY (UserId) REFERENCES user(UserId),
+		FOREIGN KEY (UserId) REFERENCES users(UserId),
 		FOREIGN KEY (ConversationId) REFERENCES conversation(ConversationId)
 		
 	)`

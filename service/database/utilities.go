@@ -95,3 +95,14 @@ func (db *appdbimpl) GetUserIdByName(Username string) (structs.Identifier, error
 	}
 	return UserId, nil
 }
+
+func (db *appdbimpl) getUserPhotobyId(UserId string) (string, error) {
+	
+	var Photo string
+	err := db.c.QueryRowContext(context.Background(),`SELECT UserPhoto FROM users WHERE UserId = ?`, UserId).Scan(&Photo)
+	if err != nil {
+		return "", err
+	}
+	return Photo, nil
+
+}

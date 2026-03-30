@@ -777,10 +777,10 @@ components:
       properties:
         conversationId:
           $ref: "#/components/schemas/Identifier"
-        UserConnected:
-          $ref: "#/components/schemas/Identifier"
-        UserHosting:
-          $ref: "#/components/schemas/Identifier"
+        Users:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
         ChatName:    
           $ref: "#/components/schemas/Name" 
         Messages:

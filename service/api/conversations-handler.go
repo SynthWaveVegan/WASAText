@@ -13,6 +13,7 @@ import (
 func (rt *_router) GETCONVERSATION(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	conversationId := ps.ByName("conversationId")
+	userId := ps.ByName("userId")
 
 	if conversationId == "" {
 		w.WriteHeader(http.StatusBadRequest)
@@ -24,7 +25,7 @@ func (rt *_router) GETCONVERSATION(w http.ResponseWriter, r *http.Request, ps ht
 		Id: conversationId,
 	}
 
-	ThisConversation, err := rt.db.GetConversation(ConversationId)
+	ThisConversation, err := rt.db.GetConversation(ConversationId, userId)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("1 something went wrong: ", err)
