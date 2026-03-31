@@ -9,8 +9,8 @@ import (
 	"context"
 )
 
-func (db *appdbimpl) ConversationExists(user1Id, user2Id string) (bool, error) {
-	// Assicurati che la query restituisca 'true' solo se entrambi gli utenti sono già presenti nella conversazione.
+func (db *appdbimpl) ConversationExists(user1Id string, user2Id string) (bool, error) {
+	
 	query := `
 		SELECT COUNT(*) 
 		FROM userChat uc1
@@ -106,7 +106,6 @@ func (db *appdbimpl) CreateConversation(UserHosting structs.Identifier, UserConn
 
 	Users = append(Users, User2)
 
-
 	NewChat := structs.Conversation{
 
 		ConversationId: ConversationId,
@@ -120,7 +119,6 @@ func (db *appdbimpl) CreateConversation(UserHosting structs.Identifier, UserConn
 
 func (db *appdbimpl) GetConversation(ConversationId structs.Identifier, currentUserId string) (structs.Conversation, error) {
 
-	// Recupera tutti gli utenti associati alla conversazione
 	rows, err := db.c.QueryContext(context.Background(), `
 		SELECT u.UserId, u.Username, u.UserPhoto
 		FROM users u
@@ -133,7 +131,6 @@ func (db *appdbimpl) GetConversation(ConversationId structs.Identifier, currentU
 	}
 	defer rows.Close()
 
-	// Crea una slice di utenti
 	var users []structs.User
 	var otherUserId string
 
@@ -146,7 +143,7 @@ func (db *appdbimpl) GetConversation(ConversationId structs.Identifier, currentU
 		}
 		users = append(users, u)
 
-		// Trova l'altro utente (quello che non è l'attuale)
+		
 		if u.UserId.Id != currentUserId {
 			otherUserId = u.UserId.Id
 		}
@@ -156,10 +153,9 @@ func (db *appdbimpl) GetConversation(ConversationId structs.Identifier, currentU
 		return structs.Conversation{}, fmt.Errorf("no users found in conversation")
 	}
 
-	// Recupera il nome dell'altro utente (quello che non sta usando la funzione)
 	var chatName string
 	if otherUserId != "" {
-		// Ottieni il nome dell'altro utente
+		
 		OtherUserId := structs.Identifier{
 			Id: otherUserId,
 		}
@@ -172,7 +168,6 @@ func (db *appdbimpl) GetConversation(ConversationId structs.Identifier, currentU
 		chatName = otherUsername
 	}
 
-	// Recupera i messaggi della conversazione
 	messageRows, err := db.c.QueryContext(context.Background(), `
 		SELECT MessageId, MessageBody, Date, UploaderId, MediaType
 		FROM message
@@ -187,7 +182,7 @@ func (db *appdbimpl) GetConversation(ConversationId structs.Identifier, currentU
 
 	var messages []structs.Message
 
-	// Scansione dei messaggi
+	
 	for messageRows.Next() {
 
 		var msg structs.Message
@@ -203,12 +198,12 @@ func (db *appdbimpl) GetConversation(ConversationId structs.Identifier, currentU
 		messages = append(messages, msg)
 	}
 
-	// Crea la struct di Conversation
+
 	ChatRetrieved := structs.Conversation{
 		ConversationId: ConversationId,
-		Users:          users,           // Inserisci tutti gli utenti
-		ChatName:       chatName,        // Nome chat (quello dell'altro utente)
-		Messages:       messages,        // Messaggi
+		Users:          users,           
+		ChatName:       chatName,      
+		Messages:       messages,        
 	}
 
 	return ChatRetrieved, nil
@@ -220,7 +215,7 @@ func (db *appdbimpl) GetMyConversations(UserHosting structs.Identifier) ([]struc
 	var ChatStream []structs.Identifier
 	var ConversationId structs.Identifier
 
-	rows, err := db.c.QueryContext(context.Background(),`SELECT ConversationId FROM conversation WHERE UserHosting = ?`, UserHosting.Id)
+	rows, err := db.c.QueryContext(context.Background(),`SELECT ConversationId FROM userChat WHERE UserId = ?`, UserHosting.Id)
 	if err != nil {
 		log.Fatal(err)
 	}

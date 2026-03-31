@@ -25,8 +25,7 @@ const Message = reactive({
 
 const Conversation = reactive({
   conversationId: '',
-  UserHosting: '',
-  UserConnected: '',
+  Users: [],
   ChatName: ''
 })
 
@@ -47,29 +46,27 @@ const refresh = async () => {
 
 const createConversation = async () => {
   try {
-    axios.defaults.headers.common['Authorization'] = UserId.value
+    axios.defaults.headers.common['Authorization'] = UserId.value;
 
     const response = await axios.post(`/users/${UserId.value}/conversations`, {
       Name: Conversation.ChatName
-    })
+    });
+
     
     const newConversation = {
-        conversationId: response.data.Identifier.Identifier,
-        UserHosting: response.data.userHosting.Identifier,
-        UserConnected: response.data.UserConnected.Identifier,
-        ChatName: response.data.Name,
-        Messages: response.data.Messages
-      };
+      conversationId: response.data.Identifier, 
+      Users: response.data.Users,
+      ChatName: response.data.Name, 
+      Messages: response.data.Messages
+    };
 
-      console.log(response.data)
-      
-      
-      conversations.value.push(newConversation);
+    console.log(response.data);
+    conversations.value.push(newConversation);
 
-  } catch(e){
-    alert(e.response ? e.response.data : e.message)
+  } catch (e) {
+    alert(e.response ? e.response.data : e.message);
   }
-}
+};
 
 const getConversation = async (id) => {
   
@@ -77,11 +74,11 @@ const getConversation = async (id) => {
     axios.defaults.headers.common['Authorization'] = UserId.value
     const response = await axios.get(`/users/${UserId.value}/conversations/${id}`)
 
-        
+    console.log(response.data.Users);
+
     const thisConversation = {
         conversationId: response.data.Identifier.Identifier,
-        UserHosting: response.data.userHosting.Identifier,
-        UserConnected: response.data.UserConnected.Identifier,
+        Users: response.data.Users,
         ChatName: response.data.Name,
         Messages: response.data.Messages
       };
@@ -249,7 +246,7 @@ onMounted(() => {
       <div v-else-if="selectedConversation">
         <div class="col-8 d-flex flex-column" style="height: 500px; border: 1px solid #ccc;">
           <div class="p-2 border-bottom">
-            <h5>{{ selectedConversation.chatName }}</h5>
+            <h5>{{ selectedConversation.ChatName }}</h5>
           </div>
           <div class="flex-grow-1 overflow-auto p-2">
             <div v-for="msg in Messages" :key="msg.MessageId" class="mb-2">

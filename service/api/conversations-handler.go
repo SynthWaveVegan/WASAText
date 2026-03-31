@@ -66,7 +66,7 @@ func (rt *_router) CREATECONVERSATION(w http.ResponseWriter, r *http.Request, ps
 	}
 
 	type RequestBody struct {
-    Name string `json:"name"`
+    	Name string `json:"Name"`
 	}
 	
 	var username RequestBody

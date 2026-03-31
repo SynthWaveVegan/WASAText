@@ -64,7 +64,7 @@ func (db *appdbimpl) GetUser(UserId structs.Identifier) (structs.User, error) {
 	var userphoto string
 	var username string
 
-	err := db.c.QueryRowContext(context.Background(),`SELECT Username FROM users WHERE UserId = ?`, UserId).Scan(&username)
+	err := db.c.QueryRowContext(context.Background(),`SELECT Username FROM users WHERE UserId = ?`, UserId.Id).Scan(&username)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return structs.User{}, err
@@ -73,7 +73,7 @@ func (db *appdbimpl) GetUser(UserId structs.Identifier) (structs.User, error) {
 		}
 	}
 
-	err = db.c.QueryRowContext(context.Background(),`SELECT UserPhoto FROM users WHERE UserId = ?`, UserId).Scan(&userphoto)
+	err = db.c.QueryRowContext(context.Background(),`SELECT UserPhoto FROM users WHERE UserId = ?`, UserId.Id).Scan(&userphoto)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return structs.User{}, err
