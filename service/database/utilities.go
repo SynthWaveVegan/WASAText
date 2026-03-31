@@ -65,7 +65,7 @@ func (db *appdbimpl) checkValidId(checkingId string, startId string) (bool, erro
 
 func checkValidName(checkingName string) bool {
 	
-	log.Printf("Nome utente ricevuto: '%s'", checkingName)
+	log.Printf("Nome ricevuto: '%s'", checkingName)
 	if len([]rune(checkingName)) >= 1 && len([]rune(checkingName)) <= 16 {
 		return true
 	}

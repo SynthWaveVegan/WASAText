@@ -131,6 +131,8 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
+  /users/{userId}/group:
+
     put:
       security:
         - bearerAuth: []
@@ -143,9 +145,13 @@ paths:
       parameters:
 
           - $ref: "#/components/parameters/userId"
-          - $ref: "#/components/parameters/groupId"
         
       operationId: ADDTOGROUP
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Name"
       responses:
           "204":
             description: user added to group succesfully

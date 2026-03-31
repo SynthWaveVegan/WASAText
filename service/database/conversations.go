@@ -36,6 +36,7 @@ func (db *appdbimpl) CreateConversation(UserHosting structs.Identifier, UserConn
 
 	var Messages []structs.Message
 	var IsGroup = 0
+	var GroupName = ""
 	
 
 	ConversationId := generateIdentifier("C")
@@ -69,8 +70,8 @@ func (db *appdbimpl) CreateConversation(UserHosting structs.Identifier, UserConn
 		return structs.Conversation{}, err
 	}
 	
-	_, err = db.c.ExecContext(context.Background(),`INSERT INTO conversation (ConversationId, ChatPhoto, IsGroup) VALUES (?, ?, ?)`, 
-	ConversationId.Id, ChatPhoto, IsGroup)
+	_, err = db.c.ExecContext(context.Background(),`INSERT INTO conversation (ConversationId, ChatPhoto, GroupName, IsGroup) VALUES (?, ?, ?, ?)`, 
+	ConversationId.Id, ChatPhoto, GroupName, IsGroup)
 	if err != nil {
     log.Println("Errore nell'inserimento della conversazione:", err)
     return structs.Conversation{}, err

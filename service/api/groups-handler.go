@@ -12,10 +12,9 @@ import (
 
 func (rt *_router) ADDTOGROUP(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	groupId := ps.ByName("groupId")
 	userId := ps.ByName("userId")
 
-	if userId == "" || groupId == "" {
+	if userId == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("no groupId or userId retrieved")
 		return
@@ -29,7 +28,12 @@ func (rt *_router) ADDTOGROUP(w http.ResponseWriter, r *http.Request, ps httprou
 		return
 	}
 
-	var GroupName string
+	type RequestBody struct {
+    	Name string `json:"Name"`
+	}
+
+	var GroupName RequestBody
+
 	err := json.NewDecoder(r.Body).Decode(&GroupName)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -43,7 +47,7 @@ func (rt *_router) ADDTOGROUP(w http.ResponseWriter, r *http.Request, ps httprou
 		Id: userId,
 	}
 
-	err = rt.db.AddToGroup(GroupName, UserId)
+	err = rt.db.AddToGroup(GroupName.Name, UserId)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("something went wrong: ", err)

@@ -134,6 +134,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 		conversationQuery := `CREATE TABLE IF NOT EXISTS conversation (
 		ConversationId VARCHAR(11) NOT NULL PRIMARY KEY,
 		ChatPhoto TEXT,
+		GroupName VARCHAR(16) NOT NULL,
 		IsGroup BOOLEAN
 
 	)`

@@ -31,7 +31,6 @@ const Conversation = reactive({
 
 const conversations = ref([]);
 
-
 const refresh = async () => {
   loading.value = true;
   errormsg.value = null;
@@ -189,6 +188,34 @@ const sendMessage = async () => {
     alert("Si è verificato un errore durante l'invio del messaggio.");
   }
 };
+const GroupName = ref("")
+const showInputForConversationId = ref(null);
+
+const toggleGroupInput = (conversationId) => {
+      showInputForConversationId.value = conversationId;
+      GroupName.value = '';  // Resetta il nome del gruppo ogni volta che si apre il campo di input
+    };
+
+const closeGroupInput = () => {
+      showInputForConversationId.value = null; // Chiudi la barra di input
+      GroupName.value = '';  // Resetta il valore del gruppo
+    };
+
+const addToGroup = async () => {
+  try{
+    axios.defaults.headers.common['Authorization'] = UserId.value;
+    const response = await axios.put(`/users/${UserId.value}/group`,
+      {Name: GroupName.value}
+    )
+    console.log("Dati ottenuti da getConversation:", data); 
+
+    showInputForConversationId.value = null;
+    GroupName.value = '';
+
+  }catch(e){
+    alert(e)
+  }
+}
 
 // Chiamata alla funzione refresh quando il componente viene montato
 onMounted(() => {
@@ -230,10 +257,21 @@ onMounted(() => {
           <div v-for="conv in conversations" :key="conv.conversationId">
             <div class="card mb-3">
               <div class="card-body">
-                <h5 class="card-title">
+                <h5 class="card-title d-flex justify-content-between align-items-center">
                   {{ conv.ChatName }}
+                  <button class="btn btn-success btn-sm" @click="toggleGroupInput(conv.conversationId)">Add to Group</button>
                 </h5>
-                <button class="btn btn-primary" @click="openConversation(conv.conversationId)">Open</button>
+                <div v-if="showInputForConversationId == conv.conversationId">
+                  <input v-model="GroupName" type="text" class="form-control mt-2" placeholder="Enter group name" />
+                  <div class="mt-2 d-flex justify-content-between">
+                    <button class="btn btn-primary btn-sm" @click="addToGroup()">Submit</button>
+                    <button class="btn btn-danger btn-sm ml-2" @click="closeGroupInput">Close</button>
+                  </div>
+                </div>
+                <div v-if="showInputForConversationId != conv.conversationId">
+                  <button class="btn btn-primary" @click="openConversation(conv.conversationId)">Open</button>
+                </div>
+                
               </div>
             </div>
           </div>

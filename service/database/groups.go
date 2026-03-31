@@ -3,14 +3,16 @@ package database
 import (
 	"database/sql"
 	"errors"
-	// "fmt"
+	"fmt"
 	"github.com/SynthWaveVegan/WASAText/service/structs"
 	"log"
 	"context"
 )
 
 func (db *appdbimpl) insertGroup(GroupId structs.Identifier, GroupName string, PhotoPath string) error {
-	_, err := db.c.ExecContext(context.Background(),`INSERT INTO groups (GroupId, GroupName, GroupPhoto) VALUES (?, ?, ?)`, GroupId, GroupName, PhotoPath)
+	var IsGroup = 1
+	_, err := db.c.ExecContext(context.Background(),`INSERT INTO conversation (ConversationId, ChatPhoto, GroupName, IsGroup) VALUES (?, ?, ?, ?)`,
+	 GroupId.Id, PhotoPath, GroupName, IsGroup)
 	return err
 }
 
@@ -19,9 +21,9 @@ func (db *appdbimpl) createGroup(GroupName string, UserId structs.Identifier) (s
 	var Users []structs.User
 	var Messages []structs.Message
 
-	thisGroupId  := generateIdentifier("G")
+	thisGroupId  := generateIdentifier("C")
 
-	validId, err := db.checkValidId(thisGroupId.Id, "G")
+	validId, err := db.checkValidId(thisGroupId.Id, "C")
 	if err != nil {
 		return structs.Group{}, err
 	}
@@ -62,7 +64,7 @@ func (db *appdbimpl) SetGroupName(mode string, newName string, GroupId structs.I
 	var counter int
 	validName := checkValidName(newName)
 
-	err := db.c.QueryRowContext(context.Background(),`SELECT COUNT(*) FROM groups WHERE GroupName = ?`, newName).Scan(&counter)
+	err := db.c.QueryRowContext(context.Background(),`SELECT COUNT(*) FROM conversation WHERE GroupName = ?`, newName).Scan(&counter)
 	if err != nil {
 		return err
 	}
@@ -88,7 +90,7 @@ func (db *appdbimpl) SetGroupName(mode string, newName string, GroupId structs.I
 
 		case "Update":
 
-			_, err = db.c.ExecContext(context.Background(),`UPDATE groups SET GroupName = ? WHERE GroupId = ?`, newName, GroupId)
+			_, err = db.c.ExecContext(context.Background(),`UPDATE conversation SET GroupName = ? WHERE ConversationId = ?`, newName, GroupId.Id)
 			if err != nil {
 				return err
 			}
@@ -101,8 +103,56 @@ func (db *appdbimpl) SetGroupName(mode string, newName string, GroupId structs.I
 	return err
 
 }
-
 func (db *appdbimpl) AddToGroup(GroupName string, AddUserId structs.Identifier) error {
+	var counter int
+	var checkId bool
+	var GroupId string
+
+	// Verifica se il gruppo esiste già
+	GroupId, checkId, err := db.CheckGroupExist(GroupName)
+	if err != nil {
+		return fmt.Errorf("error checking if group exists: %w", err)
+	}
+
+	if !checkId {
+		// Se il gruppo non esiste, crealo
+		NewGroup, err := db.createGroup(GroupName, AddUserId)
+		if err != nil {
+			return fmt.Errorf("error creating new group: %w", err)
+		}
+
+		// Aggiungi l'utente al gruppo
+		err = db.insertUserinGroup(NewGroup.GroupId, AddUserId)
+		if err != nil {
+			return fmt.Errorf("error inserting user into new group: %w", err)
+		}
+
+		return nil
+	}
+
+	// Se il gruppo esiste, aggiungi l'utente
+	err = db.c.QueryRowContext(context.Background(), `SELECT COUNT(*) FROM userChat WHERE ConversationId = ? AND UserId = ?`, GroupId, AddUserId.Id).Scan(&counter)
+	if err != nil {
+		return fmt.Errorf("error checking user membership in group: %w", err)
+	}
+
+	if counter == 1 {
+		// Se l'utente è già nel gruppo
+		return fmt.Errorf("user is already a member of the group")
+	}
+
+	if counter == 0 {
+		thisGroupId := structs.Identifier{Id: GroupId}
+		err = db.insertUserinGroup(thisGroupId, AddUserId)
+		if err != nil {
+			return fmt.Errorf("error inserting user into existing group: %w", err)
+		}
+		return nil
+	}
+
+	return fmt.Errorf("unexpected error adding user to group")
+}
+/*func (db *appdbimpl) AddToGroup(GroupName string, AddUserId structs.Identifier) error {
 
 	var counter int
 	var checkId bool
@@ -128,7 +178,7 @@ func (db *appdbimpl) AddToGroup(GroupName string, AddUserId structs.Identifier) 
 		return nil
 	}
 
-	err = db.c.QueryRowContext(context.Background(),`SELECT COUNT(*) FROM userGroup WHERE GroupId = ? AND UserId = ?`, GroupId, AddUserId).Scan(&counter)
+	err = db.c.QueryRowContext(context.Background(),`SELECT COUNT(*) FROM userChat WHERE ConversationId = ? AND UserId = ?`, GroupId, AddUserId.Id).Scan(&counter)
 
 	if err != nil {
 		return err
@@ -153,11 +203,11 @@ func (db *appdbimpl) AddToGroup(GroupName string, AddUserId structs.Identifier) 
 	}
 
 	return err
-}
+}*/
 
 func (db *appdbimpl) insertUserinGroup(GroupId structs.Identifier, AddUserId structs.Identifier) error {
 
-	_, err := db.c.ExecContext(context.Background(),`INSERT INTO userGroup (GroupId, UserId) VALUES (?, ?)`, GroupId, AddUserId)
+	_, err := db.c.ExecContext(context.Background(),`INSERT INTO userChat (ConversationId, UserId) VALUES (?, ?)`, GroupId.Id, AddUserId.Id)
 
 	return err
 }
@@ -166,7 +216,7 @@ func (db *appdbimpl) LeaveGroup(GroupId structs.Identifier, UserId structs.Ident
 
 	var counter int
 
-	err := db.c.QueryRowContext(context.Background(),`SELECT COUNT(*) FROM userGroup WHERE GroupId = ? AND UserId = ?`, GroupId, UserId).Scan(&counter)
+	err := db.c.QueryRowContext(context.Background(),`SELECT COUNT(*) FROM userChat WHERE ConversationId = ? AND UserId = ?`, GroupId.Id, UserId.Id).Scan(&counter)
 
 	if err != nil {
 		return err
@@ -189,13 +239,13 @@ func (db *appdbimpl) LeaveGroup(GroupId structs.Identifier, UserId structs.Ident
 }
 
 func (db *appdbimpl) removeUserFromGroup(GroupId structs.Identifier, UserId structs.Identifier) error {
-	_, err := db.c.ExecContext(context.Background(),`DELETE FROM userGroup WHERE GroupId = ? AND UserId = ?`, GroupId, UserId)
+	_, err := db.c.ExecContext(context.Background(),`DELETE FROM userChat WHERE ConversationId = ? AND UserId = ?`, GroupId.Id, UserId.Id)
 
 	return err
 }
 
 func (db *appdbimpl) SetGroupPhoto(photoLink string, GroupId structs.Identifier) error {
-	_, err := db.c.ExecContext(context.Background(),`UPDATE groups SET GroupPhoto = ? WHERE Groupid = ?`, photoLink, GroupId)
+	_, err := db.c.ExecContext(context.Background(),`UPDATE conversation SET ChatPhoto = ? WHERE ConversationId = ?`, photoLink, GroupId.Id)
 
 	return err
 }
@@ -204,7 +254,7 @@ func (db *appdbimpl) CheckGroupExist(Groupname string) (string, bool, error) {
 
 	var GroupId string
 
-	err := db.c.QueryRowContext(context.Background(),`SELECT GroupId FROM groups WHERE GroupName = ?`, Groupname).Scan(&GroupId)
+	err := db.c.QueryRowContext(context.Background(),`SELECT ConversationId FROM conversation WHERE GroupName = ?`, Groupname).Scan(&GroupId)
 
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
