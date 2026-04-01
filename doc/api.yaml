@@ -140,32 +140,38 @@ paths:
         - Group
       summary: add a user to a group
       description: |-
-          creates a new group or
-          add a user in an existent one
+        creates a new group or adds a user in an existing one
       parameters:
-
-          - $ref: "#/components/parameters/userId"
-        
+        - $ref: "#/components/parameters/userId"
       operationId: ADDTOGROUP
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Name"
+              type: object
+              properties:
+                Name:
+                  type: string
+                  description: "The name of the group"
+                conversationId:
+                  type: string
+                  description: "The ID of the conversation to which the user is being added"
+              required:
+                - Name
+                - conversationId 
       responses:
-          "204":
-            description: user added to group succesfully
-            content:
-              application/json:
-                schema:
-                  $ref: "#/components/schemas/Group"
-          "400":
-            $ref: "#/components/responses/BadRequest"
-          "403":
-            $ref: "#/components/responses/Forbidden"
-          "500":
-            $ref: "#/components/responses/InternalServerError"
-
+        "204":
+          description: user added to group successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Group"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /users/{userId}/conversations/{conversationId}/messages:
 

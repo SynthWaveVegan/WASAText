@@ -16,7 +16,7 @@ func (rt *_router) ADDTOGROUP(w http.ResponseWriter, r *http.Request, ps httprou
 
 	if userId == "" {
 		w.WriteHeader(http.StatusBadRequest)
-		ctx.Logger.Error("no groupId or userId retrieved")
+		ctx.Logger.Error("no userId retrieved")
 		return
 	}
 
@@ -29,25 +29,38 @@ func (rt *_router) ADDTOGROUP(w http.ResponseWriter, r *http.Request, ps httprou
 	}
 
 	type RequestBody struct {
-    	Name string `json:"Name"`
-	}
+    Name          string `json:"Name"`
+    ConversationId struct {
+        Identifier string `json:"Identifier"` 
+    } `json:"conversationId"`
+}
 
-	var GroupName RequestBody
+	var requestBody RequestBody
 
-	err := json.NewDecoder(r.Body).Decode(&GroupName)
+	err := json.NewDecoder(r.Body).Decode(&requestBody)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.Error("1 something went wrong: ", err)
 		return
-
 	}
 	defer r.Body.Close()
+
+	groupName := requestBody.Name
+	conversationId := requestBody.ConversationId.Identifier
+
+	log.Printf("Request Body: %+v", requestBody)
+
+	if groupName == "" || conversationId == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		ctx.Logger.Error("Missing group name or conversationId")
+		return
+	}
 
 	UserId := structs.Identifier{
 		Id: userId,
 	}
 
-	err = rt.db.AddToGroup(GroupName.Name, UserId)
+	err = rt.db.AddToGroup(groupName, UserId, conversationId)  
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("2 something went wrong: ", err)

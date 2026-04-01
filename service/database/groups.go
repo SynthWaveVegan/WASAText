@@ -103,7 +103,7 @@ func (db *appdbimpl) SetGroupName(mode string, newName string, GroupId structs.I
 	return err
 
 }
-func (db *appdbimpl) AddToGroup(GroupName string, CreatorUser structs.Identifier, AddUserName string) error {
+func (db *appdbimpl) AddToGroup(GroupName string, CreatorUser structs.Identifier, ConversationId string) error {
 
 	var counter int
 	var checkId bool
@@ -130,9 +130,38 @@ func (db *appdbimpl) AddToGroup(GroupName string, CreatorUser structs.Identifier
 
 		
 	}
-	AddUserId, err := GetUserIdByName(AddUserName)
+	rows, err := db.c.QueryContext(context.Background(), `
+		SELECT UserId FROM userChat WHERE ConversationId = ?`, ConversationId)
+
+	if err != nil {
+		log.Println("ERROR QUERY (getting users):", err)
+		return err
+	}
+	defer rows.Close()
+
+	//var users []structs.User
+	var AddUserId string
+
+	for rows.Next() {
+		var thisUserId string
+		err := rows.Scan(thisUserId)
+		if err != nil {
+			log.Println("ERROR SCAN (users):", err)
+			return err
+		}
+		//users = append(users, u)
+
+		if thisUserId != CreatorUser.Id {
+			AddUserId = thisUserId
+		}
+	}
+
+	AddUser := structs.Identifier{
+		Id: AddUserId,
+	}
+	
 	// Se il gruppo esiste, aggiungi l'utente
-	err = db.c.QueryRowContext(context.Background(), `SELECT COUNT(*) FROM userChat WHERE ConversationId = ? AND UserId = ?`, GroupId, AddUserId.Id).Scan(&counter)
+	err = db.c.QueryRowContext(context.Background(), `SELECT COUNT(*) FROM userChat WHERE ConversationId = ? AND UserId = ?`, GroupId, AddUser.Id).Scan(&counter)
 	if err != nil {
 		return fmt.Errorf("error checking user membership in group: %w", err)
 	}
@@ -144,7 +173,7 @@ func (db *appdbimpl) AddToGroup(GroupName string, CreatorUser structs.Identifier
 
 	if counter == 0 {
 		thisGroupId := structs.Identifier{Id: GroupId}
-		err = db.insertUserinGroup(thisGroupId, AddUserId)
+		err = db.insertUserinGroup(thisGroupId, AddUser)
 		if err != nil {
 			return fmt.Errorf("error inserting user into existing group: %w", err)
 		}
@@ -153,58 +182,7 @@ func (db *appdbimpl) AddToGroup(GroupName string, CreatorUser structs.Identifier
 
 	return fmt.Errorf("unexpected error adding user to group")
 }
-/*func (db *appdbimpl) AddToGroup(GroupName string, AddUserId structs.Identifier) error {
 
-	var counter int
-	var checkId bool
-	var GroupId string
-
-	
-
-	GroupId, checkId, err := db.CheckGroupExist(GroupName)
-	if err != nil {
-		return err
-	}
-	if !checkId {
-		NewGroup, err := db.createGroup(GroupName, AddUserId)
-		if err != nil {
-			return err
-		}
-
-		err = db.insertUserinGroup(NewGroup.GroupId, AddUserId)
-		if err != nil {
-			return err
-		}
-
-		return nil
-	}
-
-	err = db.c.QueryRowContext(context.Background(),`SELECT COUNT(*) FROM userChat WHERE ConversationId = ? AND UserId = ?`, GroupId, AddUserId.Id).Scan(&counter)
-
-	if err != nil {
-		return err
-	}
-
-	if counter == 1 { //user already in group
-		return err
-	}
-
-	if counter == 0 {
-
-		thisGroupId := structs.Identifier{
-			Id: GroupId,
-		}
-
-		err = db.insertUserinGroup(thisGroupId, AddUserId)
-		if err != nil {
-			return err
-		}
-
-		return nil
-	}
-
-	return err
-}*/
 
 func (db *appdbimpl) insertUserinGroup(GroupId structs.Identifier, AddUserId structs.Identifier) error {
 
