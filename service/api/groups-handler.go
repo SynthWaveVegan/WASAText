@@ -37,7 +37,7 @@ func (rt *_router) ADDTOGROUP(w http.ResponseWriter, r *http.Request, ps httprou
 	err := json.NewDecoder(r.Body).Decode(&GroupName)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		ctx.Logger.Error("something went wrong: ", err)
+		ctx.Logger.Error("1 something went wrong: ", err)
 		return
 
 	}
@@ -50,7 +50,7 @@ func (rt *_router) ADDTOGROUP(w http.ResponseWriter, r *http.Request, ps httprou
 	err = rt.db.AddToGroup(GroupName.Name, UserId)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		ctx.Logger.Error("something went wrong: ", err)
+		ctx.Logger.Error("2 something went wrong: ", err)
 		return
 	}
 

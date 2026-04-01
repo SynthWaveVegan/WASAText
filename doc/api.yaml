@@ -155,6 +155,10 @@ paths:
       responses:
           "204":
             description: user added to group succesfully
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/Group"
           "400":
             $ref: "#/components/responses/BadRequest"
           "403":
@@ -426,41 +430,6 @@ paths:
           $ref: "#/components/responses/Forbidden"
         "500":
           $ref: "#/components/responses/InternalServerError"
-
-    post:
-      security:
-        - bearerAuth: []
-      tags:
-        - Conversation
-      summary: creates a new conversation
-      description: |-
-        generates a new conversation
-        between two users
-      parameters:
-        - $ref: "#/components/parameters/userId"
-        - $ref: "#/components/parameters/conversationId"
-
-      operationId: CREATECONVERSATION
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Conversation"
-      responses:
-        "201":
-          description: conversation created succesfully
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Conversation"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "403":
-          $ref: "#/components/responses/Forbidden"
-        "500":
-          $ref: "#/components/responses/InternalServerError"
-              
-
 
   /login:
     post:

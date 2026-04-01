@@ -207,7 +207,15 @@ const addToGroup = async () => {
     const response = await axios.put(`/users/${UserId.value}/group`,
       {Name: GroupName.value}
     )
-    console.log("Dati ottenuti da getConversation:", data); 
+    console.log("Dati ottenuti da getConversation:", response.data); 
+    const newGroup = {
+      conversationId: response.data.Identifier, 
+      Users: response.data.Users,
+      ChatName: response.data.Name, 
+      Messages: response.data.Messages
+    }
+    console.log(newGroup);
+    conversations.value.push(newGroup);
 
     showInputForConversationId.value = null;
     GroupName.value = '';
