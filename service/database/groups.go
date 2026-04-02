@@ -42,10 +42,10 @@ func (db *appdbimpl) createGroup(GroupName string, CreatorUserId structs.Identif
 		return structs.Group{}, err
 	}
 
-	err = db.insertGroup(thisGroupId, GroupName, "")
-	if err != nil {
-		return structs.Group{}, err
-	}
+	//err = db.insertGroup(thisGroupId, GroupName, "")
+	//if err != nil {
+	//	return structs.Group{}, err
+	//}
 
 	newGroup := structs.Group{
 
