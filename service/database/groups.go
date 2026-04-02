@@ -69,8 +69,7 @@ func (db *appdbimpl) SetGroupName(mode string, newName string, GroupId structs.I
 		return err
 	}
 	if counter != 0 {
-		log.Printf("name taken")
-		return nil
+		return fmt.Errorf("group name already taken")
 	}
 	if !validName {
 		log.Printf("name invalid")
@@ -144,7 +143,7 @@ func (db *appdbimpl) AddToGroup(GroupName string, CreatorUser structs.Identifier
 
 	for rows.Next() {
 		var thisUserId string
-		err := rows.Scan(thisUserId)
+		err := rows.Scan(&thisUserId)
 		if err != nil {
 			log.Println("ERROR SCAN (users):", err)
 			return err
