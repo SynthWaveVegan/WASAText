@@ -188,7 +188,7 @@ const sendMessage = async () => {
     alert("Si è verificato un errore durante l'invio del messaggio.");
   }
 };
-const GroupName = ref("")
+const GroupName = ref("");
 const showInputForConversationId = ref(null);
 
 const toggleGroupInput = (conversationId) => {
