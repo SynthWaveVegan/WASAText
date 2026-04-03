@@ -68,28 +68,30 @@ const createConversation = async () => {
 };
 
 const getConversation = async (id) => {
-  
-  try{
-    axios.defaults.headers.common['Authorization'] = UserId.value
-    const response = await axios.get(`/users/${UserId.value}/conversations/${id}`)
+  try {
+    axios.defaults.headers.common['Authorization'] = UserId.value;
+    const response = await axios.get(`/users/${UserId.value}/conversations/${id}`);
 
-    console.log(response.data.Users);
+    console.log("Risposta di getConversation:", response.data);
 
     const thisConversation = {
-        conversationId: response.data.Identifier.Identifier,
-        Users: response.data.Users,
-        ChatName: response.data.Name,
-        Messages: response.data.Messages
-      };
-    
-    return thisConversation
+      conversationId: response.data.Identifier.Identifier,  
+      Users: response.data.Users.map(user => ({
+        Name: user.Name,
+        userId: user.userId.Identifier, 
+        UserPhoto: user.UserPhoto
+      })),
+      ChatName: response.data.Name,
+      Messages: response.data.Messages || []  
+    };
 
+    return thisConversation;
 
-  }catch(e){
-    alert(e)
+  } catch (e) {
+    console.error("Errore nella chiamata a getConversation:", e);
+    alert(e);
   }
-
-}
+};
 
 const getMyConversations = async () => {
   try {
