@@ -204,31 +204,34 @@ const closeGroupInput = () => {
     };
 
 const addToGroup = async () => {
-  try{
+  try {
+    
+
     axios.defaults.headers.common['Authorization'] = UserId.value;
-    const response = await axios.put(`/users/${UserId.value}/group`,
-      {
-        Name: GroupName.value,
-        conversationId: showInputForConversationId.value 
-      }
-    )
-    console.log("Dati ottenuti da getConversation:", response.data); 
+
+    const response = await axios.put(`/users/${UserId.value}/group`, {
+      Name: GroupName.value,
+      conversationId: showInputForConversationId.value  
+    });
+
+    console.log("Dati ottenuti da getConversation:", response.data);
+
     const newGroup = {
-      conversationId: response.data.Identifier, 
-      Users: response.data.Users,
-      ChatName: response.data.Name, 
-      Messages: response.data.Messages
-    }
-    console.log(newGroup);
+        conversationId: response.data.Identifier,
+        Users: response.data.Users,
+        ChatName: response.data.GroupName,
+        Messages: response.data.Messages || []  
+      };
+
+    console.log("group:", newGroup);
     conversations.value.push(newGroup);
 
     showInputForConversationId.value = null;
     GroupName.value = '';
-
-  }catch(e){
-    alert(e)
+  } catch (e) {
+    alert(e);
   }
-}
+};
 
 // Chiamata alla funzione refresh quando il componente viene montato
 onMounted(() => {

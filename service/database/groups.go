@@ -22,6 +22,7 @@ func (db *appdbimpl) createGroup(GroupName string, CreatorUserId structs.Identif
 	var Messages []structs.Message
 
 	thisGroupId  := generateIdentifier("C")
+	log.Printf("groupId: %s", thisGroupId)
 
 	validId, err := db.checkValidId(thisGroupId.Id, "C")
 	if err != nil {
@@ -38,6 +39,7 @@ func (db *appdbimpl) createGroup(GroupName string, CreatorUserId structs.Identif
 	Users = append(Users, CreatorUser)
 
 	err = db.SetGroupName("New", GroupName, thisGroupId)
+	log.Printf("set group name: %s", GroupName)
 	if err != nil {
 		return structs.Group{}, err
 	}
@@ -117,15 +119,18 @@ func (db *appdbimpl) AddToGroup(GroupName string, CreatorUser structs.Identifier
 	if !checkId {
 		// Se il gruppo non esiste, crealo
 		NewGroup, err := db.createGroup(GroupName, CreatorUser)
+		log.Printf("Returning group: %#v", NewGroup)
 		if err != nil {
 			return fmt.Errorf("error creating new group: %w", err)
 		}
 
 		// Aggiungi l'utente al gruppo
 		err = db.insertUserinGroup(NewGroup.GroupId, CreatorUser)
+		log.Printf("2 groupId: %s", NewGroup.GroupId)
 		if err != nil {
 			return fmt.Errorf("error inserting user into new group: %w", err)
 		}
+		GroupId = NewGroup.GroupId.Id
 
 		
 	}
@@ -172,6 +177,7 @@ func (db *appdbimpl) AddToGroup(GroupName string, CreatorUser structs.Identifier
 
 	if counter == 0 {
 		thisGroupId := structs.Identifier{Id: GroupId}
+		log.Printf("Adding user %s to group %s", AddUser.Id, GroupId)
 		err = db.insertUserinGroup(thisGroupId, AddUser)
 		if err != nil {
 			return fmt.Errorf("error inserting user into existing group: %w", err)
@@ -241,7 +247,9 @@ func (db *appdbimpl) CheckGroupExist(Groupname string) (string, bool, error) {
 			return "", false, err
 		}
 	} else {
+		
 		return GroupId, true, nil
+		
 	} 
 
 }

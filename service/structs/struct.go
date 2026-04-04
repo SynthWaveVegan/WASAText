@@ -29,7 +29,7 @@ type Message struct {
 }
 
 type Group struct {
-	GroupId    Identifier  `json:"groupId"`
+	GroupId    Identifier  `json:"conversationId"`
 	GroupName  string      `json:"Name"`
 	Users      []User      `json:"Users"`
 	Messages   []Message   `json:"Messages"`
