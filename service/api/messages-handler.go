@@ -10,74 +10,74 @@ import (
 	"net/http"
 )
 
+type MessageRequest struct {
+  MessageBody string `json:"messageBody"`
+}
+
 func (rt *_router) SENDMESSAGE(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+  
+  userId := ps.ByName("userId")
+  conversationId := ps.ByName("conversationId")
 
-	userId := ps.ByName("userId")
-	conversationId := ps.ByName("conversationId")
+  if userId == "" || conversationId == "" {
+    w.WriteHeader(http.StatusBadRequest)
+    ctx.Logger.Error("no userId or conversationId retrieved")
+    return
+  }
 
-	if userId == "" || conversationId == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		ctx.Logger.Error("no userId or conversationId retrieved")
-		return
-	}
+  authorization := r.Header.Get("Authorization")
+  if userId != authorization {
+    w.WriteHeader(http.StatusForbidden)
+    ctx.Logger.Error("user is not allowed")
+    return
+  }
 
-	authorization := r.Header.Get("Authorization")
+  MediaType := r.Header.Get("MediaType")
+  if MediaType == "" {
+    w.WriteHeader(http.StatusBadRequest)
+    ctx.Logger.Error("no mediatype retrieved")
+    return
+  } else if MediaType != "Text" && MediaType != "Photo" {
+    w.WriteHeader(http.StatusBadRequest)
+    ctx.Logger.Error("mediatype not valid for use")
+    return
+  }
 
-	if userId != authorization {
-		w.WriteHeader(http.StatusForbidden)
-		ctx.Logger.Error("user is not allowed")
-		return
-	}
+  var requestBody MessageRequest
+  err := json.NewDecoder(r.Body).Decode(&requestBody)
+  if err != nil {
+    w.WriteHeader(http.StatusInternalServerError)
+    ctx.Logger.Error("something went wrong: ", err)
+    return
+  }
+  defer r.Body.Close()
 
-	MediaType := r.Header.Get("MediaType")
+  MessageBody := requestBody.MessageBody
 
-	if MediaType == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		ctx.Logger.Error("no mediatype retrieved")
-		return
-	} else if MediaType != "Text" && MediaType != "Photo" {
-		w.WriteHeader(http.StatusBadRequest)
-		ctx.Logger.Error("mediatype not valid for use")
-		return
-	}
+  UserId := structs.Identifier{
+    Id: userId,
+  }
 
-	var MessageBody string
+  ConversationId := structs.Identifier{
+    Id: conversationId,
+  }
 
-	err := json.NewDecoder(r.Body).Decode(&MessageBody)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		ctx.Logger.Error("something went wrong: ", err)
-		return
+  NewMessage, err := rt.db.SendMessage(MessageBody, UserId, MediaType, ConversationId)
+  if err != nil {
+    w.WriteHeader(http.StatusBadRequest)
+    ctx.Logger.Error("something went wrong: ", err)
+    return
+  }
 
-	}
-	defer r.Body.Close()
+  w.Header().Set("Content-Type", "application/json")
+  err = json.NewEncoder(w).Encode(NewMessage)
+  if err != nil {
+    w.WriteHeader(http.StatusInternalServerError)
+    ctx.Logger.Error("something went wrong: ", err)
+  }
 
-	UserId := structs.Identifier{
-		Id: userId,
-	}
-
-	ConversationId := structs.Identifier{
-		Id: conversationId,
-	}
-
-	
-	NewMessage, err := rt.db.SendMessage(MessageBody, UserId, MediaType, ConversationId)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		ctx.Logger.Error("something went wrong: ", err)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	err = json.NewEncoder(w).Encode(NewMessage)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		ctx.Logger.Error("something went wrong: ", err)
-	}
-
-	w.WriteHeader(http.StatusCreated)
-	log.Println("Message sent successfully")
-
+  w.WriteHeader(http.StatusCreated)
+  log.Println("Message sent successfully")
 }
 
 func (rt *_router) FORWARDMESSAGE(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {

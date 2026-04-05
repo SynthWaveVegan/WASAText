@@ -93,6 +93,30 @@ const getConversation = async (id) => {
   }
 };
 
+
+const openConversation = async (id) => {
+  loading.value = true;
+  selectedConversation.value = null;
+
+  try {
+    const data = await getConversation(id);
+    console.log("Dati ottenuti da getConversation:", data);  // Log per debug
+
+    // Assicurati di usare 'conversationId' invece di 'id'
+    if (data && data.conversationId) {
+      selectedConversation.value = data;
+      Messages.value = data.Messages || [];;  // Assegna i messaggi
+    } else {
+      console.error("La risposta non contiene un conversationId valido.");
+      alert("Errore: la conversazione non è stata trovata.");
+    }
+  } catch (e) {
+    alert(e);
+  } finally {
+    loading.value = false;
+  }
+};
+
 const getMyConversations = async () => {
   try {
     axios.defaults.headers.common['Authorization'] = UserId.value;
@@ -123,37 +147,16 @@ const getMyConversations = async () => {
   }
 };
 
-const openConversation = async (id) => {
-  loading.value = true;
-  selectedConversation.value = null;
-
-  try {
-    const data = await getConversation(id);
-    console.log("Dati ottenuti da getConversation:", data);  // Log per debug
-
-    // Assicurati di usare 'conversationId' invece di 'id'
-    if (data && data.conversationId) {
-      selectedConversation.value = data;
-      Messages.value = data.Messages || [];;  // Assegna i messaggi
-    } else {
-      console.error("La risposta non contiene un conversationId valido.");
-      alert("Errore: la conversazione non è stata trovata.");
-    }
-  } catch (e) {
-    alert(e);
-  } finally {
-    loading.value = false;
-  }
-};
-
 const sendMessage = async () => {
   try {
 
     axios.defaults.headers.common['Authorization'] = UserId.value;
     axios.defaults.headers.common['MediaType'] = "Text";  
 
-    const response = await axios.post(`/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages`, 
-    {messageBody: Message.MessageBody});
+    const response = await axios.post(`/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages`, {
+      MessageBody: Message.MessageBody
+    }
+    );
 
 
     console.log("Messaggio inviato con successo:", response.data);
@@ -219,7 +222,7 @@ const addToGroup = async () => {
     const newGroup = {
         conversationId: response.data.Identifier,
         Users: response.data.Users,
-        ChatName: response.data.GroupName,
+        ChatName: response.data.Name,
         Messages: response.data.Messages || []  
       };
 
