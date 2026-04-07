@@ -188,7 +188,7 @@ func (db *appdbimpl) GetConversation(ConversationId structs.Identifier, currentU
 
 		var msg structs.Message
 
-		err := messageRows.Scan(&msg.MessageId, &msg.MessageBody, &msg.Date, &msg.UploaderId, &msg.MediaType)
+		err := messageRows.Scan(&msg.MessageId.Id, &msg.MessageBody, &msg.Date, &msg.UploaderId.Id, &msg.MediaType)
 		if err != nil {
 			log.Println("ERROR SCAN (messages):", err)
 			return structs.Conversation{}, err
@@ -207,6 +207,7 @@ func (db *appdbimpl) GetConversation(ConversationId structs.Identifier, currentU
 		Messages:       messages,        
 	}
 
+	log.Printf("Returning conversation: %#v", ChatRetrieved)
 	return ChatRetrieved, nil
 }
 

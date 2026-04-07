@@ -8,12 +8,16 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"log"
 	"net/http"
+	"fmt"
 )
 
 func (rt *_router) GETCONVERSATION(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	conversationId := ps.ByName("conversationId")
 	userId := ps.ByName("userId")
+
+	fmt.Println("Conversation ID: ", conversationId)  // Log del conversationId
+	fmt.Println("User ID: ", userId)  // Log del userId
 
 	if conversationId == "" {
 		w.WriteHeader(http.StatusBadRequest)

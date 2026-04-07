@@ -14,14 +14,7 @@ const selectedConversation = ref(null)
 const Messages = ref([]);
 const Comments = ref([]);
 
-const Message = reactive({
-  MessageBody: '',
-  MessageId: '',
-  UploaderId: '',
-  Date: '',
-  MediaType: '',
-  ConversationId: ''
-})
+
 
 const Conversation = reactive({
   conversationId: '',
@@ -53,8 +46,12 @@ const createConversation = async () => {
 
     
     const newConversation = {
-      conversationId: response.data.Identifier, 
-      Users: response.data.Users,
+      conversationId: response.data.Identifier.Identifier, 
+      Users: response.data.Users.map(user => ({
+        Name: user.Name,
+        userId: user.Identifier,  // Accesso corretto
+        UserPhoto: user.UserPhoto
+      })),
       ChatName: response.data.Name, 
       Messages: response.data.Messages
     };
@@ -78,7 +75,7 @@ const getConversation = async (id) => {
       conversationId: response.data.Identifier.Identifier,  
       Users: response.data.Users.map(user => ({
         Name: user.Name,
-        userId: user.userId.Identifier, 
+        userId: user.Identifier,  
         UserPhoto: user.UserPhoto
       })),
       ChatName: response.data.Name,
@@ -146,53 +143,57 @@ const getMyConversations = async () => {
     alert("Si è verificato un errore durante il recupero delle conversazioni.");
   }
 };
+const Message = reactive({
+  MessageBody: '',
+  MessageId: '',
+  UploaderId: '',
+  Date: '',
+  MediaType: '',
+  ConversationId: ''
+})
 
 const sendMessage = async () => {
   try {
-
     axios.defaults.headers.common['Authorization'] = UserId.value;
     axios.defaults.headers.common['MediaType'] = "Text";  
 
-    const response = await axios.post(`/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages`, {
-      MessageBody: Message.MessageBody
-    }
-    );
+    
+    const message = {
+      MessageBody: Message.MessageBody  
+    };
 
+    
+    const response = await axios.post(`/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages`, message);
 
     console.log("Messaggio inviato con successo:", response.data);
 
- 
     const updatedConversation = await getConversation(selectedConversation.value.conversationId);
 
     
-    Message = {
-      MessageBody: response.data.MessageBody,  
-      MessageId: response.data.MessageId,     
-      UploaderId: response.data.UploaderId, 
-      Date: response.data.Date,                
-      MediaType: response.data.MediaType,    
-      ConversationId: response.data.ConversationId  
-    };
+    message.MessageBody = response.data.MessageBody;
+    message.MessageId = response.data.MessageId;
+    message.UploaderId = response.data.UploaderId;
+    message.Date = response.data.Date;
+    message.MediaType = response.data.MediaType;
+    message.ConversationId = response.data.ConversationId;
 
-    updatedConversation.Messages.push(Message)
-
-
+  
+    updatedConversation.Messages.push(message);
 
    
-    Message = {
-      MessageBody: '',
-      MessageId: '',
-      UploaderId: '',
-      Date: '',
-      MediaType: '',
-      ConversationId: ''
-    };
+    message.MessageBody = '';
+    message.MessageId = '';
+    message.UploaderId = '';
+    message.Date = '';
+    message.MediaType = '';
+    message.ConversationId = '';
 
   } catch (e) {
     console.error(e);
     alert("Si è verificato un errore durante l'invio del messaggio.");
   }
 };
+
 const GroupName = ref("");
 const showInputForConversationId = ref(null);
 
@@ -310,15 +311,17 @@ onMounted(() => {
               <div>
                 <strong>{{ msg.uploaderId }}</strong>
               </div>
-            <div>{{ msg.MessageBody }}</div>
+              <div>
+              {{ msg.MessageBody }}
+              </div>
+            </div>
           </div>
-      </div>
-      <div class="p-2 border-top d-flex">
-        <input v-model="Message.MessageBody" class="form-control me-2" placeholder="Write..." />
-        <button @click="sendMessage">Send</button>
-      </div>
+          <div class="p-2 border-top d-flex">
+            <input v-model="Message.MessageBody" class="form-control me-2" placeholder="Write..." />
+            <button @click="sendMessage">Send</button>
+          </div>
 
-  </div>
+        </div>
       </div>
 
       <div v-else>
