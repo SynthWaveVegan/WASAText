@@ -11,11 +11,18 @@ import (
 	"time"
 	"context"
 )
+func (db *appdbimpl) markMessageRead(MessageId string) ( error) {
 
-func (db *appdbimpl) insertMessage(MessageBody string, UploaderId structs.Identifier, MessageId structs.Identifier, Date string, MediaType string, ConversationId structs.Identifier) error {
+	_, err := db.c.ExecContext(context.Background(), `UPDATE message SET IsRead = ? WHERE MessageId = ?`, "Yes", MessageId)
+		if err != nil {
+			return err
+		}
+	return nil
+}
+func (db *appdbimpl) insertMessage(MessageBody string, UploaderId structs.Identifier, MessageId structs.Identifier, Date string, MediaType string, ConversationId structs.Identifier, IsRead string) error {
 	_, err := db.c.ExecContext(context.Background(),
-	`INSERT INTO message (MessageId, MessageBody,  Date, UploaderId, MediaType, ConversationId) VALUES (?, ?, ?, ?, ?, ?)`, 
-	MessageId.Id, MessageBody, Date, UploaderId.Id, MediaType, ConversationId.Id)
+	`INSERT INTO message (MessageId, MessageBody,  Date, UploaderId, MediaType, IsRead, ConversationId) VALUES (?, ?, ?, ?, ?, ?, ?)`, 
+	MessageId.Id, MessageBody, Date, UploaderId.Id, MediaType, IsRead, ConversationId.Id)
 
 	return err
 }
@@ -33,9 +40,10 @@ func (db *appdbimpl) SendMessage(MessageBody string, UploaderId structs.Identifi
 		return structs.Message{}, err
 	}
 
-	messageDate := time.Now().UTC().Format(time.RFC3339)
+	messageDate := time.Now().UTC().Format("02/01/2006 15:04:05")
+	IsRead := "No" 
 
-	err = db.insertMessage(MessageBody, UploaderId, thisMessageId, messageDate, MediaType, ConversationId)
+	err = db.insertMessage(MessageBody, UploaderId, thisMessageId, messageDate, MediaType, ConversationId, IsRead)
 	if err != nil {
 		return structs.Message{}, err
 	}
@@ -48,13 +56,14 @@ func (db *appdbimpl) SendMessage(MessageBody string, UploaderId structs.Identifi
 	newMessage := structs.Message{
 
 		MessageBody: MessageBody,
-		Comments:    []structs.Comment{},
-		UploaderId:  UploaderId,
-		Uploader:    Uploader,
-		MessageId:   thisMessageId,
-		Date:        messageDate,
-		MediaType:   MediaType,
+		Comments:      []structs.Comment{},
+		UploaderId:     UploaderId,
+		Uploader:       Uploader,
+		MessageId:      thisMessageId,
+		Date:           messageDate,
+		MediaType:      MediaType,
 		ConversationId: ConversationId,
+		IsRead:         IsRead,
 	}
 
 	return newMessage, nil
@@ -76,7 +85,8 @@ func (db *appdbimpl) ForwardMessage(OldMessageId structs.Identifier, UploaderId 
 		return structs.Message{}, err
 	}
 
-	messageDate := time.Now().UTC().Format(time.RFC3339)
+	messageDate := time.Now().UTC().Format("02/01/2006 15:04:05")
+	IsRead := "No"
 
 	err = db.c.QueryRowContext(context.Background(),`SELECT MessageBody FROM message WHERE MessageId = ?`, OldMessageId).Scan(&MessageBody)
 	if err != nil {
@@ -88,7 +98,7 @@ func (db *appdbimpl) ForwardMessage(OldMessageId structs.Identifier, UploaderId 
 			return structs.Message{}, err
 		}
 
-	err = db.insertMessage(MessageBody, UploaderId, thisMessageId, messageDate, MediaType, ConversationId)
+	err = db.insertMessage(MessageBody, UploaderId, thisMessageId, messageDate, MediaType, ConversationId, IsRead)
 	if err != nil {
 		return structs.Message{}, err
 	}
@@ -99,14 +109,15 @@ func (db *appdbimpl) ForwardMessage(OldMessageId structs.Identifier, UploaderId 
 	}
 
 	forwardedMessage := structs.Message{
-		MessageBody: MessageBody,
-		Comments:    []structs.Comment{},
-		UploaderId:  UploaderId,
-		Uploader:    Uploader,
-		MessageId:   thisMessageId,
-		Date:        messageDate,
-		MediaType:   MediaType,
+		MessageBody:    MessageBody,
+		Comments:      []structs.Comment{},
+		UploaderId:     UploaderId,
+		Uploader:       Uploader,
+		MessageId:      thisMessageId,
+		Date:           messageDate,
+		MediaType:      MediaType,
 		ConversationId: ConversationId,
+		IsRead:         IsRead,
 	}
 
 	return forwardedMessage, nil

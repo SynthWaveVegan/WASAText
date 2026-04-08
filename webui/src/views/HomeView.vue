@@ -167,7 +167,6 @@ const sendMessage = async () => {
       MessageBody: Message.MessageBody  
     };
 
-    // Invio del messaggio
     const response = await axios.post(`/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages`, message);
 
     console.log("Messaggio inviato con successo:", response.data);
@@ -179,6 +178,7 @@ const sendMessage = async () => {
       Date: response.data.Date,
       MediaType: response.data.MediaType,
       ConversationId: response.data.ConversationId,
+      IsRead: response.data.IsRead,
       User: {  
         Name: response.data.User.Name,
         userId: response.data.User.userId.Identifier,
@@ -199,6 +199,7 @@ const sendMessage = async () => {
     message.ConversationId = '';
     message.User = '';
     Message.MessageBody = '';
+    message.IsRead = '';
 
   } catch (e) {
     console.error(e);
@@ -206,6 +207,14 @@ const sendMessage = async () => {
   }
 };
 
+const markMessageRead = async (id) => {
+  try {
+    axios.defaults.headers.common['Authorization'] = UserId.value;
+    await axios.put(`/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages/${id}/read`)
+  }catch(e){
+    alert(e)
+  }
+}
 const GroupName = ref("");
 const showInputForConversationId = ref(null);
 
@@ -319,22 +328,38 @@ onMounted(() => {
         <h5>{{ selectedConversation.ChatName }}
           <button class="btn btn-danger btn-sm float-end" @click="closeConversation">X</button>
         </h5>
-        
+        <div class="user-list mt-2">
+         <h6>Members:</h6>
+          <div class="d-flex flex-wrap">
+            <span v-for="user in selectedConversation.Users" :key="user.Id" class="badge bg-primary me-2 mb-2">
+              {{ user.Name }}
+            </span>
+          </div>
+        </div>
       </div>
       <div class="flex-grow-1 overflow-auto p-2">
         <div v-for="msg in Messages" :key="msg.MessageId" class="mb-2">
-          <!-- Contenitore per ogni messaggio -->
+        
           <div :class="{
-            'd-flex justify-content-end': msg.User.Name === username, 
-            'd-flex justify-content-start': msg.User.Name !== username
+            'd-flex justify-content-end': msg.User.Name == username, 
+            'd-flex justify-content-start': msg.User.Name != username
           }">
-            <!-- Messaggio inviato o ricevuto -->
+            
             <div class="alert" :class="{
               'alert-primary': msg.User.Name == username, 
               'alert-success': msg.User.Name != username
             }">
               <strong>{{ msg.User.Name }}:</strong> {{ msg.MessageBody }}
+              <div>{{ msg.Date }}</div>
+              <div class="message-status" v-if="msg.User.Name === username">
+
+                  <span v-if="msg.IsRead == 'Yes'" class="badge bg-success me-1">•</span>
+                  <span v-if="msg.IsRead == 'Yes'" class="badge bg-success me-1">•</span>
+
+                  <span v-if="msg.IsRead == 'No'" class="badge bg-secondary me-1">•</span>
+              </div>
             </div>
+            
           </div>
         </div>
       </div>

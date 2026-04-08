@@ -65,6 +65,7 @@ type AppDatabase interface {
 	SendMessage(MessageBody string, UploaderId structs.Identifier, MediaType string, ConversationId structs.Identifier) (structs.Message, error)
 	ForwardMessage(OldMessageId structs.Identifier, UploaderId structs.Identifier, ConversationId structs.Identifier) (structs.Message, error)
 	DeleteMessage(MessageId structs.Identifier) error
+	//markMessageRead(MessageId string) error
 
 	CommentMessage(CommentBody string, MessageId structs.Identifier, UploaderId structs.Identifier) (structs.Comment, error)
 	//insertComment(CommentId structs.Identifier, MessageId structs.Identifier, CommentBody string, Date string) error
@@ -110,6 +111,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 		Date TEXT,
 		UploaderId VARCHAR(11) NOT NULL,
 		MediaType TEXT,
+		IsRead TEXT,
 		ConversationId VARCHAR(11) NOT NULL,
 		FOREIGN KEY (ConversationId) REFERENCES conversation(ConversationId),
 		FOREIGN KEY (UploaderId) REFERENCES user(UserId)

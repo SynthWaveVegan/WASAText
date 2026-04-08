@@ -15,6 +15,7 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.PUT("/users/:userId/group", rt.wrap(rt.ADDTOGROUP))
 
 	rt.router.POST("/users/:userId/conversations/:conversationId/messages", rt.wrap(rt.SENDMESSAGE))
+	rt.router.POST("/users/:userId/conversations/:conversationId/messages/:messageId/read", rt.wrap(rt.MARKMESSAGEREAD))
 	rt.router.DELETE("/users/:userId/conversations/:conversationId/messages/:messageId", rt.wrap(rt.DELETEMESSAGE))
 	rt.router.PUT("/users/:userId/conversations/:conversationId/messages/:messageId", rt.wrap(rt.FORWARDMESSAGE))
 

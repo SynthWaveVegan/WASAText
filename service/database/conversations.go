@@ -170,10 +170,10 @@ func (db *appdbimpl) GetConversation(ConversationId structs.Identifier, currentU
 	}
 
 	messageRows, err := db.c.QueryContext(context.Background(), `
-		SELECT MessageId, MessageBody, Date, UploaderId, MediaType
+		SELECT MessageId, MessageBody, Date, UploaderId, MediaType, IsRead
 		FROM message
 		WHERE ConversationId = ?
-		ORDER BY Date DESC`, ConversationId.Id)
+		ORDER BY Date ASC`, ConversationId.Id)
 
 	if err != nil {
 		log.Println("ERROR QUERY (getting messages):", err)
@@ -188,7 +188,7 @@ func (db *appdbimpl) GetConversation(ConversationId structs.Identifier, currentU
 
 		var msg structs.Message
 
-		err := messageRows.Scan(&msg.MessageId.Id, &msg.MessageBody, &msg.Date, &msg.UploaderId.Id, &msg.MediaType)
+		err := messageRows.Scan(&msg.MessageId.Id, &msg.MessageBody, &msg.Date, &msg.UploaderId.Id, &msg.MediaType, &msg.IsRead)
 		if err != nil {
 			log.Println("ERROR SCAN (messages):", err)
 			return structs.Conversation{}, err
@@ -196,6 +196,9 @@ func (db *appdbimpl) GetConversation(ConversationId structs.Identifier, currentU
 
 		msg.Uploader, err = db.GetUser(msg.UploaderId)
 		msg.ConversationId = ConversationId
+
+		
+		
 
 		messages = append(messages, msg)
 	}
@@ -208,7 +211,7 @@ func (db *appdbimpl) GetConversation(ConversationId structs.Identifier, currentU
 		Messages:       messages,        
 	}
 
-	log.Printf("Returning conversation: %#v", ChatRetrieved)
+	//log.Printf("Returning conversation: %#v", ChatRetrieved)
 	return ChatRetrieved, nil
 }
 

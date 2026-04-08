@@ -27,6 +27,7 @@ type Message struct {
 	Date           string        `json:"Date"`
 	MediaType      string        `json:"MediaType"`
 	ConversationId Identifier    `json:"ConversationId"`
+	IsRead         string        `json: "IsRead"`
 }
 
 type Group struct {

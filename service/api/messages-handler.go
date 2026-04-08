@@ -44,6 +44,7 @@ func (rt *_router) SENDMESSAGE(w http.ResponseWriter, r *http.Request, ps httpro
   }
 
   var requestBody MessageRequest
+
   err := json.NewDecoder(r.Body).Decode(&requestBody)
   if err != nil {
     w.WriteHeader(http.StatusInternalServerError)
@@ -163,6 +164,41 @@ func (rt *_router) DELETEMESSAGE(w http.ResponseWriter, r *http.Request, ps http
 	}
 
 	err := rt.db.DeleteMessage(MessageId)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		ctx.Logger.Error("something went wrong: ", err)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+	log.Println("Message deleted successfully")
+}
+
+func (rt *_router) MARKMESSAGEREAD(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+
+	userId := ps.ByName("userId")
+	messageId := ps.ByName("messageId")
+	conversationId := ps.ByName("conversationId")
+
+	if userId == "" || messageId == "" || conversationId == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		ctx.Logger.Error("no userId or messageId or conversationid retrieved")
+		return
+	}
+
+	authorization := r.Header.Get("Authorization")
+
+	if userId != authorization {
+		w.WriteHeader(http.StatusForbidden)
+		ctx.Logger.Error("user is not allowed")
+		return
+	}
+
+	MessageId := structs.Identifier{
+		Id: messageId,
+	}
+
+	err := rt.db.markMessageRead(MessageId)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("something went wrong: ", err)

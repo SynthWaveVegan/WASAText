@@ -32,7 +32,7 @@ func (db *appdbimpl) CommentMessage(CommentBody string, MessageId structs.Identi
 		return structs.Comment{}, err
 	}
 
-	commentDate := time.Now().UTC().Format(time.RFC3339)
+	commentDate := time.Now().UTC().Format("02/01/2006 15:04:05")
 
 	err = db.insertComment(thisCommentId, MessageId, CommentBody, commentDate, UploaderId)
 	if err != nil {

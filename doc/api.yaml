@@ -173,6 +173,33 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
+  /users/{userId}/conversations/{conversationId}/messages/{messageId}/read:
+
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - Message
+      summary: marks message as read
+      description: |-
+        updates status of message in conversation
+      parameters:
+
+        - $ref: "#/components/parameters/userId"
+        - $ref: "#/components/parameters/messageId"
+        - $ref: "#/components/parameters/conversationId"
+        
+      operationId: MARKMESSAGEREAD
+      responses:
+        "204":
+          description: message updated succesfully
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
   /users/{userId}/conversations/{conversationId}/messages:
 
     post:
@@ -272,9 +299,7 @@ paths:
           $ref: "#/components/responses/Forbidden"
         "500":
           $ref: "#/components/responses/InternalServerError"
-
-
-    
+  
   /users/{userId}/messages/{messageId}/comments:
 
     post:
@@ -695,10 +720,13 @@ components:
           maxLength: 20
         MediaType:
           type: string
-          enum: [text, photo]
+          enum: [Text, Photo]
           description: Type of media in the message
         ConversationId:
           $ref: "#/components/schemas/Identifier"
+        IsRead:
+          type: string
+          enum: [Yes, No]
 
     Comment:
       title: comment
