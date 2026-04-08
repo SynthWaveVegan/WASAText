@@ -194,6 +194,7 @@ func (db *appdbimpl) GetConversation(ConversationId structs.Identifier, currentU
 			return structs.Conversation{}, err
 		}
 
+		msg.Uploader, err = db.GetUser(msg.UploaderId)
 		msg.ConversationId = ConversationId
 
 		messages = append(messages, msg)

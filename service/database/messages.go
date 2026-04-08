@@ -40,10 +40,17 @@ func (db *appdbimpl) SendMessage(MessageBody string, UploaderId structs.Identifi
 		return structs.Message{}, err
 	}
 
+	Uploader, err := db.GetUser(UploaderId)
+	if err != nil {
+		return structs.Message{}, err
+	}
+
 	newMessage := structs.Message{
+
 		MessageBody: MessageBody,
 		Comments:    []structs.Comment{},
 		UploaderId:  UploaderId,
+		Uploader:    Uploader,
 		MessageId:   thisMessageId,
 		Date:        messageDate,
 		MediaType:   MediaType,
@@ -86,10 +93,16 @@ func (db *appdbimpl) ForwardMessage(OldMessageId structs.Identifier, UploaderId 
 		return structs.Message{}, err
 	}
 
+	Uploader, err := db.GetUser(UploaderId)
+	if err != nil {
+		return structs.Message{}, err
+	}
+
 	forwardedMessage := structs.Message{
 		MessageBody: MessageBody,
 		Comments:    []structs.Comment{},
 		UploaderId:  UploaderId,
+		Uploader:    Uploader,
 		MessageId:   thisMessageId,
 		Date:        messageDate,
 		MediaType:   MediaType,

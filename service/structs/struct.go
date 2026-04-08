@@ -22,6 +22,7 @@ type Message struct {
 	MessageBody    string        `json:"MessageBody"`
 	Comments       []Comment     `json:"Comments"`
 	UploaderId     Identifier    `json:"UploaderId"`
+	Uploader       User  		 `json:"User"`
 	MessageId      Identifier    `json:"messageId"`
 	Date           string        `json:"Date"`
 	MediaType      string        `json:"MediaType"`

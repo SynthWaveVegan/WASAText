@@ -90,12 +90,11 @@ const getConversation = async (id) => {
   }
 };
 
-const userNames = ref([]);
+
 
 const openConversation = async (id) => {
   loading.value = true;
   selectedConversation.value = null;
-  userNames.value = [];
 
   try {
     const data = await getConversation(id);
@@ -106,11 +105,7 @@ const openConversation = async (id) => {
       selectedConversation.value = data;
       Messages.value = data.Messages || [];  
 
-      if (data.Users && data.Users.length > 0) {
-        data.Users.forEach(user => {
-          userNames.value[user.userId.Identifier] = user.Name;
-        });
-      }
+      
     } else {
       console.error("La risposta non contiene un conversationId valido.");
       alert("Errore: la conversazione non è stata trovata.");
@@ -163,36 +158,41 @@ const sendMessage = async () => {
     axios.defaults.headers.common['Authorization'] = UserId.value;
     axios.defaults.headers.common['MediaType'] = "Text";  
 
-    
     const message = {
       MessageBody: Message.MessageBody  
     };
 
-    
+    // Invio del messaggio
     const response = await axios.post(`/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages`, message);
 
     console.log("Messaggio inviato con successo:", response.data);
-
-    const updatedConversation = await getConversation(selectedConversation.value.conversationId);
+    
+    const updatedMessage = {
+      MessageBody: response.data.MessageBody,
+      MessageId: response.data.MessageId,
+      UploaderId: response.data.UploaderId,
+      Date: response.data.Date,
+      MediaType: response.data.MediaType,
+      ConversationId: response.data.ConversationId,
+      User: {  
+        Name: response.data.User.Name,
+        userId: response.data.User.userId.Identifier,
+        UserPhoto: response.data.User.UserPhoto
+      }
+    };
 
     
-    message.MessageBody = response.data.MessageBody;
-    message.MessageId = response.data.MessageId;
-    message.UploaderId = response.data.UploaderId;
-    message.Date = response.data.Date;
-    message.MediaType = response.data.MediaType;
-    message.ConversationId = response.data.ConversationId;
+    Messages.value = [...Messages.value, updatedMessage];
+    
 
-  
-    updatedConversation.Messages.push(message);
-
-   
+    
     message.MessageBody = '';
     message.MessageId = '';
     message.UploaderId = '';
     message.Date = '';
     message.MediaType = '';
     message.ConversationId = '';
+    message.User = '';
 
   } catch (e) {
     console.error(e);
@@ -316,15 +316,15 @@ onMounted(() => {
         <div v-for="msg in Messages" :key="msg.MessageId" class="mb-2">
           <!-- Contenitore per ogni messaggio -->
           <div :class="{
-            'd-flex justify-content-end': msg.UploaderId === UserId.value, 
-            'd-flex justify-content-start': msg.UploaderId !== UserId.value
+            'd-flex justify-content-end': msg.User.Name === username, 
+            'd-flex justify-content-start': msg.User.Name !== username
           }">
             <!-- Messaggio inviato o ricevuto -->
             <div class="alert" :class="{
-              'alert-primary': msg.UploaderId === UserId.value, 
-              'alert-secondary': msg.UploaderId !== UserId.value
+              'alert-primary': msg.User.Name == username, 
+              'alert-success': msg.User.Name != username
             }">
-              <strong>{{ userNames[msg.UploaderId.Identifier] }}:</strong> {{ msg.MessageBody }}
+              <strong>{{ msg.User.Name }}:</strong> {{ msg.MessageBody }}
             </div>
           </div>
         </div>

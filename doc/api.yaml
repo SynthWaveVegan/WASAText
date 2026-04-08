@@ -682,6 +682,8 @@ components:
             $ref: "#/components/schemas/Comment"
         UploaderId:
           $ref: "#/components/schemas/Identifier"
+        Uploader:
+          $ref: "#/components/schemas/User"
         messageId:
           $ref: "#/components/schemas/Identifier"
         Date:
