@@ -117,6 +117,11 @@ const openConversation = async (id) => {
   }
 };
 
+const closeConversation = () => {
+  selectedConversation.value = null;  // Chiudi la conversazione
+  Messages.value = [];  // Pulisci i messaggi
+};
+
 const getMyConversations = async () => {
   try {
     axios.defaults.headers.common['Authorization'] = UserId.value;
@@ -193,6 +198,7 @@ const sendMessage = async () => {
     message.MediaType = '';
     message.ConversationId = '';
     message.User = '';
+    Message.MessageBody = '';
 
   } catch (e) {
     console.error(e);
@@ -310,7 +316,10 @@ onMounted(() => {
   <div v-else-if="selectedConversation">
     <div class="col-8 d-flex flex-column" style="height: 500px; border: 1px solid #ccc;">
       <div class="p-2 border-bottom">
-        <h5>{{ selectedConversation.ChatName }}</h5>
+        <h5>{{ selectedConversation.ChatName }}
+          <button class="btn btn-danger btn-sm float-end" @click="closeConversation">X</button>
+        </h5>
+        
       </div>
       <div class="flex-grow-1 overflow-auto p-2">
         <div v-for="msg in Messages" :key="msg.MessageId" class="mb-2">
