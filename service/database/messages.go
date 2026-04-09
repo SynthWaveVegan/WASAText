@@ -139,6 +139,6 @@ func (db *appdbimpl) ForwardMessage(OldMessageId structs.Identifier, UploaderId 
 }
 
 func (db *appdbimpl) DeleteMessage(MessageId structs.Identifier) error {
-	_, err := db.c.ExecContext(context.Background(),`DELETE FROM message WHERE MessageId = ?`, MessageId)
+	_, err := db.c.ExecContext(context.Background(),`DELETE FROM message WHERE MessageId = ?`, MessageId.Id)
 	return err
 }

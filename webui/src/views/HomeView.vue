@@ -220,7 +220,11 @@ const sendMessage = async () => {
 const deleteMessage = async (id) => {
   try {
     axios.defaults.headers.common['Authorization'] = UserId.value;
-    await axios.put(`/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages/delete/${id}`)
+    await axios.delete(`/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages/delete/${id}`)
+    const index = Messages.value.findIndex(message => message.id === id);
+    if (index !== -1) {
+      Messages.value.splice(index, 1); // Rimuove l'elemento all'indice trovato
+    }
   }catch(e){
     alert(e)
   }
@@ -359,7 +363,7 @@ onMounted(() => {
               'alert-primary': msg.User.Name == username, 
               'alert-success': msg.User.Name != username
             }">
-              <button class="btn btn-danger btn-sm float-end" v-if="msg.User.Name == username" @click="deleteMessage(msg.MessageId.value)">X</button>
+              <button class="btn btn-secondary btn-sm float-end" v-if="msg.User.Name == username" @click="deleteMessage(msg.messageId.Identifier)">X</button>
               <strong>{{ msg.User.Name }}:</strong> {{ msg.MessageBody }}
               <div>{{ msg.Date }}</div>
               <div class="message-status" v-if="msg.User.Name === username">
