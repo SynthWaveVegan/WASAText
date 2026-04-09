@@ -177,10 +177,9 @@ func (rt *_router) DELETEMESSAGE(w http.ResponseWriter, r *http.Request, ps http
 func (rt *_router) MARKMESSAGEREAD(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	userId := ps.ByName("userId")
-	messageId := ps.ByName("messageId")
 	conversationId := ps.ByName("conversationId")
 
-	if userId == "" || messageId == "" || conversationId == "" {
+	if userId == "" || conversationId == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("no userId or messageId or conversationid retrieved")
 		return
@@ -194,11 +193,15 @@ func (rt *_router) MARKMESSAGEREAD(w http.ResponseWriter, r *http.Request, ps ht
 		return
 	}
 
-	MessageId := structs.Identifier{
-		Id: messageId,
+	UserId := structs.Identifier{
+		Id: userId,
 	}
 
-	err := rt.db.markMessageRead(MessageId)
+	ConversationId := structs.Identifier{
+		Id: conversationId,
+	}
+
+	err := rt.db.MarkMessageRead(UserId, ConversationId)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("something went wrong: ", err)

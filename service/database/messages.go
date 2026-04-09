@@ -5,20 +5,35 @@ import (
 	// "errors"
 	// "fmt"
 	"github.com/SynthWaveVegan/WASAText/service/structs"
-	// "log"
+	"log"
 	// "os"
 	// "path/filepath"
 	"time"
 	"context"
 )
-func (db *appdbimpl) markMessageRead(MessageId string) ( error) {
+func (db *appdbimpl) MarkMessageRead(UserId structs.Identifier, ConversationId structs.Identifier) error {
 
-	_, err := db.c.ExecContext(context.Background(), `UPDATE message SET IsRead = ? WHERE MessageId = ?`, "Yes", MessageId)
+	var otherUserId string
+
+	err := db.c.QueryRowContext(context.Background(), `
+		SELECT u.UserId
+		FROM users u
+		JOIN userChat uc ON u.UserId = uc.UserId
+		WHERE uc.ConversationId = ? AND u.UserId != ?`, ConversationId.Id, UserId.Id).Scan(&otherUserId)
+
+	if err != nil {
+		log.Println("ERROR QUERY (getting users):", err)
+		return err
+	}
+	
+	_, err = db.c.ExecContext(context.Background(), `UPDATE message SET IsRead = 'Yes' WHERE ConversationId = ? AND UploaderId = ? AND IsRead != 'Yes'`,
+	 ConversationId.Id, otherUserId)
 		if err != nil {
 			return err
 		}
 	return nil
 }
+
 func (db *appdbimpl) insertMessage(MessageBody string, UploaderId structs.Identifier, MessageId structs.Identifier, Date string, MediaType string, ConversationId structs.Identifier, IsRead string) error {
 	_, err := db.c.ExecContext(context.Background(),
 	`INSERT INTO message (MessageId, MessageBody,  Date, UploaderId, MediaType, IsRead, ConversationId) VALUES (?, ?, ?, ?, ?, ?, ?)`, 

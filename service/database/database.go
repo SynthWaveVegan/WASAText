@@ -65,7 +65,7 @@ type AppDatabase interface {
 	SendMessage(MessageBody string, UploaderId structs.Identifier, MediaType string, ConversationId structs.Identifier) (structs.Message, error)
 	ForwardMessage(OldMessageId structs.Identifier, UploaderId structs.Identifier, ConversationId structs.Identifier) (structs.Message, error)
 	DeleteMessage(MessageId structs.Identifier) error
-	//markMessageRead(MessageId string) error
+	MarkMessageRead(UserId structs.Identifier, ConversationId structs.Identifier) error
 
 	CommentMessage(CommentBody string, MessageId structs.Identifier, UploaderId structs.Identifier) (structs.Comment, error)
 	//insertComment(CommentId structs.Identifier, MessageId structs.Identifier, CommentBody string, Date string) error

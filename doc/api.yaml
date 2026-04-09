@@ -173,7 +173,7 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
-  /users/{userId}/conversations/{conversationId}/messages/{messageId}/read:
+  /users/{userId}/conversations/{conversationId}/messages/read:
 
     put:
       security:
@@ -236,8 +236,7 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
-
-  /users/{userId}/conversations/{conversationId}/messages/{messageId}:
+  /users/{userId}/conversations/{conversationId}/messages/delete/{messageId}:
 
     delete:
       security:
@@ -264,7 +263,9 @@ paths:
           $ref: "#/components/responses/Forbidden"
         "500":
           $ref: "#/components/responses/InternalServerError"
-        
+  
+  /users/{userId}/conversations/{conversationId}/messages/forward/{messageId}:
+
     put:
       security:
         - bearerAuth: []
