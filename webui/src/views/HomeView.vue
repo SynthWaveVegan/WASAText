@@ -58,6 +58,7 @@ const createConversation = async () => {
 
     console.log(response.data);
     conversations.value.push(newConversation);
+    Conversation.ChatName = '';
 
   } catch (e) {
     alert(e.response ? e.response.data : e.message);
@@ -183,7 +184,7 @@ const sendMessage = async () => {
     
     const updatedMessage = {
       MessageBody: response.data.MessageBody,
-      MessageId: response.data.MessageId,
+      messageId: response.data.messageId,
       UploaderId: response.data.UploaderId,
       Date: response.data.Date,
       MediaType: response.data.MediaType,
@@ -223,12 +224,25 @@ const deleteMessage = async (id) => {
     await axios.delete(`/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages/delete/${id}`)
     const index = Messages.value.findIndex(message => message.id === id);
     if (index !== -1) {
-      Messages.value.splice(index, 1); // Rimuove l'elemento all'indice trovato
+      Messages.value = Messages.value.filter(message => message.MessageId !== id);
     }
+    alert("message canceled")
+    await openConversation(selectedConversation.value.conversationId);
   }catch(e){
     alert(e)
   }
 }
+
+const forwardMessage = async (id) => {
+  try{
+    axios.defaults.headers.common['Authorization'] = UserId.value;
+    await axios.delete(`/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages/forward/${id}`)
+
+  }catch(e){
+    alert(e)
+  }
+}
+
 const GroupName = ref("");
 const showInputForConversationId = ref(null);
 
@@ -363,7 +377,7 @@ onMounted(() => {
               'alert-primary': msg.User.Name == username, 
               'alert-success': msg.User.Name != username
             }">
-              <button class="btn btn-secondary btn-sm float-end" v-if="msg.User.Name == username" @click="deleteMessage(msg.messageId.Identifier)">X</button>
+              <button class="btn btn-danger btn-sm float-end" v-if="msg.User.Name == username" @click="deleteMessage(msg.messageId.Identifier)">X</button>
               <strong>{{ msg.User.Name }}:</strong> {{ msg.MessageBody }}
               <div>{{ msg.Date }}</div>
               <div class="message-status" v-if="msg.User.Name === username">
