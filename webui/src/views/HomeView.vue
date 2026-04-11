@@ -236,7 +236,7 @@ const deleteMessage = async (id) => {
 const forwardMessage = async (id) => {
   try{
     axios.defaults.headers.common['Authorization'] = UserId.value;
-    await axios.delete(`/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages/forward/${id}`)
+    await axios.put(`/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages/forward/${id}`)
 
   }catch(e){
     alert(e)
@@ -377,6 +377,7 @@ onMounted(() => {
               'alert-primary': msg.User.Name == username, 
               'alert-success': msg.User.Name != username
             }">
+              <button class="btn btn-success btn-sm float-end"  @click="forwardMessage(msg.messageId.Identifier)">></button>
               <button class="btn btn-danger btn-sm float-end" v-if="msg.User.Name == username" @click="deleteMessage(msg.messageId.Identifier)">X</button>
               <strong>{{ msg.User.Name }}:</strong> {{ msg.MessageBody }}
               <div>{{ msg.Date }}</div>
