@@ -233,6 +233,12 @@ const deleteMessage = async (id) => {
   }
 }
 
+const showInputForMessageId = ref(null);
+
+const OpenForwardInput = (messageId) => {
+  showInputForMessageId.value = messageId;
+  
+}
 const forwardMessage = async (id) => {
   try{
     axios.defaults.headers.common['Authorization'] = UserId.value;
@@ -351,7 +357,7 @@ onMounted(() => {
   <div v-if="loading">Loading...</div>
 
   <div v-else-if="selectedConversation">
-    <div class="col-8 d-flex flex-column" style="height: 500px; border: 1px solid #ccc;">
+    <div class="col-8 d-flex flex-column" style="height: 500px; width: 1480px; border: 1px solid #ccc;">
       <div class="p-2 border-bottom">
         <h5>{{ selectedConversation.ChatName }}
           <button class="btn btn-danger btn-sm float-end" @click="closeConversation">X</button>
@@ -373,14 +379,17 @@ onMounted(() => {
             'd-flex justify-content-start': msg.User.Name != username
           }">
             
-            <div class="alert" :class="{
-              'alert-primary': msg.User.Name == username, 
-              'alert-success': msg.User.Name != username
+            <div
+            class="alert d-inline-block w-auto"
+            style="min-width: 180px; max-width: 70%;"
+            :class="{
+            'alert-primary': msg.User.Name == username,
+            'alert-success': msg.User.Name != username
             }">
-              <button class="btn btn-success btn-sm float-end"  @click="forwardMessage(msg.messageId.Identifier)">></button>
+              <button class="btn btn-success btn-sm float-end ms-1"  @click="forwardMessage(msg.messageId.Identifier)">></button>
               <button class="btn btn-danger btn-sm float-end" v-if="msg.User.Name == username" @click="deleteMessage(msg.messageId.Identifier)">X</button>
               <strong>{{ msg.User.Name }}:</strong> {{ msg.MessageBody }}
-              <div>{{ msg.Date }}</div>
+              <div class="small text-muted">{{ msg.Date }}</div>
               <div class="message-status" v-if="msg.User.Name === username">
 
                   <span v-if="msg.IsRead == 'Yes'" class="badge bg-success me-1">•</span>
