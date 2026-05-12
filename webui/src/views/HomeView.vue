@@ -33,7 +33,7 @@ const refresh = async () => {
   } catch (e) {
     errormsg.value = e.toString();
   }
-  loading.value = false;
+  loading.value = false; a
 };
 
 const createConversation = async () => {
