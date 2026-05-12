@@ -33,7 +33,7 @@ const refresh = async () => {
   } catch (e) {
     errormsg.value = e.toString();
   }
-  loading.value = false; a
+  loading.value = false; 
 };
 
 const createConversation = async () => {
@@ -234,13 +234,21 @@ const deleteMessage = async (id) => {
 }
 
 const showInputForMessageId = ref(null);
+const Forwardinput = ref("");
 
 const OpenForwardInput = (messageId) => {
   showInputForMessageId.value = messageId;
-  
+  Forwardinput.value = '';
 }
+
+const CloseForwardInput = () => {
+  showInputForMessageId.value = null;
+  Forwardinput.value = '';
+}
+
 const forwardMessage = async (id) => {
   try{
+    
     axios.defaults.headers.common['Authorization'] = UserId.value;
     await axios.put(`/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages/forward/${id}`)
 
@@ -264,8 +272,6 @@ const closeGroupInput = () => {
 
 const addToGroup = async () => {
   try {
-    
-
     axios.defaults.headers.common['Authorization'] = UserId.value;
 
     const response = await axios.put(`/users/${UserId.value}/group`, {
@@ -386,7 +392,7 @@ onMounted(() => {
             'alert-primary': msg.User.Name == username,
             'alert-success': msg.User.Name != username
             }">
-              <button class="btn btn-success btn-sm float-end ms-1"  @click="forwardMessage(msg.messageId.Identifier)">></button>
+              <button class="btn btn-success btn-sm float-end ms-1"  @click="OpenForwardInput(msg.messageId.Identifier)">></button>
               <button class="btn btn-danger btn-sm float-end" v-if="msg.User.Name == username" @click="deleteMessage(msg.messageId.Identifier)">X</button>
               <strong>{{ msg.User.Name }}:</strong> {{ msg.MessageBody }}
               <div class="small text-muted">{{ msg.Date }}</div>
