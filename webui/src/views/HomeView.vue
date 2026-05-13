@@ -250,7 +250,9 @@ const forwardMessage = async (id) => {
   try{
     
     axios.defaults.headers.common['Authorization'] = UserId.value;
-    await axios.put(`/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages/forward/${id}`)
+    await axios.put(`/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages/forward/${id}`, {
+      
+    })
 
   }catch(e){
     alert(e)

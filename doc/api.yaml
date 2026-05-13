@@ -264,7 +264,7 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
   
-  /users/{userId}/conversations/{conversationId}/messages/forward/{messageId}:
+  /users/{userId}/conversations/{conversationId}/messages/forward:
 
     put:
       security:
@@ -278,7 +278,7 @@ paths:
       parameters:
 
         - $ref: "#/components/parameters/userId"
-        - $ref: "#/components/parameters/messageId"
+        
         - $ref: "#/components/parameters/conversationId"
         
       operationId: FORWARDMESSAGE
