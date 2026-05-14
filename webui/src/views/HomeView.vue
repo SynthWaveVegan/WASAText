@@ -159,6 +159,7 @@ const getMyConversations = async () => {
     alert("Si è verificato un errore durante il recupero delle conversazioni.");
   }
 };
+
 const Message = reactive({
   MessageBody: '',
   MessageId: '',
@@ -233,18 +234,16 @@ const deleteMessage = async (id) => {
   }
 }
 
-const showInputForMessageId = ref(null);
-const Forwardinput = ref("");
 
-const OpenForwardInput = (messageId) => {
-  showInputForMessageId.value = messageId;
-  Forwardinput.value = '';
-}
+const showConversationModal = ref(false);
+const messageToForward = ref(null);
 
-const CloseForwardInput = () => {
-  showInputForMessageId.value = null;
-  Forwardinput.value = '';
-}
+const OpenForwardModal = async (messageId) => {
+  messageToForward.value = messageId;
+  await getMyConversations();
+  showConversationModal.value = true;
+};
+
 
 const forwardMessage = async (id) => {
   try{
@@ -253,6 +252,12 @@ const forwardMessage = async (id) => {
     await axios.put(`/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages/forward/${id}`, {
       
     })
+
+    alert("Messaggio inoltrato!");
+
+    showConversationModal.value = false;
+
+    messageToForward.value = null;
 
   }catch(e){
     alert(e)
@@ -389,12 +394,56 @@ onMounted(() => {
             
             <div
             class="alert d-inline-block w-auto"
-            style="min-width: 180px; max-width: 70%;"
+            style="min-width: 400px; max-width: 70%;"
             :class="{
             'alert-primary': msg.User.Name == username,
             'alert-success': msg.User.Name != username
             }">
-              <button class="btn btn-success btn-sm float-end ms-1"  @click="OpenForwardInput(msg.messageId.Identifier)">></button>
+              <button class="btn btn-success btn-sm float-end ms-1"  @click="OpenForwardModal(msg.messageId.Identifier)">></button>
+              <div v-if="showConversationModal"
+                  class="modal fade show d-block"
+                  tabindex="-1"
+                  style="background-color: rgba(0,0,0,0.5); backdrop-filter: blur(5px);">
+
+                <div class="modal-dialog modal-dialog-centered modal-md">
+
+                  <div class="modal-content">
+
+                    <div class="modal-header">
+
+                      <h5 class="modal-title">
+                        Seleziona conversazione
+                      </h5>
+
+                      <button type="button"
+                              class="btn-close"
+                              @click="showConversationModal = false">
+                      </button>
+
+                    </div>
+
+                    <div class="modal-body">
+
+                      <div v-for="conv in conversations"
+                          :key="conv.Identifier"
+                          class="list-group mb-2">
+
+                        <button class="list-group-item list-group-item-action"
+                                @click="forwardMessage(conv.Identifier)">
+
+                          {{ conv.Name }}
+
+                        </button>
+
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </div>
               <button class="btn btn-danger btn-sm float-end" v-if="msg.User.Name == username" @click="deleteMessage(msg.messageId.Identifier)">X</button>
               <strong>{{ msg.User.Name }}:</strong> {{ msg.MessageBody }}
               <div class="small text-muted">{{ msg.Date }}</div>
