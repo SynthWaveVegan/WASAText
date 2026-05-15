@@ -191,6 +191,7 @@ const sendMessage = async () => {
       MediaType: response.data.MediaType,
       ConversationId: response.data.ConversationId,
       IsRead: response.data.IsRead,
+      IsForwarded: response.data.IsForwarded,
       User: {  
         Name: response.data.User.Name,
         userId: response.data.User.userId.Identifier,
@@ -210,8 +211,9 @@ const sendMessage = async () => {
     message.MediaType = '';
     message.ConversationId = '';
     message.User = '';
-    Message.MessageBody = '';
+    message.MessageBody = '';
     message.IsRead = '';
+    message.IsForwarded = '';
 
   } catch (e) {
     console.error(e);
@@ -250,7 +252,7 @@ const forwardMessage = async (id) => {
     
     axios.defaults.headers.common['Authorization'] = UserId.value;
     await axios.put(`/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages/forward/${id}`, {
-      
+      Message: 
     })
 
     alert("Messaggio inoltrato!");
