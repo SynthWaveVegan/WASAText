@@ -286,7 +286,7 @@ paths:
         content:
           application/json: 
             schema:
-              $ref: "#/components/schemas/Message/MessageBody"
+              $ref: "#/components/schemas/Message"
       responses:
         "201":
           description: message forwarded succesfully
@@ -726,6 +726,9 @@ components:
         ConversationId:
           $ref: "#/components/schemas/Identifier"
         IsRead:
+          type: string
+          enum: [Yes, No]
+        IsForwarded:
           type: string
           enum: [Yes, No]
 

@@ -28,6 +28,7 @@ type Message struct {
 	MediaType      string        `json:"MediaType"`
 	ConversationId Identifier    `json:"ConversationId"`
 	IsRead         string        `json: "IsRead"`
+	IsForwarded    string        `json: "IsForwarded"`
 }
 
 type Group struct {

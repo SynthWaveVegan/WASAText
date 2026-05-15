@@ -170,7 +170,7 @@ func (db *appdbimpl) GetConversation(ConversationId structs.Identifier, currentU
 	}
 
 	messageRows, err := db.c.QueryContext(context.Background(), `
-		SELECT MessageId, MessageBody, Date, UploaderId, MediaType, IsRead
+		SELECT MessageId, MessageBody, Date, UploaderId, MediaType, IsRead, IsForwarded
 		FROM message
 		WHERE ConversationId = ?
 		ORDER BY Date ASC`, ConversationId.Id)
@@ -188,7 +188,7 @@ func (db *appdbimpl) GetConversation(ConversationId structs.Identifier, currentU
 
 		var msg structs.Message
 
-		err := messageRows.Scan(&msg.MessageId.Id, &msg.MessageBody, &msg.Date, &msg.UploaderId.Id, &msg.MediaType, &msg.IsRead)
+		err := messageRows.Scan(&msg.MessageId.Id, &msg.MessageBody, &msg.Date, &msg.UploaderId.Id, &msg.MediaType, &msg.IsRead, &msg.IsForwarded)
 		if err != nil {
 			log.Println("ERROR SCAN (messages):", err)
 			return structs.Conversation{}, err

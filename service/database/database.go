@@ -112,6 +112,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 		UploaderId VARCHAR(11) NOT NULL,
 		MediaType TEXT,
 		IsRead TEXT,
+		IsForwarded TEXT,
 		ConversationId VARCHAR(11) NOT NULL,
 		FOREIGN KEY (ConversationId) REFERENCES conversation(ConversationId),
 		FOREIGN KEY (UploaderId) REFERENCES user(UserId)

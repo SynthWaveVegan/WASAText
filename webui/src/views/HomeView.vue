@@ -166,7 +166,9 @@ const Message = reactive({
   UploaderId: '',
   Date: '',
   MediaType: '',
-  ConversationId: ''
+  ConversationId: '',
+  IsRead: '',
+  IsForwarded: '',
 })
 
 
@@ -204,16 +206,16 @@ const sendMessage = async () => {
     
 
     
-    message.MessageBody = '';
-    message.MessageId = '';
-    message.UploaderId = '';
-    message.Date = '';
-    message.MediaType = '';
-    message.ConversationId = '';
-    message.User = '';
-    message.MessageBody = '';
-    message.IsRead = '';
-    message.IsForwarded = '';
+    Message.MessageBody = '';
+    Message.MessageId = '';
+    Message.UploaderId = '';
+    Message.Date = '';
+    Message.MediaType = '';
+    Message.ConversationId = '';
+    Message.User = '';
+    Message.MessageBody = '';
+    Message.IsRead = '';
+    Message.IsForwarded = '';
 
   } catch (e) {
     console.error(e);
@@ -247,13 +249,13 @@ const OpenForwardModal = async (messageId) => {
 };
 
 
-const forwardMessage = async (id) => {
+const forwardMessage = async (MessageBody) => {
   try{
     
+    
+
     axios.defaults.headers.common['Authorization'] = UserId.value;
-    await axios.put(`/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages/forward/${id}`, {
-      Message: 
-    })
+    await axios.put(`/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages/forward`, message)
 
     alert("Messaggio inoltrato!");
 
@@ -271,7 +273,7 @@ const showInputForConversationId = ref(null);
 
 const toggleGroupInput = (conversationId) => {
       showInputForConversationId.value = conversationId;
-      GroupName.value = '';  // Resetta il nome del gruppo ogni volta che si apre il campo di input
+      GroupName.value = '';  
     };
 
 const closeGroupInput = () => {
@@ -431,9 +433,9 @@ onMounted(() => {
                           class="list-group mb-2">
 
                         <button class="list-group-item list-group-item-action"
-                                @click="forwardMessage(conv.Identifier)">
+                                @click="forwardMessage(msg.MessageBody)">
 
-                          {{ conv.Name }}
+                          {{ conv.ChatName }}
 
                         </button>
 
