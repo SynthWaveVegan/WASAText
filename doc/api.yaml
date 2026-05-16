@@ -264,9 +264,9 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
   
-  /users/{userId}/conversations/{conversationId}/messages/forward:
+  /users/{userId}/conversations/{conversationId}/messages/forward/{messageId}:
 
-    put:
+    post:
       security:
         - bearerAuth: []
       tags:
@@ -286,7 +286,7 @@ paths:
         content:
           application/json: 
             schema:
-              $ref: "#/components/schemas/Message"
+              $ref: "#/components/schemas/Identifier"
       responses:
         "201":
           description: message forwarded succesfully

@@ -249,19 +249,52 @@ const OpenForwardModal = async (messageId) => {
 };
 
 
-const forwardMessage = async (MessageBody) => {
+const forwardMessage = async (convId) => {
   try{
-    
-    
-
+    axios.defaults.headers.common['MediaType'] = "Text"; 
     axios.defaults.headers.common['Authorization'] = UserId.value;
-    await axios.put(`/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages/forward`, message)
+    const response = await axios.post(`/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages/forward/${messageToForward.value}`, 
+      {Identifier : convId}
+    )
 
-    alert("Messaggio inoltrato!");
+    alert("Message Forwarded!");
+    const updatedMessage = {
+      MessageBody: response.data.MessageBody,
+      messageId: response.data.messageId,
+      UploaderId: response.data.UploaderId,
+      Date: response.data.Date,
+      MediaType: response.data.MediaType,
+      ConversationId: response.data.ConversationId,
+      IsRead: response.data.IsRead,
+      IsForwarded: response.data.IsForwarded,
+      User: {  
+        Name: response.data.User.Name,
+        userId: response.data.User.userId.Identifier,
+        UserPhoto: response.data.User.UserPhoto
+      }
+    };
+
+    
+    Messages.value = [...Messages.value, updatedMessage];
+    
+
+    
+    Message.MessageBody = '';
+    Message.MessageId = '';
+    Message.UploaderId = '';
+    Message.Date = '';
+    Message.MediaType = '';
+    Message.ConversationId = '';
+    Message.User = '';
+    Message.MessageBody = '';
+    Message.IsRead = '';
+    Message.IsForwarded = '';
 
     showConversationModal.value = false;
 
     messageToForward.value = null;
+
+    await openConversation(convId);
 
   }catch(e){
     alert(e)
@@ -416,7 +449,7 @@ onMounted(() => {
                     <div class="modal-header">
 
                       <h5 class="modal-title">
-                        Seleziona conversazione
+                        Select Conversation
                       </h5>
 
                       <button type="button"
@@ -433,7 +466,7 @@ onMounted(() => {
                           class="list-group mb-2">
 
                         <button class="list-group-item list-group-item-action"
-                                @click="forwardMessage(msg.MessageBody)">
+                                @click="forwardMessage(conv.conversationId)">
 
                           {{ conv.ChatName }}
 
@@ -451,12 +484,14 @@ onMounted(() => {
               <button class="btn btn-danger btn-sm float-end" v-if="msg.User.Name == username" @click="deleteMessage(msg.messageId.Identifier)">X</button>
               <strong>{{ msg.User.Name }}:</strong> {{ msg.MessageBody }}
               <div class="small text-muted">{{ msg.Date }}</div>
+              <span v-if="msg.IsForwarded == 'Yes'" class="badge bg-primary me-1">↠↠</span>
               <div class="message-status" v-if="msg.User.Name === username">
 
                   <span v-if="msg.IsRead == 'Yes'" class="badge bg-success me-1">•</span>
                   <span v-if="msg.IsRead == 'Yes'" class="badge bg-success me-1">•</span>
 
                   <span v-if="msg.IsRead == 'No'" class="badge bg-secondary me-1">•</span>
+                  
               </div>
             </div>
             

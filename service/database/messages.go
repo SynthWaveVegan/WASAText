@@ -106,12 +106,12 @@ func (db *appdbimpl) ForwardMessage(OldMessageId structs.Identifier, UploaderId 
 	IsRead := "No"
 	IsForwarded := "Yes" 
 
-	err = db.c.QueryRowContext(context.Background(),`SELECT MessageBody FROM message WHERE MessageId = ?`, OldMessageId).Scan(&MessageBody)
+	err = db.c.QueryRowContext(context.Background(),`SELECT MessageBody FROM message WHERE MessageId = ?`, OldMessageId.Id).Scan(&MessageBody)
 	if err != nil {
 			return structs.Message{}, err
 		}
 
-	err = db.c.QueryRowContext(context.Background(),`SELECT MediaType FROM message WHERE MessageId = ?`, OldMessageId).Scan(&MediaType)
+	err = db.c.QueryRowContext(context.Background(),`SELECT MediaType FROM message WHERE MessageId = ?`, OldMessageId.Id).Scan(&MediaType)
 	if err != nil {
 			return structs.Message{}, err
 		}
