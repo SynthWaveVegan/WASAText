@@ -201,10 +201,7 @@ const sendMessage = async () => {
       }
     };
 
-    
     Messages.value = [...Messages.value, updatedMessage];
-    
-
     
     Message.MessageBody = '';
     Message.MessageId = '';
@@ -274,10 +271,7 @@ const forwardMessage = async (convId) => {
       }
     };
 
-    
     Messages.value = [...Messages.value, updatedMessage];
-    
-
     
     Message.MessageBody = '';
     Message.MessageId = '';
@@ -341,6 +335,54 @@ const addToGroup = async () => {
     alert(e);
   }
 };
+
+const messageToComment = ref(null);
+const showCommentModal = ref(false);
+
+const OpenCommentModal = async (messageId) => {
+  messageToComment.value = messageId;
+  await getMyConversations();
+  showCommentModal.value = true;
+};
+
+const Comment = reactive({
+  CommentId: '',
+  MessageId: '',
+  CommentBody: '',
+  CommentDate: '',
+  UploaderId: '',
+})
+
+const commentMessage = async () => {
+  try{
+    axios.defaults.headers.common['Authorization'] = UserId.value;
+    const response = await axios.post(`/users/${UserId.value}/messages/{messageId}/comments`,
+      {CommentBody: Comment.CommentBody}
+    );
+
+    const UpdatedComment = {
+      CommentId: response.data.commentId,
+      MessageId: response.data.MessageId,
+      CommentBody: response.data.CommentBody,
+      CommentDate: response.data.Date,
+      UploaderId: response.data.UploaderId,
+    }
+
+    Comments.value = [...Comments.value, UpdatedComment];
+
+    Comment.CommentId = '',
+    Comment.MessageId = '',
+    Comment.CommentBody = '',
+    Comment.CommentDate = '',
+    Comment.UploaderId = '',
+
+    showCommentModal.value = false;
+    messageToComment.value = null;
+
+  }catch(e){
+    alert(e)
+  }
+}
 
 // Chiamata alla funzione refresh quando il componente viene montato
 onMounted(() => {
@@ -437,50 +479,39 @@ onMounted(() => {
             'alert-success': msg.User.Name != username
             }">
               <button class="btn btn-success btn-sm float-end ms-1"  @click="OpenForwardModal(msg.messageId.Identifier)">></button>
+              <button class="btn btn-secondary btn-sm float-end ms-1"  @click="OpenCommentModal(msg.messageId.Identifier)">Comment</button>
               <div v-if="showConversationModal"
                   class="modal fade show d-block"
                   tabindex="-1"
                   style="background-color: rgba(0,0,0,0.5); backdrop-filter: blur(5px);">
-
                 <div class="modal-dialog modal-dialog-centered modal-md">
-
                   <div class="modal-content">
-
                     <div class="modal-header">
-
                       <h5 class="modal-title">
                         Select Conversation
                       </h5>
-
                       <button type="button"
                               class="btn-close"
                               @click="showConversationModal = false">
                       </button>
-
                     </div>
-
                     <div class="modal-body">
-
                       <div v-for="conv in conversations"
                           :key="conv.Identifier"
                           class="list-group mb-2">
-
                         <button class="list-group-item list-group-item-action"
                                 @click="forwardMessage(conv.conversationId)">
-
                           {{ conv.ChatName }}
-
                         </button>
-
                       </div>
-
                     </div>
-
                   </div>
-
                 </div>
-
               </div>
+              <div v-if="showForwardModal"
+                  class="modal fade show d-block"
+                  tabindex="-1"
+                  style="background-color: rgba(0,0,0,0.5); backdrop-filter: blur(5px);">
               <button class="btn btn-danger btn-sm float-end" v-if="msg.User.Name == username" @click="deleteMessage(msg.messageId.Identifier)">X</button>
               <strong>{{ msg.User.Name }}:</strong> {{ msg.MessageBody }}
               <div class="small text-muted">{{ msg.Date }}</div>
