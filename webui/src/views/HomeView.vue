@@ -169,6 +169,7 @@ const Message = reactive({
   ConversationId: '',
   IsRead: '',
   IsForwarded: '',
+  Comments: [],
 })
 
 
@@ -194,11 +195,12 @@ const sendMessage = async () => {
       ConversationId: response.data.ConversationId,
       IsRead: response.data.IsRead,
       IsForwarded: response.data.IsForwarded,
+      Comments: response.data.Comments || [] ,
       User: {  
         Name: response.data.User.Name,
         userId: response.data.User.userId.Identifier,
         UserPhoto: response.data.User.UserPhoto
-      }
+      } 
     };
 
     Messages.value = [...Messages.value, updatedMessage];
@@ -213,6 +215,7 @@ const sendMessage = async () => {
     Message.MessageBody = '';
     Message.IsRead = '';
     Message.IsForwarded = '';
+    Message.Comments = [];
 
   } catch (e) {
     console.error(e);
@@ -264,6 +267,7 @@ const forwardMessage = async (convId) => {
       ConversationId: response.data.ConversationId,
       IsRead: response.data.IsRead,
       IsForwarded: response.data.IsForwarded,
+      Comments: response.data.Comments || [] ,
       User: {  
         Name: response.data.User.Name,
         userId: response.data.User.userId.Identifier,
@@ -283,6 +287,7 @@ const forwardMessage = async (convId) => {
     Message.MessageBody = '';
     Message.IsRead = '';
     Message.IsForwarded = '';
+    Message.Comments = [];
 
     showConversationModal.value = false;
 
@@ -339,9 +344,9 @@ const addToGroup = async () => {
 const messageToComment = ref(null);
 const showCommentModal = ref(false);
 
-const OpenCommentModal = async (messageId) => {
-  messageToComment.value = messageId;
-  await getMyConversations();
+const OpenCommentModal = async (message) => {
+  messageToComment.value = message.MessageId;
+  Comments.value = message.Comments || [];
   showCommentModal.value = true;
 };
 
@@ -356,7 +361,7 @@ const Comment = reactive({
 const commentMessage = async () => {
   try{
     axios.defaults.headers.common['Authorization'] = UserId.value;
-    const response = await axios.post(`/users/${UserId.value}/messages/{messageId}/comments`,
+    const response = await axios.post(`/users/${UserId.value}/messages/${messageToComment.value}/comments`,
       {CommentBody: Comment.CommentBody}
     );
 
@@ -479,7 +484,7 @@ onMounted(() => {
             'alert-success': msg.User.Name != username
             }">
               <button class="btn btn-success btn-sm float-end ms-1"  @click="OpenForwardModal(msg.messageId.Identifier)">></button>
-              <button class="btn btn-secondary btn-sm float-end ms-1"  @click="OpenCommentModal(msg.messageId.Identifier)">Comment</button>
+              <button class="btn btn-secondary btn-sm float-end ms-1"  @click="OpenCommentModal(msg.messageId.Identifier)">💬</button>
               <div v-if="showConversationModal"
                   class="modal fade show d-block"
                   tabindex="-1"
@@ -508,10 +513,7 @@ onMounted(() => {
                   </div>
                 </div>
               </div>
-              <div v-if="showForwardModal"
-                  class="modal fade show d-block"
-                  tabindex="-1"
-                  style="background-color: rgba(0,0,0,0.5); backdrop-filter: blur(5px);">
+              <div v-else-if="showCommentModal"></div>
               <button class="btn btn-danger btn-sm float-end" v-if="msg.User.Name == username" @click="deleteMessage(msg.messageId.Identifier)">X</button>
               <strong>{{ msg.User.Name }}:</strong> {{ msg.MessageBody }}
               <div class="small text-muted">{{ msg.Date }}</div>
