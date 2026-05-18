@@ -188,7 +188,7 @@ const sendMessage = async () => {
     
     const updatedMessage = {
       MessageBody: response.data.MessageBody,
-      messageId: response.data.messageId,
+      MessageId: response.data.messageId,
       UploaderId: response.data.UploaderId,
       Date: response.data.Date,
       MediaType: response.data.MediaType,
@@ -260,7 +260,7 @@ const forwardMessage = async (convId) => {
     alert("Message Forwarded!");
     const updatedMessage = {
       MessageBody: response.data.MessageBody,
-      messageId: response.data.messageId,
+      MessageId: response.data.messageId,
       UploaderId: response.data.UploaderId,
       Date: response.data.Date,
       MediaType: response.data.MediaType,
@@ -345,7 +345,7 @@ const messageToComment = ref(null);
 const showCommentModal = ref(false);
 
 const OpenCommentModal = async (message) => {
-  messageToComment.value = message.MessageId;
+  messageToComment.value = message.messageId.Identifier;
   Comments.value = message.Comments || [];
   showCommentModal.value = true;
 };
@@ -358,16 +358,18 @@ const Comment = reactive({
   UploaderId: '',
 })
 
-const commentMessage = async () => {
+const reactions = ['👍', '❤️', '😂', '😮', '😢', '😡'];
+
+const commentMessage = async (reaction) => {
   try{
     axios.defaults.headers.common['Authorization'] = UserId.value;
     const response = await axios.post(`/users/${UserId.value}/messages/${messageToComment.value}/comments`,
-      {CommentBody: Comment.CommentBody}
+      {CommentBody: reaction}
     );
 
     const UpdatedComment = {
       CommentId: response.data.commentId,
-      MessageId: response.data.MessageId,
+      MessageId: response.data.messageId,
       CommentBody: response.data.CommentBody,
       CommentDate: response.data.Date,
       UploaderId: response.data.UploaderId,
@@ -484,7 +486,7 @@ onMounted(() => {
             'alert-success': msg.User.Name != username
             }">
               <button class="btn btn-success btn-sm float-end ms-1"  @click="OpenForwardModal(msg.messageId.Identifier)">></button>
-              <button class="btn btn-secondary btn-sm float-end ms-1"  @click="OpenCommentModal(msg.messageId.Identifier)">💬</button>
+              <button class="btn btn-secondary btn-sm float-end ms-1"  @click="OpenCommentModal(msg)">💬</button>
               <div v-if="showConversationModal"
                   class="modal fade show d-block"
                   tabindex="-1"
@@ -513,7 +515,37 @@ onMounted(() => {
                   </div>
                 </div>
               </div>
-              <div v-else-if="showCommentModal"></div>
+              <div v-if="showCommentModal">
+                <div class="modal fade" tabindex="-1" :class="{ show: showCommentModal }" 
+                    style="display: block;" v-if="showCommentModal">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title">Comments</h5>
+                        <button type="button" class="btn-close" @click="showCommentModal = false"></button>
+                      </div>
+                      <div class="modal-body">
+                        <ul class="list-group mb-3">
+                          <li class="list-group-item" v-for="c in Comments" :key="c.CommentId">
+                            {{ c.CommentBody }} - {{ c.UploaderId }}
+                          </li>
+                        </ul>
+
+                        <h6>Reactions:</h6>
+                        <div class="d-flex gap-2">
+                          <button 
+                            v-for="reaction in reactions" 
+                            :key="reaction" 
+                            class="btn btn-light fs-3" 
+                            @click="commentMessage(reaction)">
+                            {{ reaction }}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
               <button class="btn btn-danger btn-sm float-end" v-if="msg.User.Name == username" @click="deleteMessage(msg.messageId.Identifier)">X</button>
               <strong>{{ msg.User.Name }}:</strong> {{ msg.MessageBody }}
               <div class="small text-muted">{{ msg.Date }}</div>

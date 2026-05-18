@@ -37,9 +37,13 @@ func (rt *_router) COMMENTMESSAGE(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
-	var CommentBody string
+	type CommentRequest struct {
+    	CommentBody string `json:"CommentBody"`
+	}
 
-	err := json.NewDecoder(r.Body).Decode(&CommentBody)
+	var commentReq CommentRequest
+
+	err := json.NewDecoder(r.Body).Decode(&commentReq)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.Error("something went wrong: ", err)
@@ -48,7 +52,7 @@ func (rt *_router) COMMENTMESSAGE(w http.ResponseWriter, r *http.Request, ps htt
 	}
 	defer r.Body.Close()
 
-	NewComment, err := rt.db.CommentMessage(CommentBody, MessageId, UserId)
+	NewComment, err := rt.db.CommentMessage(commentReq.CommentBody, MessageId, UserId)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("something went wrong: ", err)

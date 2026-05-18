@@ -14,7 +14,8 @@ import (
 
 func (db *appdbimpl) insertComment(CommentId structs.Identifier, MessageId structs.Identifier, CommentBody string, Date string, UploaderId structs.Identifier) error {
 
-	_, err := db.c.ExecContext(context.Background(),`INSERT INTO comment(CommentId, MessageId, CommentBody, Date, UploaderId) VALUES (?, ?, ?, ?, ?)`, CommentId, MessageId, CommentBody, Date, UploaderId)
+	_, err := db.c.ExecContext(context.Background(),`INSERT INTO comment(CommentId, MessageId, CommentBody, Date, UploaderId) VALUES (?, ?, ?, ?, ?)`, 
+	CommentId.Id, MessageId.Id, CommentBody, Date, UploaderId.Id)
 
 	return err
 }
@@ -52,6 +53,6 @@ func (db *appdbimpl) CommentMessage(CommentBody string, MessageId structs.Identi
 }
 
 func (db *appdbimpl) UncommentMessage(CommentId structs.Identifier) error {
-	_, err := db.c.ExecContext(context.Background(),`DELETE FROM comment WHERE CommentId = ?`, CommentId)
+	_, err := db.c.ExecContext(context.Background(),`DELETE FROM comment WHERE CommentId = ?`, CommentId.Id)
 	return err
 }
