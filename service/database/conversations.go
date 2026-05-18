@@ -197,8 +197,46 @@ func (db *appdbimpl) GetConversation(ConversationId structs.Identifier, currentU
 		msg.Uploader, err = db.GetUser(msg.UploaderId)
 		msg.ConversationId = ConversationId
 
+		commentRows, err := db.c.QueryContext(context.Background(), `
+        SELECT CommentId, CommentBody, Date, UploaderId
+        FROM comment
+        WHERE MessageId = ?
+        ORDER BY Date ASC`,
+        msg.MessageId.Id,
+    	)
+
+    	if err != nil {
+        	log.Println("ERROR QUERY (comments):", err)
+        	return structs.Conversation{}, err
+    	}
+
+    	var comments []structs.Comment
+
+    	for commentRows.Next() {
+
+        	var c structs.Comment
+
+       		err := commentRows.Scan(
+            	&c.CommentId.Id,
+            	&c.CommentBody,
+            	&c.Date,
+            	&c.UploaderId.Id,
+        	)
+
+        	if err != nil {
+            	log.Println("ERROR SCAN (comments):", err)
+            	return structs.Conversation{}, err
+        	}
+
+        	c.MessageId = msg.MessageId
+			c.Uploader, err = db.GetUser(c.UploaderId)
+
+        	comments = append(comments, c)
+    	}
+
+    	commentRows.Close()
 		
-		
+		msg.Comments = comments
 
 		messages = append(messages, msg)
 	}

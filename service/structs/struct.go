@@ -16,6 +16,7 @@ type Comment struct {
 	CommentBody string      `json:"CommentBody"`
 	Date        string      `json:"Date"`
 	UploaderId  Identifier  `json:"UploaderId"`
+	Uploader    User  		`json:"User"`
 }
 
 type Message struct {

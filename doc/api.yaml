@@ -755,6 +755,8 @@ components:
           maxLength: 20
         UploaderId:
           $ref: "#/components/schemas/Identifier"
+        Uploader:
+          $ref: "#/components/schemas/User"
     
     Group:
       title: group

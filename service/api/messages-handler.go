@@ -209,5 +209,5 @@ func (rt *_router) MARKMESSAGEREAD(w http.ResponseWriter, r *http.Request, ps ht
 	}
 
 	w.WriteHeader(http.StatusNoContent)
-	log.Println("Message deleted successfully")
+	
 }

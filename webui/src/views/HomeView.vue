@@ -373,17 +373,39 @@ const commentMessage = async (reaction) => {
       CommentBody: response.data.CommentBody,
       CommentDate: response.data.Date,
       UploaderId: response.data.UploaderId,
+      User: {  
+        Name: response.data.User.Name,
+        userId: response.data.User.userId.Identifier,
+        UserPhoto: response.data.User.UserPhoto
+      }
     }
 
-    Comments.value = [...Comments.value, UpdatedComment];
+    
 
-    Comment.CommentId = '',
-    Comment.MessageId = '',
-    Comment.CommentBody = '',
-    Comment.CommentDate = '',
-    Comment.UploaderId = '',
+    const msgIndex = Messages.value.findIndex(
+    msg => msg.messageId.Identifier === messageToComment.value
+    );
 
-    showCommentModal.value = false;
+    if (msgIndex !== -1) {
+
+      if (!Messages.value[msgIndex].Comments) {
+        Messages.value[msgIndex].Comments = [];
+      }
+
+      Messages.value[msgIndex].Comments.push(UpdatedComment);
+
+  
+      Comments.value = [...Messages.value[msgIndex].Comments];
+    }
+
+    Comment.CommentId = '';
+    Comment.MessageId = '';
+    Comment.CommentBody = '';
+    Comment.CommentDate = '';
+    Comment.UploaderId = '';
+    Message.User = '';
+
+    
     messageToComment.value = null;
 
   }catch(e){
@@ -525,11 +547,14 @@ onMounted(() => {
                         <button type="button" class="btn-close" @click="showCommentModal = false"></button>
                       </div>
                       <div class="modal-body">
-                        <ul class="list-group mb-3">
-                          <li class="list-group-item" v-for="c in Comments" :key="c.CommentId">
-                            {{ c.CommentBody }} - {{ c.UploaderId }}
-                          </li>
-                        </ul>
+                        <div class="comments-window mb-3" style="max-height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; border-radius: 5px;">
+                          <ul class="list-group">
+                            <li class="list-group-item" v-for="c in Comments" :key="c.CommentId">
+                              <strong>{{ c.User.Name }}:</strong> {{ c.CommentBody }}
+                            </li>
+                            <li v-if="Comments.length === 0" class="list-group-item text-muted">No comments yet</li>
+                          </ul>
+                        </div>
 
                         <h6>Reactions:</h6>
                         <div class="d-flex gap-2">
