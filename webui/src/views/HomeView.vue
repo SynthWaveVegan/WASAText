@@ -243,7 +243,7 @@ const showConversationModal = ref(false);
 const messageToForward = ref(null);
 
 const OpenForwardModal = async (messageId) => {
-  messageToForward.value = messageId;
+  messageToForward.value = messageId.Identifier;
   await getMyConversations();
   showConversationModal.value = true;
 };
@@ -345,6 +345,9 @@ const messageToComment = ref(null);
 const showCommentModal = ref(false);
 
 const OpenCommentModal = async (message) => {
+  console.log(message);
+  console.log(message.MessageId);
+  
   messageToComment.value = message.messageId.Identifier;
   Comments.value = message.Comments || [];
   showCommentModal.value = true;
@@ -383,7 +386,7 @@ const commentMessage = async (reaction) => {
     
 
     const msgIndex = Messages.value.findIndex(
-    msg => msg.messageId.Identifier === messageToComment.value
+    msg => msg.MessageId === messageToComment.value
     );
 
     if (msgIndex !== -1) {
@@ -405,12 +408,14 @@ const commentMessage = async (reaction) => {
     Comment.UploaderId = '';
     Message.User = '';
 
-    
-    messageToComment.value = null;
-
   }catch(e){
     alert(e)
   }
+}
+
+const closeCommentModal = () => {
+  showCommentModal.value = false;
+  messageToComment.value = null;
 }
 
 // Chiamata alla funzione refresh quando il componente viene montato
@@ -544,7 +549,7 @@ onMounted(() => {
                     <div class="modal-content">
                       <div class="modal-header">
                         <h5 class="modal-title">Comments</h5>
-                        <button type="button" class="btn-close" @click="showCommentModal = false"></button>
+                        <button type="button" class="btn-close" @click="closeCommentModal"></button>
                       </div>
                       <div class="modal-body">
                         <div class="comments-window mb-3" style="max-height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; border-radius: 5px;">

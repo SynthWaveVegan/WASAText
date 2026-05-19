@@ -40,12 +40,18 @@ func (db *appdbimpl) CommentMessage(CommentBody string, MessageId structs.Identi
 		return structs.Comment{}, err
 	}
 
+	Uploader, err := db.GetUser(UploaderId)
+	if err != nil {
+		return structs.Comment{}, err
+	}
+
 	newComment := structs.Comment{
 		CommentId:   thisCommentId,
 		MessageId:   MessageId,
 		CommentBody: CommentBody,
 		Date:        commentDate,
 		UploaderId:  UploaderId,
+		Uploader:    Uploader,
 	}
 
 	return newComment, err
