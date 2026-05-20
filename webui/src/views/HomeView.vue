@@ -415,9 +415,9 @@ const uncommentMessage = async (id) => {
     await axios.delete(`/users/${UserId.value}/messages/${messageToComment.value}/comments/${id}`);    
     Comments.value = Comments.value.filter(comment => comment.commentId !== id);
         
-    const msgIndex = Messages.value.findIndex(msg => msg.MessageId === messageToComment.value);
+    const msgIndex = Messages.value.findIndex(msg => msg.messageId === messageToComment.value);
     if (msgIndex !== -1 && Messages.value[msgIndex].Comments) {
-      Messages.value[msgIndex].Comments = Messages.value[msgIndex].Comments.filter(c => c.CommentId !== id);
+      Messages.value[msgIndex].Comments = Messages.value[msgIndex].Comments.filter(c => c.commentId !== id);
     }
     alert("message canceled")
   } catch(e) { 

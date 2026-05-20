@@ -23,9 +23,9 @@ func (db *appdbimpl) insertComment(CommentId structs.Identifier, MessageId struc
 func (db *appdbimpl) CommentMessage(CommentBody string, MessageId structs.Identifier, UploaderId structs.Identifier) (structs.Comment, error) {
 
 
-	thisCommentId := generateIdentifier("C")
+	thisCommentId := generateIdentifier("R")
 	
-	checkId, err := db.checkValidId(thisCommentId.Id, "C")
+	checkId, err := db.checkValidId(thisCommentId.Id, "R")
 	if !checkId {
 		return structs.Comment{}, err
 	}
