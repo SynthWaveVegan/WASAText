@@ -309,8 +309,8 @@ const toggleGroupInput = (conversationId) => {
     };
 
 const closeGroupInput = () => {
-      showInputForConversationId.value = null; // Chiudi la barra di input
-      GroupName.value = '';  // Resetta il valore del gruppo
+      showInputForConversationId.value = null; 
+      GroupName.value = ''; 
     };
 
 const addToGroup = async () => {
@@ -346,7 +346,7 @@ const showCommentModal = ref(false);
 
 const OpenCommentModal = async (message) => {
   console.log(message);
-  console.log(message.MessageId);
+  console.log(message.messageId);
   
   messageToComment.value = message.messageId.Identifier;
   Comments.value = message.Comments || [];
@@ -385,20 +385,15 @@ const commentMessage = async (reaction) => {
 
     
 
-    const msgIndex = Messages.value.findIndex(
-    msg => msg.MessageId === messageToComment.value
-    );
+    Comments.value.push(UpdatedComment);
 
+    
+    const msgIndex = Messages.value.findIndex(msg => msg.MessageId === messageToComment.value);
     if (msgIndex !== -1) {
-
       if (!Messages.value[msgIndex].Comments) {
         Messages.value[msgIndex].Comments = [];
       }
-
       Messages.value[msgIndex].Comments.push(UpdatedComment);
-
-  
-      Comments.value = [...Messages.value[msgIndex].Comments];
     }
 
     Comment.CommentId = '';
@@ -406,13 +401,29 @@ const commentMessage = async (reaction) => {
     Comment.CommentBody = '';
     Comment.CommentDate = '';
     Comment.UploaderId = '';
-    Message.User = '';
+    Comment.User = '';
 
   }catch(e){
     alert(e)
   }
 }
 
+const uncommentMessage = async (id) => {
+  try {
+    axios.defaults.headers.common['Authorization'] = UserId.value;
+        
+    await axios.delete(`/users/${UserId.value}/messages/${messageToComment.value}/comments/${id}`);    
+    Comments.value = Comments.value.filter(comment => comment.commentId !== id);
+        
+    const msgIndex = Messages.value.findIndex(msg => msg.MessageId === messageToComment.value);
+    if (msgIndex !== -1 && Messages.value[msgIndex].Comments) {
+      Messages.value[msgIndex].Comments = Messages.value[msgIndex].Comments.filter(c => c.CommentId !== id);
+    }
+    alert("message canceled")
+  } catch(e) { 
+    alert(e);
+  }
+}
 const closeCommentModal = () => {
   showCommentModal.value = false;
   messageToComment.value = null;
@@ -498,7 +509,7 @@ onMounted(() => {
         </div>
       </div>
       <div class="flex-grow-1 overflow-auto p-2">
-        <div v-for="msg in Messages" :key="msg.MessageId" class="mb-2">
+        <div v-for="msg in Messages" :key="msg.messageId" class="mb-2">
           
           <div :class="{
             'd-flex justify-content-end': msg.User.Name == username, 
@@ -554,8 +565,9 @@ onMounted(() => {
                       <div class="modal-body">
                         <div class="comments-window mb-3" style="max-height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; border-radius: 5px;">
                           <ul class="list-group">
-                            <li class="list-group-item" v-for="c in Comments" :key="c.CommentId">
+                            <li class="list-group-item" v-for="c in Comments" :key="c.commentId">
                               <strong>{{ c.User.Name }}:</strong> {{ c.CommentBody }}
+                              <button class="btn btn-danger btn-sm float-end" v-if="c.User.Name == username" @click="uncommentMessage(c.commentId)">X</button>
                             </li>
                             <li v-if="Comments.length === 0" class="list-group-item text-muted">No comments yet</li>
                           </ul>
