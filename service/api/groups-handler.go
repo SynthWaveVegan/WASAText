@@ -10,7 +10,7 @@ import (
 	"net/http"
 )
 
-func (rt *_router) ADDTOGROUP(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) CREATEGROUP(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	userId := ps.ByName("userId")
 
@@ -29,11 +29,9 @@ func (rt *_router) ADDTOGROUP(w http.ResponseWriter, r *http.Request, ps httprou
 	}
 
 	type RequestBody struct {
-    Name          string `json:"Name"`
-    ConversationId struct {
-        Identifier string `json:"Identifier"` 
-    } `json:"conversationId"`
-}
+    Name           string `json:"Name"`
+    ConversationId string `json:"conversationId"`
+	}
 
 	var requestBody RequestBody
 
@@ -46,7 +44,7 @@ func (rt *_router) ADDTOGROUP(w http.ResponseWriter, r *http.Request, ps httprou
 	defer r.Body.Close()
 
 	groupName := requestBody.Name
-	conversationId := requestBody.ConversationId.Identifier
+	conversationId := requestBody.ConversationId
 
 	log.Printf("Request Body: %+v", requestBody)
 
@@ -60,15 +58,21 @@ func (rt *_router) ADDTOGROUP(w http.ResponseWriter, r *http.Request, ps httprou
 		Id: userId,
 	}
 
-	err = rt.db.AddToGroup(groupName, UserId, conversationId)  
+	NewGroup, err := rt.db.CreateGroup(groupName, UserId, conversationId)  
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		ctx.Logger.Error("2 something went wrong: ", err)
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
-	log.Println("User added to group successfully")
+	err = json.NewEncoder(w).Encode(NewGroup)
+	if err != nil {
+    	ctx.Logger.Error("3 something went wrong: ", err)
+    	return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	log.Println("group created successfully")
 }
 
 func (rt *_router) LEAVEGROUP(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {

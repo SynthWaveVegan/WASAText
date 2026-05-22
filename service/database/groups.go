@@ -1,4 +1,4 @@
-package database
+ package database
 
 import (
 	"database/sql"
@@ -16,7 +16,7 @@ func (db *appdbimpl) insertGroup(GroupId structs.Identifier, GroupName string, P
 	return err
 }
 
-func (db *appdbimpl) createGroup(GroupName string, CreatorUserId structs.Identifier) (structs.Group, error) {
+func (db *appdbimpl) CreateGroup(GroupName string, CreatorUserId structs.Identifier, ConversationId string) (structs.Group, error) {
 
 	var Users []structs.User
 	var Messages []structs.Message
@@ -38,16 +38,52 @@ func (db *appdbimpl) createGroup(GroupName string, CreatorUserId structs.Identif
 	}
 	Users = append(Users, CreatorUser)
 
+	rows, err := db.c.QueryContext(context.Background(), `
+		SELECT UserId FROM userChat WHERE ConversationId = ?`, ConversationId)
+
+	if err != nil {
+		log.Println("ERROR QUERY (getting users):", err)
+		return structs.Group{}, err
+	}
+	defer rows.Close()
+
+	var AddUserId string
+
+	for rows.Next() {
+		var thisUserId string
+		err := rows.Scan(&thisUserId)
+		if err != nil {
+			log.Println("ERROR SCAN (users):", err)
+			return structs.Group{}, err
+		}
+
+		if thisUserId != CreatorUserId.Id {
+			AddUserId = thisUserId
+		}
+	}
+
+	AddUser := structs.Identifier{
+		Id: AddUserId,
+	}
+
+	User2, err := db.GetUser(AddUser)
+	if err != nil {
+		return structs.Group{}, err
+	}
+
+	Users = append(Users, User2)
+
 	err = db.SetGroupName("New", GroupName, thisGroupId)
 	log.Printf("set group name: %s", GroupName)
 	if err != nil {
 		return structs.Group{}, err
 	}
 
-	//err = db.insertGroup(thisGroupId, GroupName, "")
-	//if err != nil {
-	//	return structs.Group{}, err
-	//}
+	for _, user := range Users {
+		err = db.insertUserinGroup(thisGroupId, user.UserId)
+	}
+	
+	var GroupPhoto = ""
 
 	newGroup := structs.Group{
 
@@ -55,6 +91,7 @@ func (db *appdbimpl) createGroup(GroupName string, CreatorUserId structs.Identif
 		GroupName: GroupName,
 		Users:     Users,
 		Messages:  Messages,
+		ChatPhoto: GroupPhoto,
 	}
 
 	return newGroup, nil
@@ -104,7 +141,7 @@ func (db *appdbimpl) SetGroupName(mode string, newName string, GroupId structs.I
 	return err
 
 }
-func (db *appdbimpl) AddToGroup(GroupName string, CreatorUser structs.Identifier, ConversationId string) error {
+/*func (db *appdbimpl) AddToGroup(GroupName string, CreatorUser structs.Identifier) error {
 
 	var counter int
 	var checkId bool
@@ -118,7 +155,7 @@ func (db *appdbimpl) AddToGroup(GroupName string, CreatorUser structs.Identifier
 
 	if !checkId {
 		// Se il gruppo non esiste, crealo
-		NewGroup, err := db.createGroup(GroupName, CreatorUser)
+		NewGroup, err := db.CreateGroup(GroupName, CreatorUser)
 		log.Printf("Returning group: %#v", NewGroup)
 		if err != nil {
 			return fmt.Errorf("error creating new group: %w", err)
@@ -186,7 +223,7 @@ func (db *appdbimpl) AddToGroup(GroupName string, CreatorUser structs.Identifier
 	}
 
 	return fmt.Errorf("unexpected error adding user to group")
-}
+}*/
 
 
 func (db *appdbimpl) insertUserinGroup(GroupId structs.Identifier, AddUserId structs.Identifier) error {

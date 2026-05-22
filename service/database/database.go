@@ -71,8 +71,8 @@ type AppDatabase interface {
 	//insertComment(CommentId structs.Identifier, MessageId structs.Identifier, CommentBody string, Date string) error
 	UncommentMessage(CommentId structs.Identifier) error
 
-	AddToGroup(GroupName string, CreatorUser structs.Identifier, ConversationId string) error
-	//createGroup(GroupName string, UserId structs.Identifier) (structs.Group, error)
+	//AddToGroup(GroupName string, CreatorUser structs.Identifier) error
+	CreateGroup(GroupName string, CreatorUserId structs.Identifier, ConversationId string) (structs.Group, error)
 	LeaveGroup(GroupId structs.Identifier, UserId structs.Identifier) error
 	SetGroupName(mode string, newName string, GroupId structs.Identifier) error
 

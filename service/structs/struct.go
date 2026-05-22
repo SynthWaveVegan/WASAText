@@ -37,6 +37,7 @@ type Group struct {
 	GroupName  string      `json:"Name"`
 	Users      []User      `json:"Users"`
 	Messages   []Message   `json:"Messages"`
+	ChatPhoto  string      `json:"ChatPhoto"`
 }
 
 type Conversation struct {

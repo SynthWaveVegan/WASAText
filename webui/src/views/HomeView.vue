@@ -313,11 +313,11 @@ const closeGroupInput = () => {
       GroupName.value = ''; 
     };
 
-const addToGroup = async () => {
+const CreateGroup = async () => {
   try {
     axios.defaults.headers.common['Authorization'] = UserId.value;
 
-    const response = await axios.put(`/users/${UserId.value}/group`, {
+    const response = await axios.post(`/users/${UserId.value}/group`, {
       Name: GroupName.value,
       conversationId: showInputForConversationId.value  
     });
@@ -325,10 +325,11 @@ const addToGroup = async () => {
     console.log("Dati ottenuti da getConversation:", response.data);
 
     const newGroup = {
-        conversationId: response.data.Identifier,
+        conversationId: response.data.conversationId.Identifier,
         Users: response.data.Users,
         ChatName: response.data.Name,
-        Messages: response.data.Messages || []  
+        Messages: response.data.Messages || [] ,
+        ChatPhoto: response.data.ChatPhoto
       };
 
     console.log("group:", newGroup);
@@ -471,12 +472,12 @@ onMounted(() => {
           <div class="card-body">
             <h5 class="card-title d-flex justify-content-between align-items-center">
               {{ conv.ChatName }}
-              <button class="btn btn-success btn-sm" @click="toggleGroupInput(conv.conversationId)">Add to Group</button>
+              <button class="btn btn-success btn-sm" @click="toggleGroupInput(conv.conversationId)">New Group</button>
             </h5>
             <div v-if="showInputForConversationId == conv.conversationId">
               <input v-model="GroupName" type="text" class="form-control mt-2" placeholder="Enter group name" />
               <div class="mt-2 d-flex justify-content-between">
-                <button class="btn btn-primary btn-sm" @click="addToGroup()">Submit</button>
+                <button class="btn btn-primary btn-sm" @click="CreateGroup()">Submit</button>
                 <button class="btn btn-danger btn-sm ml-2" @click="closeGroupInput">Close</button>
               </div>
             </div>
