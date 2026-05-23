@@ -349,6 +349,47 @@ const CreateGroup = async () => {
   }
 };
 
+
+
+
+
+
+
+const AddToGroup = async (id) => {
+  try{
+
+  }catch(e){
+    alert(e)
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+const newGroupName = ref("")
+
+const SetGroupName = async () => {
+  try{
+
+  }catch(e){
+    alert(e)
+  }
+}
+
+
+
+
+
+
+
+
 const messageToComment = ref(null);
 const showCommentModal = ref(false);
 

@@ -131,6 +131,36 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - Group
+      summary: add another user to group
+      description: |-
+        takes an existing group and
+        adds a user with a conversation in it
+      parameters:
+
+        - $ref: "#/components/parameters/groupId"
+        - $ref: "#/components/parameters/userId"
+
+      operationId: ADDTOGROUP
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Name"
+      responses:
+        "204":
+          description: guser added succesfully
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
   /users/{userId}/group:
 
     post:

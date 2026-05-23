@@ -12,6 +12,7 @@ func (rt *_router) Handler() http.Handler {
 
 	rt.router.PUT("/groups/:groupId", rt.wrap(rt.SETGROUPNAME))
 	rt.router.DELETE("/users/:userId/group/:groupId", rt.wrap(rt.LEAVEGROUP))
+	rt.router.PUT("/users/:userId/group/:groupId", rt.wrap(rt.ADDTOGROUP))
 	rt.router.POST("/users/:userId/group", rt.wrap(rt.CREATEGROUP))
 
 	rt.router.POST("/users/:userId/conversations/:conversationId/messages", rt.wrap(rt.SENDMESSAGE))
