@@ -82,6 +82,7 @@ const getConversation = async (id) => {
         UserPhoto: user.UserPhoto
       })),
       ChatName: response.data.Name,
+      IsGroup: response.data.IsGroup,
       Messages: response.data.Messages || []  
     };
 
@@ -349,7 +350,16 @@ const CreateGroup = async () => {
   }
 };
 
+const GroupModalInput = ref("")
 
+const AddGroupModal = async (id) => {
+  GroupModalInput.value = id
+
+}
+
+const CloseAddGroupModal = async () => {
+  GroupModalInput.value = null
+}
 
 
 
@@ -371,12 +381,22 @@ const AddToGroup = async (id) => {
 
 
 
+const EditGroupModal = async (id) => {
+  GroupModalInput.value = id
 
+}
+
+const CloseEditGroupModal = async () => {
+  GroupModalInput.value = null
+}
 
 const newGroupName = ref("")
 
 const SetGroupName = async () => {
   try{
+    const response = await axios.put(`/groups/${GroupModalInput.value}`, {
+      Name: newGroup.value
+    })
 
   }catch(e){
     alert(e)
@@ -544,8 +564,9 @@ onMounted(() => {
 
   <div v-else-if="selectedConversation">
     <div class="col-8 d-flex flex-column" style="height: 500px; width: 1480px; border: 1px solid #ccc;">
-      <div class="p-2 border-bottom">
-        <h5>{{ selectedConversation.ChatName }}
+      <div class="p-2 border-bottom">        
+        <h5>{{ selectedConversation.ChatName }} 
+          <button class="btn btn-secondary btn-sm" v-if="selectedConversation.IsGroup == 'Yes'" @click="EditGroupModal">✏️</button>
           <button class="btn btn-danger btn-sm float-end" @click="closeConversation">X</button>
         </h5>
         <div class="user-list mt-2">
@@ -554,6 +575,7 @@ onMounted(() => {
             <span v-for="user in selectedConversation.Users" :key="user.Id" class="badge bg-primary me-2 mb-2">
               {{ user.Name }}
             </span>
+            <button class="btn btn-success btn-sm" v-if="selectedConversation.IsGroup == 'Yes'" @click="AddGroupModal">+</button>
           </div>
         </div>
       </div>

@@ -75,6 +75,56 @@ func (rt *_router) CREATEGROUP(w http.ResponseWriter, r *http.Request, ps httpro
 	log.Println("group created successfully")
 }
 
+func (rt *_router) ADDTOGROUP(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+
+	groupId := ps.ByName("groupId")
+
+	if groupId == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		ctx.Logger.Error("no userId retrieved")
+		return
+	}
+
+
+	type RequestBody struct {
+    Name           string `json:"Name"`
+	}
+
+	var requestBody RequestBody
+
+	err := json.NewDecoder(r.Body).Decode(&requestBody)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		ctx.Logger.Error("1 something went wrong: ", err)
+		return
+	}
+	defer r.Body.Close()
+
+	UserName := requestBody.Name
+
+	log.Printf("Request Body: %+v", requestBody)
+
+	if UserName == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		ctx.Logger.Error("Missing group name or conversationId")
+		return
+	}
+
+	GroupId := structs.Identifier{
+		Id: groupId,
+	}
+
+	err = rt.db.AddToGroup(GroupId, UserName)  
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		ctx.Logger.Error("2 something went wrong: ", err)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+	log.Println("user added successfully")
+}
+
 func (rt *_router) LEAVEGROUP(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	userId := ps.ByName("userId")
