@@ -805,5 +805,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Message"
+        IsGroup:
+          type: string
+          enum: [Yes, No]
 
             

@@ -28,8 +28,8 @@ type Message struct {
 	Date           string        `json:"Date"`
 	MediaType      string        `json:"MediaType"`
 	ConversationId Identifier    `json:"ConversationId"`
-	IsRead         string        `json: "IsRead"`
-	IsForwarded    string        `json: "IsForwarded"`
+	IsRead         string        `json:"IsRead"`
+	IsForwarded    string        `json:"IsForwarded"`
 }
 
 type Group struct {
@@ -45,5 +45,6 @@ type Conversation struct {
 	Users          []User       `json:"Users"`
 	ChatName       string       `json:"Name"`
 	Messages       []Message    `json:"Messages"`
+	IsGroup        string       `json:"IsGroup"`
 }
 

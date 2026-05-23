@@ -10,7 +10,7 @@ import (
 )
 
 func (db *appdbimpl) insertGroup(GroupId structs.Identifier, GroupName string, PhotoPath string) error {
-	var IsGroup = 1
+	var IsGroup = "Yes"
 	_, err := db.c.ExecContext(context.Background(),`INSERT INTO conversation (ConversationId, ChatPhoto, GroupName, IsGroup) VALUES (?, ?, ?, ?)`,
 	 GroupId.Id, PhotoPath, GroupName, IsGroup)
 	return err

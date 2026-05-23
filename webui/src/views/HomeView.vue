@@ -53,9 +53,11 @@ const createConversation = async () => {
         UserPhoto: user.UserPhoto
       })),
       ChatName: response.data.Name, 
-      Messages: response.data.Messages
+      Messages: response.data.Messages,
+      IsGroup: response.data.IsGroup
     };
 
+    
     console.log(response.data);
     conversations.value.push(newConversation);
     Conversation.ChatName = '';
@@ -325,13 +327,18 @@ const CreateGroup = async () => {
     console.log("Dati ottenuti da getConversation:", response.data);
 
     const newGroup = {
-        conversationId: response.data.conversationId.Identifier,
-        Users: response.data.Users,
-        ChatName: response.data.Name,
-        Messages: response.data.Messages || [] ,
-        ChatPhoto: response.data.ChatPhoto
-      };
+      conversationId: response.data.conversationId.Identifier, 
+      Users: response.data.Users.map(user => ({
+        Name: user.Name,
+        userId: user.Identifier,  
+        UserPhoto: user.UserPhoto
+      })),
+      ChatName: response.data.Name, 
+      Messages: response.data.Messages,
+      ChatPhoto: response.data.ChatPhoto,
+    };
 
+    
     console.log("group:", newGroup);
     conversations.value.push(newGroup);
 

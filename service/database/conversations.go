@@ -35,7 +35,7 @@ func (db *appdbimpl) ConversationExists(user1Id string, user2Id string) (bool, e
 func (db *appdbimpl) CreateConversation(UserHosting structs.Identifier, UserConnectedName string) (structs.Conversation, error) {
 
 	var Messages []structs.Message
-	var IsGroup = 0
+	var IsGroup = "No"
 	var GroupName = ""
 	
 
@@ -113,6 +113,7 @@ func (db *appdbimpl) CreateConversation(UserHosting structs.Identifier, UserConn
 		Users:          Users,
 		ChatName:       UserConnectedName,
 		Messages:       Messages,
+		IsGroup:        IsGroup,
 	}
 
 	return NewChat, nil
@@ -154,19 +155,38 @@ func (db *appdbimpl) GetConversation(ConversationId structs.Identifier, currentU
 		return structs.Conversation{}, fmt.Errorf("no users found in conversation")
 	}
 
-	var chatName string
-	if otherUserId != "" {
-		
-		OtherUserId := structs.Identifier{
-			Id: otherUserId,
-		}
+	var isGroup string
+	var groupName string
 
-		otherUsername, err := db.getUsernamebyId(OtherUserId)
-		if err != nil {
-			log.Println("ERROR GETTING USER NAME:", err)
-			return structs.Conversation{}, err
-		}
-		chatName = otherUsername
+	err = db.c.QueryRowContext(context.Background(), `
+    	SELECT IsGroup, GroupName
+    	FROM conversation
+    	WHERE ConversationId = ?`,
+    	ConversationId.Id,
+	).Scan(&isGroup, &groupName)
+
+	if err != nil {
+    	return structs.Conversation{}, err
+	}
+	
+	var chatName string
+
+	if isGroup == "Yes" {
+
+    	chatName = groupName
+
+	} else if otherUserId != "" {
+
+    	OtherUserId := structs.Identifier{
+        	Id: otherUserId,
+    	}
+
+    	otherUsername, err := db.getUsernamebyId(OtherUserId)
+    	if err != nil {
+        	return structs.Conversation{}, err
+    	}
+
+    	chatName = otherUsername
 	}
 
 	messageRows, err := db.c.QueryContext(context.Background(), `
@@ -241,12 +261,16 @@ func (db *appdbimpl) GetConversation(ConversationId structs.Identifier, currentU
 		messages = append(messages, msg)
 	}
 
+	
+	
+
 
 	ChatRetrieved := structs.Conversation{
 		ConversationId: ConversationId,
 		Users:          users,           
 		ChatName:       chatName,      
 		Messages:       messages,        
+		IsGroup:        isGroup,
 	}
 
 	//log.Printf("Returning conversation: %#v", ChatRetrieved)

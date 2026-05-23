@@ -138,7 +138,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 		ConversationId VARCHAR(11) NOT NULL PRIMARY KEY,
 		ChatPhoto TEXT,
 		GroupName VARCHAR(16) NOT NULL,
-		IsGroup BOOLEAN
+		IsGroup TEXT
 
 	)`
 		/*	photoQuery := `CREATE TABLE IF NOT EXISTS photo (
