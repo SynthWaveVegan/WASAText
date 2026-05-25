@@ -351,6 +351,7 @@ const CreateGroup = async () => {
 };
 
 const GroupModalInput = ref("")
+const AddingUser = ref("")
 
 const AddGroupModal = async (id) => {
   GroupModalInput.value = id
@@ -359,17 +360,33 @@ const AddGroupModal = async (id) => {
 
 const CloseAddGroupModal = async () => {
   GroupModalInput.value = null
+  AddingUser.value = null
 }
 
 
 
 
 
-const AddToGroup = async (id) => {
-  try{
+const AddToGroup = async () => {
+  try {
 
-  }catch(e){
-    alert(e)
+    await axios.put(
+      `/users/${UserId.value}/group/${GroupModalInput.value}`,
+      {
+        Name: AddingUser.value,
+      }
+    )
+
+    await openConversation(selectedConversation.value.conversationId)
+
+    AddingUser.value = ""
+    GroupModalInput.value = null
+
+  } catch (e) {
+
+    console.log(e.response)
+
+    alert("Errore durante l'aggiunta utente")
   }
 }
 
@@ -575,9 +592,48 @@ onMounted(() => {
             <span v-for="user in selectedConversation.Users" :key="user.Id" class="badge bg-primary me-2 mb-2">
               {{ user.Name }}
             </span>
-            <button class="btn btn-success btn-sm" v-if="selectedConversation.IsGroup == 'Yes'" @click="AddGroupModal">+</button>
+            <button class="btn btn-success btn-sm" v-if="selectedConversation.IsGroup == 'Yes'" @click="AddGroupModal(selectedConversation.conversationId)">+</button>
           </div>
         </div>
+        <div v-if="GroupModalInput == selectedConversation.conversationId"
+              class="card shadow-sm border-0 mt-3">
+              <div class="card-body p-3">
+
+                <label class="form-label fw-semibold text-muted">
+                  Add user to group
+                </label>
+
+                <div class="input-group">
+                  <span class="input-group-text bg-light">
+                    👤
+                  </span>
+
+                  <input
+                    v-model="AddingUser"
+                    type="text"
+                    class="form-control"
+                    placeholder="Enter username"
+                  />
+
+                  <button
+                    class="btn btn-primary"
+                    @click="AddToGroup"
+                  >
+                    Add
+                  </button>
+                </div>
+
+                <div class="text-end mt-2">
+                  <button
+                    class="btn btn-outline-secondary btn-sm"
+                   @click="CloseAddGroupModal"
+                  >
+                    Cancel
+                  </button>
+                </div>
+
+              </div>
+            </div>
       </div>
       <div class="flex-grow-1 overflow-auto p-2">
         <div v-for="msg in Messages" :key="msg.messageId" class="mb-2">
@@ -594,7 +650,7 @@ onMounted(() => {
             'alert-primary': msg.User.Name == username,
             'alert-success': msg.User.Name != username
             }">
-              <button class="btn btn-success btn-sm float-end ms-1"  @click="OpenForwardModal(msg.messageId.Identifier)">></button>
+              <button class="btn btn-success btn-sm float-end ms-1"  @click="OpenForwardModal(msg.messageId.Identifier)">⇉</button>
               <button class="btn btn-secondary btn-sm float-end ms-1"  @click="OpenCommentModal(msg)">💬</button>
               <div v-if="showConversationModal"
                   class="modal fade show d-block"
