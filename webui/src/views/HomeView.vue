@@ -355,7 +355,6 @@ const AddingUser = ref("")
 
 const AddGroupModal = async (id) => {
   GroupModalInput.value = id
-
 }
 
 const CloseAddGroupModal = async () => {
@@ -363,9 +362,35 @@ const CloseAddGroupModal = async () => {
   AddingUser.value = null
 }
 
+const LeaveGroupInput = ref("")
+const showLeaveModal = ref(false)
 
+const LeaveGroupModal = (id) => {
+  LeaveGroupInput.value = id
+  showLeaveModal.value = true
+}
 
+const closeLeaveModal = () => {
+  showLeaveModal.value = false
+  LeaveGroupInput.value = ""
+}
 
+const LeaveGroup = async () => {
+  try {
+    axios.defaults.headers.common['Authorization'] = UserId.value;
+
+    await axios.delete(`/users/${UserId.value}/group/${LeaveGroupInput.value}`)
+
+    alert("You left the group")
+
+    showLeaveModal.value = false
+    selectedConversation.value = null;
+    await getMyConversations();
+
+  } catch (e) {
+    alert(e)
+  }
+}
 
 const AddToGroup = async () => {
   try {
@@ -554,10 +579,10 @@ onMounted(() => {
     <div class="col-12">
       <div v-for="conv in conversations" :key="conv.conversationId">
         <div class="card mb-3">
-          <div class="card-body">
+          <div class="card-body">            
             <h5 class="card-title d-flex justify-content-between align-items-center">
               {{ conv.ChatName }}
-              <button class="btn btn-success btn-sm" @click="toggleGroupInput(conv.conversationId)">New Group</button>
+              <button class="btn btn-success btn-sm" v-if="conv.IsGroup == 'No'" @click="toggleGroupInput(conv.conversationId)">New Group</button>
             </h5>
             <div v-if="showInputForConversationId == conv.conversationId">
               <input v-model="GroupName" type="text" class="form-control mt-2" placeholder="Enter group name" />
@@ -583,8 +608,55 @@ onMounted(() => {
     <div class="col-8 d-flex flex-column" style="height: 500px; width: 1480px; border: 1px solid #ccc;">
       <div class="p-2 border-bottom">        
         <h5>{{ selectedConversation.ChatName }} 
-          <button class="btn btn-secondary btn-sm" v-if="selectedConversation.IsGroup == 'Yes'" @click="EditGroupModal">✏️</button>
+          <button class="btn btn-secondary btn-sm" v-if="selectedConversation.IsGroup == 'Yes'" @click="EditGroupModal(selectedConversation.conversationId)">✏️</button>
+          <button class="btn btn-danger btn-sm" v-if="selectedConversation.IsGroup == 'Yes'" @click="LeaveGroupModal(selectedConversation.conversationId)">Leave</button>
           <button class="btn btn-danger btn-sm float-end" @click="closeConversation">X</button>
+          <div
+            v-if="showLeaveModal"
+            class="modal fade show d-block"
+            tabindex="-1"
+            style="background: rgba(0,0,0,0.5);"
+          >
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+
+                <div class="modal-header">
+                  <h5 class="modal-title">
+                    Confirm
+                  </h5>
+
+                  <button
+                    type="button"
+                    class="btn-close"
+                    @click="closeLeaveModal"
+                  ></button>
+                </div>
+
+                <div class="modal-body">
+                  <p>Are you sure you want to leave this group?</p>
+                </div>
+
+                <div class="modal-footer">
+                  <button
+                    type="button"
+                    class="btn btn-secondary"
+                    @click="closeLeaveModal"
+                  >
+                    No
+                  </button>
+
+                  <button
+                    type="button"
+                    class="btn btn-danger"
+                    @click="LeaveGroup"
+                  >
+                    Yes, Leave
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          </div>
         </h5>
         <div class="user-list mt-2">
          <h6>Members:</h6>
