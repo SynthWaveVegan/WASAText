@@ -89,6 +89,7 @@ paths:
 
       operationId: SETGROUPNAME
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -147,6 +148,7 @@ paths:
 
       operationId: ADDTOGROUP
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -175,6 +177,7 @@ paths:
         - $ref: "#/components/parameters/userId"
       operationId: CREATEGROUP
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -247,6 +250,7 @@ paths:
 
       operationId: SENDMESSAGE
       requestBody:
+        required: true
         content:
           application/json: 
             schema:
@@ -312,6 +316,7 @@ paths:
         
       operationId: FORWARDMESSAGE
       requestBody:
+        required: true
         content:
           application/json: 
             schema:
@@ -348,6 +353,7 @@ paths:
 
       operationId: COMMENTMESSAGE
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -411,6 +417,7 @@ paths:
 
       operationId: CREATECONVERSATION
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -546,6 +553,7 @@ paths:
 
       operationId: SETMYUSERNAME
       requestBody:
+        required: true
         description: creates/changes your own username
         content:
           application/json:
@@ -578,6 +586,7 @@ paths:
         
       operationId: SETMYPHOTO
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -594,6 +603,12 @@ paths:
           $ref: "#/components/responses/InternalServerError"
 
 components:
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
 
   parameters:
 
@@ -688,11 +703,11 @@ components:
 
     Name:
       type: object
+      required: [name]
       properties:
         name:
           type: string
           example: filippohd
-          pattern: "^[a-z0-9]*?$"
           minLength: 1
           maxLength: 16
       
@@ -711,9 +726,13 @@ components:
       title: user
       description: local user
       type: object
+      required: [Username, userId, UserPhoto]
       properties:
         Username:
-          $ref: "#/components/schemas/Name"
+          type: string
+          example: filippohd
+          minLength: 1
+          maxLength: 16
         userId:
           $ref: "#/components/schemas/Identifier"
         UserPhoto:
@@ -721,11 +740,11 @@ components:
 
     MessageBody:
       type: object
+      required: [MessageBody]
       properties:
         MessageBody:
           type: string
           example: ciao
-          pattern: "^[a-z0-9]*?$"
           minLength: 1
           maxLength: 50
 
@@ -733,11 +752,11 @@ components:
       title: message
       description: message of a user in a conversation
       type: object
+      required: [MessageBody, Comments, UploaderId, Uploader, messageId, Date, MediaType, ConversationId, IsRead, IsForwarded]
       properties:
         MessageBody: 
           type: string
           example: ciao
-          pattern: "^[a-z0-9]*?$"
           minLength: 1
           maxLength: 50
         Comments:
@@ -753,7 +772,6 @@ components:
         Date:
           type: string
           format: date-time
-          pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
           example: "2021-05-12T09:00:00Z"
           minLength: 20
           maxLength: 20
@@ -772,6 +790,7 @@ components:
 
     CommentBody:
       type: object
+      required: [CommentBody]
       properties:
         CommentBody:
           type: string
@@ -783,6 +802,7 @@ components:
       title: comment
       description: comment of a message
       type: object
+      required: [commentId, messageId, CommentBody, Date, UploaderId, Uploader]
       properties:
         commentId:
           $ref: "#/components/schemas/Identifier"
@@ -790,13 +810,11 @@ components:
           $ref: "#/components/schemas/Identifier"
         CommentBody:
           type: string
-          pattern: "^[a-z0-9]*?$"
           minLength: 1
           maxLength: 1
         Date:
           type: string
           format: date-time
-          pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
           example: "2021-05-12T09:00:00Z"
           minLength: 20
           maxLength: 20
@@ -809,11 +827,15 @@ components:
       title: group
       description: group conversation of multiple users
       type: object
+      required: [groupId, GroupName, Users, Messages, ChatPhoto]
       properties:
         groupId:
           $ref: "#/components/schemas/Identifier"
         GroupName:
-          $ref: "#/components/schemas/Name"
+          type: string
+          example: filippohd
+          minLength: 1
+          maxLength: 16$ref: "#/components/schemas/Name"
         Users:
           type: array
           items:
@@ -827,19 +849,17 @@ components:
         
     ConversationList:
       title: ConversationList
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            anyOf:
-              - $ref: "#/components/schemas/Conversation"
-              - $ref: "#/components/schemas/Group"
+      type: array
+      items:
+        anyOf:
+          - $ref: "#/components/schemas/Conversation"
+          - $ref: "#/components/schemas/Group"
 
     Conversation:
       title: conversation
       description: conversation on the platform
       type: object
+      required: [conversationId, Users, ChatName, Messages, IsGroup]
       properties:
         conversationId:
           $ref: "#/components/schemas/Identifier"
@@ -848,7 +868,10 @@ components:
           items:
             $ref: "#/components/schemas/User"
         ChatName:    
-          $ref: "#/components/schemas/Name" 
+          type: string
+          example: filippohd
+          minLength: 1
+          maxLength: 16 
         Messages:
           type: array
           items:
