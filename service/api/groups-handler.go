@@ -165,34 +165,36 @@ func (rt *_router) LEAVEGROUP(w http.ResponseWriter, r *http.Request, ps httprou
 
 func (rt *_router) SETGROUPNAME(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	groupId := ps.ByName("groupId")
-	if groupId == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		return
+    groupId := ps.ByName("groupId")
+    if groupId == "" {
+        w.WriteHeader(http.StatusBadRequest)
+        return
+    }
+
+	type SetGroupNameRequest struct {
+    Name string `json:"Name"`
 	}
 
-	var GroupName string
-	err := json.NewDecoder(r.Body).Decode(&GroupName)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		ctx.Logger.Error("something went wrong: ", err)
-		return
+    var req SetGroupNameRequest
 
-	}
-	defer r.Body.Close()
+    err := json.NewDecoder(r.Body).Decode(&req)
+    if err != nil {
+        w.WriteHeader(http.StatusBadRequest)
+        ctx.Logger.Error("invalid body:", err)
+        return
+    }
+    defer r.Body.Close()
 
-	GroupId := structs.Identifier{
-		Id: groupId,
-	}
+    GroupId := structs.Identifier{
+        Id: groupId,
+    }
 
-	err = rt.db.SetGroupName("Update", GroupName, GroupId)
+    err = rt.db.SetGroupName("Update", req.Name, GroupId)
+    if err != nil {
+        w.WriteHeader(http.StatusBadRequest)
+        ctx.Logger.Error("db error:", err)
+        return
+    }
 
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		ctx.Logger.Error("something went wrong: ", err)
-		return
-	}
-
-	w.WriteHeader(http.StatusNoContent)
-	log.Println("Group name updated successfully")
+    w.WriteHeader(http.StatusNoContent)
 }

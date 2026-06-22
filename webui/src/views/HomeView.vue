@@ -86,6 +86,7 @@ const getConversation = async (id) => {
       Messages: response.data.Messages || []  
     };
 
+    
     return thisConversation;
 
   } catch (e) {
@@ -420,37 +421,34 @@ const AddToGroup = async () => {
 
 
 
+const EditGroupModalInput = ref("")
 
 
-
-const EditGroupModal = async (id) => {
-  GroupModalInput.value = id
+const EditGroupModal = (id) => {
+  EditGroupModalInput.value = id
 
 }
 
-const CloseEditGroupModal = async () => {
-  GroupModalInput.value = null
+const CloseEditGroupModal = () => {
+  EditGroupModalInput.value = null
 }
 
 const newGroupName = ref("")
 
 const SetGroupName = async () => {
   try{
-    const response = await axios.put(`/groups/${GroupModalInput.value}`, {
-      Name: newGroup.value
+    const response = await axios.put(`/groups/${EditGroupModalInput.value}`, {
+      Name: newGroupName.value
     })
+    selectedConversation.value.ChatName = newGroupName.value
+    
+    CloseEditGroupModal()
+    await getMyConversations()
 
   }catch(e){
     alert(e)
   }
 }
-
-
-
-
-
-
-
 
 const messageToComment = ref(null);
 const showCommentModal = ref(false);
@@ -666,6 +664,11 @@ onMounted(() => {
             </span>
             <button class="btn btn-success btn-sm" v-if="selectedConversation.IsGroup == 'Yes'" @click="AddGroupModal(selectedConversation.conversationId)">+</button>
           </div>
+        </div>
+        <div v-if="EditGroupModalInput == selectedConversation.conversationId">
+          <input v-model="newGroupName" />
+          <button @click="SetGroupName">Salva</button>
+          <button @click="CloseEditGroupModal">Annulla</button>
         </div>
         <div v-if="GroupModalInput == selectedConversation.conversationId"
               class="card shadow-sm border-0 mt-3">
