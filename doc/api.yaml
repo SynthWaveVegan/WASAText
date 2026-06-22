@@ -9,7 +9,7 @@ info:
 tags:
   - name: "User"
     description: endpoints for users related operations
-  - name: "Conversations"
+  - name: "Conversation"
     description: endpoints for conversation related operations
   - name: "Login"
     description: enpoints for loggin in action
@@ -216,7 +216,6 @@ paths:
       parameters:
 
         - $ref: "#/components/parameters/userId"
-        - $ref: "#/components/parameters/messageId"
         - $ref: "#/components/parameters/conversationId"
         
       operationId: MARKMESSAGEREAD
@@ -251,7 +250,7 @@ paths:
         content:
           application/json: 
             schema:
-              $ref: "#/components/schemas/Message/MessageBody" 
+              $ref: "#/components/schemas/MessageBody" 
       responses:
         "201":
           description: message created succesfully
@@ -308,7 +307,7 @@ paths:
       parameters:
 
         - $ref: "#/components/parameters/userId"
-        
+        - $ref: "#/components/parameters/messageId"
         - $ref: "#/components/parameters/conversationId"
         
       operationId: FORWARDMESSAGE
@@ -409,7 +408,6 @@ paths:
         between two users
       parameters:
         - $ref: "#/components/parameters/userId"
-        - $ref: "#/components/parameters/conversationId"
 
       operationId: CREATECONVERSATION
       requestBody:
@@ -439,7 +437,7 @@ paths:
       security:
         - bearerAuth: []
       tags:
-        - Conversations
+        - Conversation
       summary: returns all the conversations
       description: |-
         returns personal stream of conversations
@@ -468,7 +466,7 @@ paths:
       security:
         - bearerAuth: []
       tags:
-        - Conversations
+        - Conversation
       summary: returns a specific conversation
       description: |-
         finds a specific conversation
@@ -682,7 +680,7 @@ components:
       properties:
         photoUrl:
           type: string
-          format: url
+          format: uri
           minLength: 10
           maxLength: 2048
           pattern: '^https?://.*$'
@@ -720,6 +718,16 @@ components:
           $ref: "#/components/schemas/Identifier"
         UserPhoto:
           $ref: "#/components/schemas/Photo"
+
+    MessageBody:
+      type: object
+      properties:
+        MessageBody:
+          type: string
+          example: ciao
+          pattern: "^[a-z0-9]*?$"
+          minLength: 1
+          maxLength: 50
 
     Message:
       title: message
@@ -761,6 +769,15 @@ components:
         IsForwarded:
           type: string
           enum: [Yes, No]
+
+    CommentBody:
+      type: object
+      properties:
+        CommentBody:
+          type: string
+          pattern: "^[a-z0-9]*?$"
+          minLength: 1
+          maxLength: 1
 
     Comment:
       title: comment
@@ -815,8 +832,9 @@ components:
         items:
           type: array
           items:
-            $ref: "#/components/schemas/Conversation"
-            $ref: "#/components/schemas/Group"
+            anyOf:
+              - $ref: "#/components/schemas/Conversation"
+              - $ref: "#/components/schemas/Group"
 
     Conversation:
       title: conversation

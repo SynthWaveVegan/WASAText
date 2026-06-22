@@ -11,7 +11,7 @@ import (
 )
 
 type MessageRequest struct {
-  MessageBody string `json:"messageBody"`
+  MessageBody string `json:"MessageBody"`
 }
 
 func (rt *_router) SENDMESSAGE(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
