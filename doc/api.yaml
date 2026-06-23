@@ -181,14 +181,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                Name:
-                  type: string
-                  description: "The name of the group"
-                conversationId:
-                  type: string
-                  description: "The ID of the conversation to which the user is being added"
+              $ref: "#/components/schemas/CreateGroupRequest"
               required:
                 - Name
                 - conversationId 
@@ -849,8 +842,6 @@ components:
         conversationId:
           $ref: "#/components/schemas/Identifier"
 
-
-        
     ConversationList:
       title: ConversationList
       type: array
