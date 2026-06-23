@@ -702,14 +702,10 @@ components:
           description: New photo URL for the user
 
     Name:
-      type: object
-      required: [name]
-      properties:
-        name:
-          type: string
-          example: filippohd
-          minLength: 1
-          maxLength: 16
+      type: string
+      example: filippohd
+      minLength: 1
+      maxLength: 16
       
 
     Identifier:
@@ -729,10 +725,7 @@ components:
       required: [Username, userId, UserPhoto]
       properties:
         Username:
-          type: string
-          example: filippohd
-          minLength: 1
-          maxLength: 16
+          $ref: "#/components/schemas/Name"
         userId:
           $ref: "#/components/schemas/Identifier"
         UserPhoto:
@@ -832,10 +825,7 @@ components:
         groupId:
           $ref: "#/components/schemas/Identifier"
         GroupName:
-          type: string
-          example: filippohd
-          minLength: 1
-          maxLength: 16$ref: "#/components/schemas/Name"
+          $ref: "#/components/schemas/Name"
         Users:
           type: array
           items:
@@ -846,6 +836,20 @@ components:
             $ref: "#/components/schemas/Message"
         ChatPhoto:
           $ref: "#/components/schemas/Photo"
+
+    CreateGroupRequest:
+      type: object
+      required: [Name, conversationId]
+      properties:
+        Name:
+          type: string
+          example: filippohd
+          minLength: 1
+          maxLength: 16
+        conversationId:
+          $ref: "#/components/schemas/Identifier"
+
+
         
     ConversationList:
       title: ConversationList
@@ -868,10 +872,7 @@ components:
           items:
             $ref: "#/components/schemas/User"
         ChatName:    
-          type: string
-          example: filippohd
-          minLength: 1
-          maxLength: 16 
+          $ref: "#/components/schemas/Name"
         Messages:
           type: array
           items:
