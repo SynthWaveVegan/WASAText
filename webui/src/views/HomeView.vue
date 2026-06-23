@@ -58,7 +58,7 @@ const createConversation = async () => {
     };
 
     
-    console.log(response.data);
+    console.log(newConversation);
     conversations.value.push(newConversation);
     Conversation.ChatName = '';
 
@@ -72,7 +72,7 @@ const getConversation = async (id) => {
     axios.defaults.headers.common['Authorization'] = UserId.value;
     const response = await axios.get(`/users/${UserId.value}/conversations/${id}`);
 
-    console.log("Risposta di getConversation:", response.data);
+    
 
     const thisConversation = {
       conversationId: response.data.Identifier.Identifier,  
@@ -86,7 +86,7 @@ const getConversation = async (id) => {
       Messages: response.data.Messages || []  
     };
 
-    
+    console.log("Risposta di getConversation:", thisConversation);
     return thisConversation;
 
   } catch (e) {
@@ -143,7 +143,7 @@ const getMyConversations = async () => {
     const response = await axios.get(`/users/${UserId.value}/conversations`);
 
     if (response.data && Array.isArray(response.data) && response.data.length > 0) {
-      console.log("Conversazioni recuperate:", response.data);
+      
 
       const allConversations = await Promise.all(
         response.data.map(async (conversation) => {
@@ -153,7 +153,7 @@ const getMyConversations = async () => {
       );
 
       conversations.value = allConversations;
-
+      console.log("Conversazioni recuperate:", allConversations);
     } else {
       console.log("Nessuna conversazione trovata.");
       conversations.value = []; 
@@ -188,7 +188,7 @@ const sendMessage = async () => {
 
     const response = await axios.post(`/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages`, message);
 
-    console.log("Messaggio inviato con successo:", response.data);
+    
     
     const updatedMessage = {
       MessageBody: response.data.MessageBody,
@@ -206,6 +206,8 @@ const sendMessage = async () => {
         UserPhoto: response.data.User.UserPhoto
       } 
     };
+
+    console.log("Messaggio inviato con successo:", updatedMessage);
 
     Messages.value = [...Messages.value, updatedMessage];
     
@@ -246,8 +248,9 @@ const deleteMessage = async (id) => {
 const showConversationModal = ref(false);
 const messageToForward = ref(null);
 
-const OpenForwardModal = async (messageId) => {
-  messageToForward.value = messageId.Identifier;
+const OpenForwardModal = async (message) => {
+  messageToForward.value = message.messageId.Identifier;
+  console.log("messaggio da inoltrare:", messageToForward.value)
   await getMyConversations();
   showConversationModal.value = true;
 };
@@ -513,6 +516,7 @@ const commentMessage = async (reaction) => {
     
 
     Comments.value.push(UpdatedComment);
+    console.log("Commento inviato:", UpdatedComment);
 
     
     const msgIndex = Messages.value.findIndex(msg => msg.MessageId === messageToComment.value);
@@ -729,7 +733,7 @@ onMounted(() => {
             </div>
       </div>
       <div class="flex-grow-1 overflow-auto p-2">
-        <div v-for="msg in Messages" :key="msg.messageId" class="mb-2">
+        <div v-for="msg in Messages" :key="msg.MessageId" class="mb-2">
           
           <div :class="{
             'd-flex justify-content-end': msg.User.Name == username, 
@@ -743,7 +747,7 @@ onMounted(() => {
             'alert-primary': msg.User.Name == username,
             'alert-success': msg.User.Name != username
             }">
-              <button class="btn btn-success btn-sm float-end ms-1"  @click="OpenForwardModal(msg.messageId.Identifier)">⇉</button>
+              <button class="btn btn-success btn-sm float-end ms-1"  @click="OpenForwardModal(msg)">⇉</button>
               <button class="btn btn-secondary btn-sm float-end ms-1"  @click="OpenCommentModal(msg)">💬</button>
               <div v-if="showConversationModal"
                   class="modal fade show d-block"
@@ -762,7 +766,7 @@ onMounted(() => {
                     </div>
                     <div class="modal-body">
                       <div v-for="conv in conversations"
-                          :key="conv.Identifier"
+                          :key="conv.conversationId"
                           class="list-group mb-2">
                         <button class="list-group-item list-group-item-action"
                                 @click="forwardMessage(conv.conversationId)">
@@ -785,9 +789,9 @@ onMounted(() => {
                       <div class="modal-body">
                         <div class="comments-window mb-3" style="max-height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; border-radius: 5px;">
                           <ul class="list-group">
-                            <li class="list-group-item" v-for="c in Comments" :key="c.commentId">
+                            <li class="list-group-item" v-for="c in Comments" :key="c.CommentId">
                               <strong>{{ c.User.Name }}:</strong> {{ c.CommentBody }}
-                              <button class="btn btn-danger btn-sm float-end" v-if="c.User.Name == username" @click="uncommentMessage(c.commentId)">X</button>
+                              <button class="btn btn-danger btn-sm float-end" v-if="c.User.Name == username" @click="uncommentMessage(c.CommentId)">X</button>
                             </li>
                             <li v-if="Comments.length === 0" class="list-group-item text-muted">No comments yet</li>
                           </ul>
@@ -808,7 +812,7 @@ onMounted(() => {
                   </div>
                 </div>
               </div>
-              <button class="btn btn-danger btn-sm float-end" v-if="msg.User.Name == username" @click="deleteMessage(msg.messageId.Identifier)">X</button>
+              <button class="btn btn-danger btn-sm float-end" v-if="msg.User.Name == username" @click="deleteMessage(msg.MessageId.Identifier)">X</button>
               <strong>{{ msg.User.Name }}:</strong> {{ msg.MessageBody }}
               <div class="small text-muted">{{ msg.Date }}</div>
               <span v-if="msg.IsForwarded == 'Yes'" class="badge bg-primary me-1">↠↠</span>
