@@ -16,7 +16,7 @@ func (db *appdbimpl) ConversationExists(user1Id string, user2Id string) (bool, e
 		FROM userChat uc1
 		JOIN userChat uc2 ON uc1.ConversationId = uc2.ConversationId
 		JOIN conversation c ON c.ConversationId = uc1.ConversationId
-		WHERE uc1.UserId = ? AND uc2.UserId = ? AND c.IsGroup = FALSE
+		WHERE uc1.UserId = ? AND uc2.UserId = ? AND c.IsGroup = no
 	`
 
 	var count int
@@ -35,7 +35,7 @@ func (db *appdbimpl) ConversationExists(user1Id string, user2Id string) (bool, e
 func (db *appdbimpl) CreateConversation(UserHosting structs.Identifier, UserConnectedName string) (structs.Conversation, error) {
 
 	var Messages []structs.Message
-	var IsGroup = "No"
+	var IsGroup = "no"
 	var GroupName = ""
 	
 
@@ -171,7 +171,7 @@ func (db *appdbimpl) GetConversation(ConversationId structs.Identifier, currentU
 	
 	var chatName string
 
-	if isGroup == "Yes" {
+	if isGroup == "yes" {
 
     	chatName = groupName
 

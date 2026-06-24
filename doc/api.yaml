@@ -31,6 +31,9 @@ paths:
 
 
   /groups/{groupId}/photo:
+    parameters:
+        - $ref: "#/components/parameters/groupId"
+
     put:
       security:
         - bearerAuth: []
@@ -41,9 +44,7 @@ paths:
       description: |-
         sets the photo that
         the group will be seen with
-      parameters:
-        
-        - $ref: "#/components/parameters/groupId"
+      
 
       operationId: SETGROUPPHOTO
       requestBody:
@@ -55,7 +56,7 @@ paths:
               properties:
                 photoUrl:
                   type: string
-                  format: uri
+                  format: url
                   minLength: 10
                   maxLength: 2048
                   pattern: '^https?://.*$'
@@ -73,6 +74,8 @@ paths:
     
   /groups/{groupId}:
 
+    parameters:
+        - $ref: "#/components/parameters/groupId"
 
     put:
       security:
@@ -83,9 +86,7 @@ paths:
       description: |-
         sets the name that
         the group will be seen with
-      parameters:
-
-        - $ref: "#/components/parameters/groupId"
+      
 
       operationId: SETGROUPNAME
       requestBody:
@@ -106,6 +107,10 @@ paths:
 
 
   /users/{userId}/group/{groupId}:
+    parameters:
+
+        - $ref: "#/components/parameters/userId"
+        - $ref: "#/components/parameters/groupId"
 
     delete:
       security:
@@ -116,10 +121,7 @@ paths:
       description: |-
         removes the group from
         the user conversations
-      parameters:
-
-        - $ref: "#/components/parameters/userId"
-        - $ref: "#/components/parameters/groupId"
+      
         
       operationId: LEAVEGROUP
       responses:
@@ -141,11 +143,6 @@ paths:
       description: |-
         takes an existing group and
         adds a user with a conversation in it
-      parameters:
-
-        - $ref: "#/components/parameters/groupId"
-        - $ref: "#/components/parameters/userId"
-
       operationId: ADDTOGROUP
       requestBody:
         required: true
@@ -164,7 +161,8 @@ paths:
           $ref: "#/components/responses/InternalServerError"
 
   /users/{userId}/group:
-
+    parameters:
+        - $ref: "#/components/parameters/userId"
     post:
       security:
         - bearerAuth: []
@@ -173,8 +171,7 @@ paths:
       summary: add a user to a group
       description: |-
         creates a new group or adds a user in an existing one
-      parameters:
-        - $ref: "#/components/parameters/userId"
+      
       operationId: CREATEGROUP
       requestBody:
         required: true
@@ -197,7 +194,10 @@ paths:
           $ref: "#/components/responses/InternalServerError"
 
   /users/{userId}/conversations/{conversationId}/messages/read:
+    parameters:
 
+        - $ref: "#/components/parameters/userId"
+        - $ref: "#/components/parameters/conversationId"
     put:
       security:
         - bearerAuth: []
@@ -206,10 +206,7 @@ paths:
       summary: marks message as read
       description: |-
         updates status of message in conversation
-      parameters:
-
-        - $ref: "#/components/parameters/userId"
-        - $ref: "#/components/parameters/conversationId"
+      
         
       operationId: MARKMESSAGEREAD
       responses:
@@ -224,6 +221,10 @@ paths:
 
   /users/{userId}/conversations/{conversationId}/messages:
 
+    parameters:
+
+        - $ref: "#/components/parameters/userId"
+        - $ref: "#/components/parameters/conversationId"
     post:
       security:
         - bearerAuth: []
@@ -233,10 +234,7 @@ paths:
       description: |-
         sends a message to a user
         or a group conversation
-      parameters:
-
-        - $ref: "#/components/parameters/userId"
-        - $ref: "#/components/parameters/conversationId"
+      
 
       operationId: SENDMESSAGE
       requestBody:
@@ -261,6 +259,11 @@ paths:
 
   /users/{userId}/conversations/{conversationId}/messages/delete/{messageId}:
 
+    parameters:
+
+        - $ref: "#/components/parameters/userId"
+        - $ref: "#/components/parameters/messageId"
+        - $ref: "#/components/parameters/conversationId"
     delete:
       security:
         - bearerAuth: []
@@ -270,11 +273,7 @@ paths:
       description: |-
         removes a message 
         of a specific user
-      parameters:
-
-        - $ref: "#/components/parameters/userId"
-        - $ref: "#/components/parameters/messageId"
-        - $ref: "#/components/parameters/conversationId"
+      
         
       operationId: DELETEMESSAGE
       responses:
@@ -289,6 +288,11 @@ paths:
   
   /users/{userId}/conversations/{conversationId}/messages/forward/{messageId}:
 
+    parameters:
+
+        - $ref: "#/components/parameters/userId"
+        - $ref: "#/components/parameters/messageId"
+        - $ref: "#/components/parameters/conversationId"
     post:
       security:
         - bearerAuth: []
@@ -298,11 +302,7 @@ paths:
       description: |-
         sends a message already existent
         to another conversation
-      parameters:
-
-        - $ref: "#/components/parameters/userId"
-        - $ref: "#/components/parameters/messageId"
-        - $ref: "#/components/parameters/conversationId"
+      
         
       operationId: FORWARDMESSAGE
       requestBody:
@@ -327,6 +327,9 @@ paths:
   
   /users/{userId}/messages/{messageId}/comments:
 
+    parameters:
+        - $ref: "#/components/parameters/userId"
+        - $ref: "#/components/parameters/messageId"
     post:
       security:
         - bearerAuth: []
@@ -337,9 +340,7 @@ paths:
       description: |-
         add a comment to a 
         message of a specific user
-      parameters:
-        - $ref: "#/components/parameters/userId"
-        - $ref: "#/components/parameters/messageId"
+      
 
       operationId: COMMENTMESSAGE
       requestBody:
@@ -364,6 +365,11 @@ paths:
 
   /users/{userId}/messages/{messageId}/comments/{commentId}:
 
+    parameters:
+
+        - $ref: "#/components/parameters/userId"
+        - $ref: "#/components/parameters/messageId"
+        - $ref: "#/components/parameters/commentId"
     delete:
       security:
         - bearerAuth: []
@@ -374,11 +380,7 @@ paths:
       description: |-
         removes a comment to a 
         message of a specific user
-      parameters:
-
-        - $ref: "#/components/parameters/userId"
-        - $ref: "#/components/parameters/messageId"
-        - $ref: "#/components/parameters/commentId"
+      
 
       operationId: UNCOMMENTMESSAGE
       responses:
@@ -393,6 +395,8 @@ paths:
 
   /users/{userId}/conversations:
 
+    parameters:
+        - $ref: "#/components/parameters/userId"
     post:
       security:
         - bearerAuth: []
@@ -402,8 +406,7 @@ paths:
       description: |-
         generates a new conversation
         between two users
-      parameters:
-        - $ref: "#/components/parameters/userId"
+      
 
       operationId: CREATECONVERSATION
       requestBody:
@@ -439,10 +442,6 @@ paths:
       description: |-
         returns personal stream of conversations
         for the user
-      parameters:
-
-          - $ref: "#/components/parameters/userId"
-
       operationId: GETMYCONVERSATIONS
       responses:
         "200":
@@ -459,6 +458,11 @@ paths:
           $ref: "#/components/responses/InternalServerError"
     
   /users/{userId}/conversations/{conversationId}:
+
+    parameters:
+
+        - $ref: "#/components/parameters/conversationId"
+        - $ref: "#/components/parameters/userId"
     get:
       security:
         - bearerAuth: []
@@ -468,10 +472,7 @@ paths:
       description: |-
         finds a specific conversation
         from its id
-      parameters:
-
-        - $ref: "#/components/parameters/conversationId"
-        - $ref: "#/components/parameters/userId"
+      
 
       operationId: GETCONVERSATION
       responses:
@@ -528,6 +529,9 @@ paths:
           
   /users/{userId}:
 
+    parameters:
+
+        - $ref: "#/components/parameters/userId"
     put:
       security:
         - bearerAuth: []
@@ -537,9 +541,7 @@ paths:
       description: |-
         sets the name that
         the user will be seen with
-      parameters:
-
-        - $ref: "#/components/parameters/userId"
+      
 
       operationId: SETMYUSERNAME
       requestBody:
@@ -560,6 +562,10 @@ paths:
           $ref: "#/components/responses/InternalServerError"
 
   /users/{userId}/photo:
+    
+    parameters:
+
+        - $ref: "#/components/parameters/userId"
     put:
       security:
         - bearerAuth: []
@@ -570,9 +576,7 @@ paths:
       description: |-
         sets the photo that
         the user will be seen with
-      parameters:
-
-        - $ref: "#/components/parameters/userId"
+      
         
       operationId: SETMYPHOTO
       requestBody:
@@ -685,28 +689,31 @@ components:
       properties:
         photoUrl:
           type: string
-          format: uri
+          format: url
           minLength: 10
           maxLength: 2048
           pattern: '^https?://.*$'
           description: New photo URL for the user
 
     Name:
-      type: string
-      example: filippohd
-      minLength: 1
-      maxLength: 16
+      type: object
+      required: [Name]
+      properties:
+        Name:
+          type: string
+          minLength: 1
+          maxLength: 16
       
 
     Identifier:
-      title: identifier
-      description: alphanumerical identifier for a resource
-      type: string
-      pattern: "^@[A-Z][0-9]{9}$"
-      example: "@U000000001"
-      readOnly: true
-      minLength: 11
-      maxLength: 11
+      type: object
+      required: [id]
+      properties:
+        id:
+          type: string
+          pattern: "^@[A-Z][0-9]{9}$"
+          minLength: 11
+          maxLength: 11
 
     User:
       title: user
@@ -760,16 +767,22 @@ components:
           maxLength: 20
         MediaType:
           type: string
-          enum: [Text, Photo]
+          enum:
+            - text
+            - photo
           description: Type of media in the message
         ConversationId:
           $ref: "#/components/schemas/Identifier"
         IsRead:
           type: string
-          enum: [Yes, No]
+          enum:
+            - yes
+            - no
         IsForwarded:
           type: string
-          enum: [Yes, No]
+          enum:
+            - yes
+            - no
 
     CommentBody:
       type: object
@@ -840,12 +853,15 @@ components:
           $ref: "#/components/schemas/Identifier"
 
     ConversationList:
-      title: ConversationList
-      type: array
-      items:
-        anyOf:
-          - $ref: "#/components/schemas/Conversation"
-          - $ref: "#/components/schemas/Group"
+      type: object
+      required: [conversations]
+      properties:
+        conversations:
+          type: array
+          items:
+            anyOf:
+              - $ref: "#/components/schemas/Conversation"
+              - $ref: "#/components/schemas/Group"
 
     Conversation:
       title: conversation
@@ -867,6 +883,8 @@ components:
             $ref: "#/components/schemas/Message"
         IsGroup:
           type: string
-          enum: [Yes, No]
+          enum:
+            - yes
+            - no
 
             

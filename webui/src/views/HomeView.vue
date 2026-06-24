@@ -180,7 +180,7 @@ const Message = reactive({
 const sendMessage = async () => {
   try {
     axios.defaults.headers.common['Authorization'] = UserId.value;
-    axios.defaults.headers.common['MediaType'] = "Text";  
+    axios.defaults.headers.common['MediaType'] = "text";  
 
     const message = {
       MessageBody: Message.MessageBody  
@@ -258,7 +258,7 @@ const OpenForwardModal = async (message) => {
 
 const forwardMessage = async (convId) => {
   try{
-    axios.defaults.headers.common['MediaType'] = "Text"; 
+    axios.defaults.headers.common['MediaType'] = "text"; 
     axios.defaults.headers.common['Authorization'] = UserId.value;
     const response = await axios.post(`/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages/forward/${messageToForward.value}`, 
       {Identifier : convId}
@@ -628,8 +628,8 @@ onMounted(() => {
     <div class="col-8 d-flex flex-column" style="height: 500px; width: 1480px; border: 1px solid #ccc;">
       <div class="p-2 border-bottom">        
         <h5>{{ selectedConversation.ChatName }} 
-          <button class="btn btn-secondary btn-sm" v-if="selectedConversation.IsGroup == 'Yes'" @click="EditGroupModal(selectedConversation.conversationId)">✏️</button>
-          <button class="btn btn-danger btn-sm" v-if="selectedConversation.IsGroup == 'Yes'" @click="LeaveGroupModal(selectedConversation.conversationId)">Leave</button>
+          <button class="btn btn-secondary btn-sm" v-if="selectedConversation.IsGroup == 'yes'" @click="EditGroupModal(selectedConversation.conversationId)">✏️</button>
+          <button class="btn btn-danger btn-sm" v-if="selectedConversation.IsGroup == 'yes'" @click="LeaveGroupModal(selectedConversation.conversationId)">Leave</button>
           <button class="btn btn-danger btn-sm float-end" @click="closeConversation">X</button>
           <div
             v-if="showLeaveModal"
@@ -684,7 +684,7 @@ onMounted(() => {
             <span v-for="user in selectedConversation.Users" :key="user.Id" class="badge bg-primary me-2 mb-2">
               {{ user.Name }}
             </span>
-            <button class="btn btn-success btn-sm" v-if="selectedConversation.IsGroup == 'Yes'" @click="AddGroupModal(selectedConversation.conversationId)">+</button>
+            <button class="btn btn-success btn-sm" v-if="selectedConversation.IsGroup == 'yes'" @click="AddGroupModal(selectedConversation.conversationId)">+</button>
           </div>
         </div>
         <div v-if="EditGroupModalInput == selectedConversation.conversationId">
@@ -818,10 +818,10 @@ onMounted(() => {
               <span v-if="msg.IsForwarded == 'Yes'" class="badge bg-primary me-1">↠↠</span>
               <div class="message-status" v-if="msg.User.Name === username">
 
-                  <span v-if="msg.IsRead == 'Yes'" class="badge bg-success me-1">•</span>
-                  <span v-if="msg.IsRead == 'Yes'" class="badge bg-success me-1">•</span>
+                  <span v-if="msg.IsRead == 'yes'" class="badge bg-success me-1">•</span>
+                  <span v-if="msg.IsRead == 'yes'" class="badge bg-success me-1">•</span>
 
-                  <span v-if="msg.IsRead == 'No'" class="badge bg-secondary me-1">•</span>
+                  <span v-if="msg.IsRead == 'no'" class="badge bg-secondary me-1">•</span>
                   
               </div>
             </div>

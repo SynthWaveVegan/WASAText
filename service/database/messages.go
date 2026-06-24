@@ -26,7 +26,7 @@ func (db *appdbimpl) MarkMessageRead(UserId structs.Identifier, ConversationId s
 		return err
 	}
 	
-	_, err = db.c.ExecContext(context.Background(), `UPDATE message SET IsRead = 'Yes' WHERE ConversationId = ? AND UploaderId = ? AND IsRead != 'Yes'`,
+	_, err = db.c.ExecContext(context.Background(), `UPDATE message SET IsRead = 'yes' WHERE ConversationId = ? AND UploaderId = ? AND IsRead != 'yes'`,
 	 ConversationId.Id, otherUserId)
 		if err != nil {
 			return err
@@ -56,8 +56,8 @@ func (db *appdbimpl) SendMessage(MessageBody string, UploaderId structs.Identifi
 	}
 
 	messageDate := time.Now().UTC().Format("02/01/2006 15:04:05")
-	IsRead := "No" 
-	IsForwarded := "No" 
+	IsRead := "no" 
+	IsForwarded := "no" 
 
 	err = db.insertMessage(MessageBody, UploaderId, thisMessageId, messageDate, MediaType, ConversationId, IsRead, IsForwarded)
 	if err != nil {
@@ -103,8 +103,8 @@ func (db *appdbimpl) ForwardMessage(OldMessageId structs.Identifier, UploaderId 
 	}
 
 	messageDate := time.Now().UTC().Format("02/01/2006 15:04:05")
-	IsRead := "No"
-	IsForwarded := "Yes" 
+	IsRead := "no"
+	IsForwarded := "yes" 
 
 	err = db.c.QueryRowContext(context.Background(),
     	`SELECT MessageBody, MediaType FROM message WHERE MessageId = ?`,

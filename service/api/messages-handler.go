@@ -37,7 +37,7 @@ func (rt *_router) SENDMESSAGE(w http.ResponseWriter, r *http.Request, ps httpro
     w.WriteHeader(http.StatusBadRequest)
     ctx.Logger.Error("no mediatype retrieved")
     return
-  } else if MediaType != "Text" && MediaType != "Photo" {
+  } else if MediaType != "text" && MediaType != "photo" {
     w.WriteHeader(http.StatusBadRequest)
     ctx.Logger.Error("mediatype not valid for use")
     return
