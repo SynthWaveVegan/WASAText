@@ -55,7 +55,7 @@ paths:
               properties:
                 photoUrl:
                   type: string
-                  format: url
+                  format: uri
                   minLength: 10
                   maxLength: 2048
                   pattern: '^https?://.*$'
@@ -347,7 +347,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Comment/CommentBody"
+              $ref: "#/components/schemas/CommentBody"
       responses:
         "201":
           description: comment created succesfully
@@ -779,7 +779,7 @@ components:
           type: string
           pattern: "^[a-z0-9]*?$"
           minLength: 1
-          maxLength: 1
+          maxLength: 4
 
     Comment:
       title: comment
@@ -794,7 +794,7 @@ components:
         CommentBody:
           type: string
           minLength: 1
-          maxLength: 1
+          maxLength: 4
         Date:
           type: string
           format: date-time
