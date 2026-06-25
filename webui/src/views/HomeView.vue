@@ -602,7 +602,7 @@ onMounted(() => {
           <div class="card-body">            
             <h5 class="card-title d-flex justify-content-between align-items-center">
               {{ conv.ChatName }}
-              <button class="btn btn-success btn-sm" v-if="conv.IsGroup == 'No'" @click="toggleGroupInput(conv.conversationId)">New Group</button>
+              <button class="btn btn-success btn-sm" v-if="conv.IsGroup == 'no'" @click="toggleGroupInput(conv.conversationId)">New Group</button>
             </h5>
             <div v-if="showInputForConversationId == conv.conversationId">
               <input v-model="GroupName" type="text" class="form-control mt-2" placeholder="Enter group name" />
@@ -815,7 +815,7 @@ onMounted(() => {
               <button class="btn btn-danger btn-sm float-end" v-if="msg.User.Name == username" @click="deleteMessage(msg.MessageId.Identifier)">X</button>
               <strong>{{ msg.User.Name }}:</strong> {{ msg.MessageBody }}
               <div class="small text-muted">{{ msg.Date }}</div>
-              <span v-if="msg.IsForwarded == 'Yes'" class="badge bg-primary me-1">↠↠</span>
+              <span v-if="msg.IsForwarded == 'yes'" class="badge bg-primary me-1">↠↠</span>
               <div class="message-status" v-if="msg.User.Name === username">
 
                   <span v-if="msg.IsRead == 'yes'" class="badge bg-success me-1">•</span>

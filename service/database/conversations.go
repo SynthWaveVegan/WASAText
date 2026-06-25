@@ -16,7 +16,7 @@ func (db *appdbimpl) ConversationExists(user1Id string, user2Id string) (bool, e
 		FROM userChat uc1
 		JOIN userChat uc2 ON uc1.ConversationId = uc2.ConversationId
 		JOIN conversation c ON c.ConversationId = uc1.ConversationId
-		WHERE uc1.UserId = ? AND uc2.UserId = ? AND c.IsGroup = no
+		WHERE uc1.UserId = ? AND uc2.UserId = ? AND c.IsGroup = 'no'
 	`
 
 	var count int
