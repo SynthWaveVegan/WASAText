@@ -12,6 +12,7 @@ const startEdit = () => {
 }
 
 const newUsername = ref("")
+const newPhoto = ref("")
 const UserId = ref(localStorage.getItem('userId'));  
 const username = ref(localStorage.getItem('username')); 
 
@@ -33,6 +34,20 @@ const SetMyUsername = async () => {
   } catch (e) {
     alert(e)
     }
+}
+
+const SetMyPhoto = async () => {
+
+  try{
+    axios.defaults.headers.common['Authorization'] = UserId.value
+
+    const response = await axios.put(`/users/${UserId.value}/photo`, {
+      Photo: newPhoto.value
+    })
+      
+  }catch(e) {
+    alert(e)
+  }
 }
 
 </script>
