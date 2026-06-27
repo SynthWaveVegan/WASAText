@@ -179,17 +179,44 @@ const Message = reactive({
 
 const sendMessage = async () => {
   try {
+
     axios.defaults.headers.common['Authorization'] = UserId.value;
-    axios.defaults.headers.common['MediaType'] = "text";  
 
-    const message = {
-      MessageBody: Message.MessageBody  
-    };
+    let response;
 
-    const response = await axios.post(`/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages`, message);
+    if (selectedFile.value) {
 
-    
-    
+      const formData = new FormData();
+
+      formData.append("image", selectedFile.value);
+
+      response = await axios.post(
+        `/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            "MediaType": "image"
+          }
+        }
+      );
+
+    } else {
+
+      response = await axios.post(
+        `/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages`,
+        {
+          MessageBody: Message.MessageBody
+        },
+        {
+          headers: {
+            MediaType: "text"
+          }
+        }
+      );
+
+    }
+
     const updatedMessage = {
       MessageBody: response.data.MessageBody,
       MessageId: response.data.messageId,
@@ -199,50 +226,23 @@ const sendMessage = async () => {
       ConversationId: response.data.ConversationId,
       IsRead: response.data.IsRead,
       IsForwarded: response.data.IsForwarded,
-      Comments: response.data.Comments || [] ,
-      User: {  
+      Comments: response.data.Comments || [],
+      User: {
         Name: response.data.User.Name,
         userId: response.data.User.userId.Identifier,
         UserPhoto: response.data.User.UserPhoto
-      } 
+      }
     };
 
-    console.log("Messaggio inviato con successo:", updatedMessage);
+    Messages.value.push(updatedMessage);
 
-    Messages.value = [...Messages.value, updatedMessage];
-    
-    Message.MessageBody = '';
-    Message.MessageId = '';
-    Message.UploaderId = '';
-    Message.Date = '';
-    Message.MediaType = '';
-    Message.ConversationId = '';
-    Message.User = '';
-    Message.MessageBody = '';
-    Message.IsRead = '';
-    Message.IsForwarded = '';
-    Message.Comments = [];
+    Message.MessageBody = "";
+    selectedFile.value = null;
 
   } catch (e) {
     console.error(e);
-    alert("Si è verificato un errore durante l'invio del messaggio.");
   }
 };
-
-const deleteMessage = async (id) => {
-  try {
-    axios.defaults.headers.common['Authorization'] = UserId.value;
-    await axios.delete(`/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages/delete/${id}`)
-    const index = Messages.value.findIndex(message => message.id === id);
-    if (index !== -1) {
-      Messages.value = Messages.value.filter(message => message.MessageId !== id);
-    }
-    alert("message canceled")
-    await openConversation(selectedConversation.value.conversationId);
-  }catch(e){
-    alert(e)
-  }
-}
 
 
 const showConversationModal = ref(false);
@@ -453,7 +453,17 @@ const SetGroupName = async () => {
   }
 }
 
+const fileInput = ref(null);
 
+const openFilePicker = () => {
+  fileInput.value.click();
+};
+
+const selectedFile = ref(null);
+
+const onFileSelected = (event) => {
+  selectedFile.value = event.target.files[0];
+};
 
 
 
@@ -832,6 +842,17 @@ onMounted(() => {
       <div class="p-2 border-top d-flex">
         <input v-model="Message.MessageBody" class="form-control me-2" placeholder="Write..." />
         <button class="btn btn-primary" @click="sendMessage">Send</button>
+        <button class="camera-button" @click="openFilePicker">
+          📷
+        </button>
+
+        <input
+          ref="fileInput"
+          type="file"
+          hidden
+          accept="image/*"
+          @change="onFileSelected"
+        />
       </div>
     </div>
   </div>

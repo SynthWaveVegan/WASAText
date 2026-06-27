@@ -19,15 +19,14 @@ func (rt *_router) SETMYPHOTO(w http.ResponseWriter, r *http.Request, ps httprou
 		return
 	}
 
-	var PhotoPath string
-	err := json.NewDecoder(r.Body).Decode(&PhotoPath)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		ctx.Logger.Error("something went wrong: ", err)
-		return
-
+	type PhotoRequest struct {
+    	Photo string `json:"Photo"`
 	}
-	defer r.Body.Close()
+
+	var req PhotoRequest
+	err := json.NewDecoder(r.Body).Decode(&req)
+
+	PhotoPath := req.Photo
 
 	authorization := r.Header.Get("Authorization")
 

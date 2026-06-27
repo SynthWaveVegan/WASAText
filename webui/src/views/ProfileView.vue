@@ -36,19 +36,35 @@ const SetMyUsername = async () => {
     }
 }
 
-const SetMyPhoto = async () => {
+const fileInput = ref(null);
 
-  try{
+const openFilePicker = () => {
+  fileInput.value.click();
+};
+
+const selectedFile = ref(null);
+
+
+
+const photoPath = ref("");
+
+const updatePhoto = async () => {
+  try {
     axios.defaults.headers.common['Authorization'] = UserId.value
 
-    const response = await axios.put(`/users/${UserId.value}/photo`, {
-      Photo: newPhoto.value
-    })
-      
-  }catch(e) {
-    alert(e)
+    await axios.put(`/users/${UserId.value}/photo`, {
+      Photo: photoPath.value
+    });
+
+    localStorage.setItem('userphoto', photoPath.value);
+
+    photoPath.value = "";
+
+  } catch (e) {
+    console.error(e);
+    alert("something went wrong");
   }
-}
+};
 
 </script>
 
@@ -63,6 +79,7 @@ const SetMyPhoto = async () => {
   <div v-if="!editing">
     <span class="fw-bold">{{ username }}</span>
     <button class="btn btn-sm btn-outline-primary ms-2"  @click="startEdit">Change Username</button>
+    
   </div>
   <div v-else>
       <input v-model="newUsername" class="form-control d-inline-block w-auto" />
@@ -74,7 +91,17 @@ const SetMyPhoto = async () => {
       </button>
   </div>
   <div>
-    <img :src="propic" class="img-fluid mb-3" style="max-width: 180px;" alt="change profile pic">
+    <span class="fw-bold">{{ username }}'s Photo</span>
+    <img :src="userphoto" alt="User photo" />
+    <input
+      v-model="photoPath"
+      type="text"
+      placeholder="Inserisci path immagine (es. /uploads/img.jpg)"
+    />
+
+    <button @click="updatePhoto">
+      Salva foto profilo
+    </button>
   </div>
   
   
