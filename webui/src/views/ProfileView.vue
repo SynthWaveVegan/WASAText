@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue'
 import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from '../services/axios.js'
-import propic from '@/assets/images/istockphoto-1495088043-612x612.jpg'
+
 
 const editing = ref(false)
 
@@ -12,9 +12,9 @@ const startEdit = () => {
 }
 
 const newUsername = ref("")
-const newPhoto = ref("")
 const UserId = ref(localStorage.getItem('userId'));  
 const username = ref(localStorage.getItem('username')); 
+const userphoto = ref(localStorage.getItem("userphoto") || "");
 
 
 const SetMyUsername = async () => {
@@ -56,6 +56,7 @@ const updatePhoto = async () => {
       Photo: photoPath.value
     });
 
+    userphoto.value = photoPath.value;
     localStorage.setItem('userphoto', photoPath.value);
 
     photoPath.value = "";
@@ -96,12 +97,13 @@ const updatePhoto = async () => {
     <input
       v-model="photoPath"
       type="text"
-      placeholder="Inserisci path immagine (es. /uploads/img.jpg)"
+      placeholder="Insert path"
     />
 
     <button @click="updatePhoto">
-      Salva foto profilo
+      Save profile pic
     </button>
+    <li>you have to save the image in the images folder</li>
   </div>
   
   
