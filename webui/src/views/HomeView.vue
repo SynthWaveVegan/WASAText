@@ -166,7 +166,7 @@ const getMyConversations = async () => {
 
 const Message = reactive({
   MessageBody: '',
-  MessageId: '',
+  messageId: '',
   UploaderId: '',
   Date: '',
   MediaType: '',
@@ -219,7 +219,7 @@ const sendMessage = async () => {
 
     const updatedMessage = {
       MessageBody: response.data.MessageBody,
-      MessageId: response.data.messageId,
+      messageId: response.data.messageId,
       UploaderId: response.data.UploaderId,
       Date: response.data.Date,
       MediaType: response.data.MediaType,
@@ -237,7 +237,17 @@ const sendMessage = async () => {
     Messages.value.push(updatedMessage);
     console.log("messaggio inviato: ", updatedMessage)
 
-    Message.MessageBody = "";
+    Message.MessageBody = '';
+    Message.messageId = '';
+    Message.UploaderId = '';
+    Message.Date = '';
+    Message.MediaType = '';
+    Message.ConversationId = '';
+    Message.User = '';
+    Message.MessageBody = '';
+    Message.IsRead = '';
+    Message.IsForwarded = '';
+    Message.Comments = [];
     selectedFile.value = null;
 
   } catch (e) {
@@ -268,7 +278,7 @@ const forwardMessage = async (convId) => {
     alert("Message Forwarded!");
     const updatedMessage = {
       MessageBody: response.data.MessageBody,
-      MessageId: response.data.messageId,
+      messageId: response.data.messageId,
       UploaderId: response.data.UploaderId,
       Date: response.data.Date,
       MediaType: response.data.MediaType,
@@ -286,7 +296,7 @@ const forwardMessage = async (convId) => {
     Messages.value = [...Messages.value, updatedMessage];
     
     Message.MessageBody = '';
-    Message.MessageId = '';
+    Message.messageId = '';
     Message.UploaderId = '';
     Message.Date = '';
     Message.MediaType = '';
@@ -312,10 +322,10 @@ const deleteMessage = async (messageid) => {
   try {
     axios.defaults.headers.common['Authorization'] = UserId.value;
         
-    await axios.delete(`/users/${UserId.value}/messages/${messageid}/delete`);   
+    await axios.delete(`/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages/${messageid}/delete`);   
 
     Messages.value = Messages.value.filter(
-      Message => Message.MessageId.Identifier !== messageid
+      Message => Message.messageId.Identifier !== messageid
     );
         
     alert("message canceled")
@@ -505,7 +515,7 @@ const OpenCommentModal = async (message) => {
   console.log(message);
   console.log(message.messageId);
   
-  messageToComment.value = message.MessageId.Identifier;
+  messageToComment.value = message.messageId.Identifier;
   Comments.value = message.Comments || [];
   showCommentModal.value = true;
 };
@@ -571,11 +581,11 @@ const uncommentMessage = async (id) => {
     axios.defaults.headers.common['Authorization'] = UserId.value;
         
     await axios.delete(`/users/${UserId.value}/messages/${messageToComment.value}/comments/${id}`);    
-    Comments.value = Comments.value.filter(comment => comment.commentId !== id);
+    Comments.value = Comments.value.filter(comment => comment.CommentId.Identifier !== id);
         
-    const msgIndex = Messages.value.findIndex(msg => msg.messageId === messageToComment.value);
+    const msgIndex = Messages.value.findIndex(msg => msg.messageId.Identifier === messageToComment.value);
     if (msgIndex !== -1 && Messages.value[msgIndex].Comments) {
-      Messages.value[msgIndex].Comments = Messages.value[msgIndex].Comments.filter(c => c.commentId !== id);
+      Messages.value[msgIndex].Comments = Messages.value[msgIndex].Comments.filter(c => c.CommentId.Identifier !== id);
     }
     alert("comment canceled")
     closeCommentModal();
@@ -820,7 +830,7 @@ onMounted(() => {
                           <ul class="list-group">
                             <li class="list-group-item" v-for="c in Comments" :key="c.CommentId">
                               <strong>{{ c.User.Name }}:</strong> {{ c.CommentBody }}
-                              <button class="btn btn-danger btn-sm float-end" v-if="c.User.Name == username" @click="uncommentMessage(c.CommentId)">X</button>
+                              <button class="btn btn-danger btn-sm float-end" v-if="c.User.Name == username" @click="uncommentMessage(c.CommentId.Identifier)">X</button>
                             </li>
                             <li v-if="Comments.length === 0" class="list-group-item text-muted">No comments yet</li>
                           </ul>
@@ -841,7 +851,7 @@ onMounted(() => {
                   </div>
                 </div>
               </div>
-              <button class="btn btn-danger btn-sm float-end" v-if="msg.User.Name == username" @click="deleteMessage(msg.MessageId.Identifier)">X</button>
+              <button class="btn btn-danger btn-sm float-end" v-if="msg.User.Name == username" @click="deleteMessage(msg.messageId.Identifier)">X</button>
               <strong>{{ msg.User.Name }}:</strong> {{ msg.MessageBody }}
               <div class="small text-muted">{{ msg.Date }}</div>
               <span v-if="msg.IsForwarded == 'yes'" class="badge bg-primary me-1">↠↠</span>
