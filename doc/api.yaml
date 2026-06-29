@@ -12,7 +12,7 @@ tags:
   - name: "Conversation"
     description: endpoints for conversation related operations
   - name: "Login"
-    description: enpoints for loggin in action
+    description: endpoints for loggin in action
   - name: "Photo"
     description: endpoints for photo related operations
   - name: "Message"
@@ -193,7 +193,7 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
-  /users/{userId}/conversations/{conversationId}/messages/read:
+  /users/{userId}/conversations/{conversationId}/messages/readstatus:
     parameters:
 
         - $ref: "#/components/parameters/userId"
@@ -257,7 +257,7 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
-  /users/{userId}/conversations/{conversationId}/messages/delete/{messageId}:
+  /users/{userId}/conversations/{conversationId}/messages/{messageId}/delete:
 
     parameters:
 
@@ -286,7 +286,7 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
   
-  /users/{userId}/conversations/{conversationId}/messages/forward/{messageId}:
+  /users/{userId}/conversations/{conversationId}/messages/{messageId}/forwards:
 
     parameters:
 

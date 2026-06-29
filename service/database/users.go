@@ -96,18 +96,18 @@ func (db *appdbimpl) GetUser(UserId structs.Identifier) (structs.User, error) {
 func (db *appdbimpl) CheckUserExist(username string) (string, bool, error) {
 
 	var userId string
-	// Questo controlla se esiste l'username nella tabella 'users' e ritorna il corrispondente userId
+	
 	err := db.c.QueryRowContext(context.Background(), `SELECT UserId FROM users WHERE Username = ?`, username).Scan(&userId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			// Se non c'è nessun risultato, significa che l'utente non esiste
+			
 			return "", false, nil
 		}
-		// Per altri errori (problemi di connessione, query malformate, etc.), restituisci un errore specifico
+		
 		return "", false, fmt.Errorf("failed to check if user exists: %w", err)
 	}
 
-	// Se l'utente esiste, restituisci il suo userId
+	
 	return userId, true, nil
 }
 

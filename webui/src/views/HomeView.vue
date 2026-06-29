@@ -126,7 +126,7 @@ const openConversation = async (id) => {
 const markMessageRead = async () => {
   try {
     axios.defaults.headers.common['Authorization'] = UserId.value;
-    await axios.put(`/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages/read`)
+    await axios.put(`/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages/readstatus`)
   }catch(e){
     alert(e)
   }
@@ -235,6 +235,7 @@ const sendMessage = async () => {
     };
 
     Messages.value.push(updatedMessage);
+    console.log("messaggio inviato: ", updatedMessage)
 
     Message.MessageBody = "";
     selectedFile.value = null;
@@ -260,7 +261,7 @@ const forwardMessage = async (convId) => {
   try{
     axios.defaults.headers.common['MediaType'] = "text"; 
     axios.defaults.headers.common['Authorization'] = UserId.value;
-    const response = await axios.post(`/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages/forward/${messageToForward.value}`, 
+    const response = await axios.post(`/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages/${messageToForward.value}/forwards`, 
       {Identifier : convId}
     )
 
@@ -304,6 +305,22 @@ const forwardMessage = async (convId) => {
 
   }catch(e){
     alert(e)
+  }
+}
+
+const deleteMessage = async (id) => {
+  try {
+    axios.defaults.headers.common['Authorization'] = UserId.value;
+        
+    await axios.delete(`/users/${UserId.value}/messages/${id}/delete`);   
+
+    Messages.value = Messages.value.filter(
+      Message => Message.messageId !== id
+    );
+        
+    alert("message canceled")
+  } catch(e) { 
+    alert(e);
   }
 }
 
@@ -488,7 +505,7 @@ const OpenCommentModal = async (message) => {
   console.log(message);
   console.log(message.messageId);
   
-  messageToComment.value = message.messageId.Identifier;
+  messageToComment.value = message.MessageId.Identifier;
   Comments.value = message.Comments || [];
   showCommentModal.value = true;
 };
@@ -560,7 +577,8 @@ const uncommentMessage = async (id) => {
     if (msgIndex !== -1 && Messages.value[msgIndex].Comments) {
       Messages.value[msgIndex].Comments = Messages.value[msgIndex].Comments.filter(c => c.commentId !== id);
     }
-    alert("message canceled")
+    alert("comment canceled")
+    closeCommentModal();
   } catch(e) { 
     alert(e);
   }
@@ -569,6 +587,7 @@ const closeCommentModal = () => {
   showCommentModal.value = false;
   messageToComment.value = null;
 }
+
 
 // Chiamata alla funzione refresh quando il componente viene montato
 onMounted(() => {
@@ -743,7 +762,7 @@ onMounted(() => {
             </div>
       </div>
       <div class="flex-grow-1 overflow-auto p-2">
-        <div v-for="msg in Messages" :key="msg.MessageId" class="mb-2">
+        <div v-for="msg in Messages"  class="mb-2">
           
           <div :class="{
             'd-flex justify-content-end': msg.User.Name == username, 
@@ -822,7 +841,7 @@ onMounted(() => {
                   </div>
                 </div>
               </div>
-              <button class="btn btn-danger btn-sm float-end" v-if="msg.User.Name == username" @click="deleteMessage(msg.MessageId.Identifier)">X</button>
+              <button class="btn btn-danger btn-sm float-end" v-if="msg.User.Name == username" @click="deleteMessage(msg.messageId.Identifier)">X</button>
               <strong>{{ msg.User.Name }}:</strong> {{ msg.MessageBody }}
               <div class="small text-muted">{{ msg.Date }}</div>
               <span v-if="msg.IsForwarded == 'yes'" class="badge bg-primary me-1">↠↠</span>

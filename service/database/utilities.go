@@ -12,7 +12,7 @@ import (
 	
 )
 
-// startId: U(user) M(message) C(conversation) G(group) T(comment) P(photo) E(error)
+// startId: U(user) M(message) C(conversation) R(comment) 
 func generateIdentifier(startId string) structs.Identifier {
 
 	var randomInt string
@@ -33,7 +33,7 @@ func (db *appdbimpl) checkValidId(checkingId string, startId string) (bool, erro
 	var countCheck int
 	var err error
 
-	// Seleziona la query giusta in base al tipo di ID
+	
 	switch startId {
 	case "U":
 		err = db.c.QueryRowContext(context.Background(), `SELECT COUNT(*) FROM users WHERE UserId = ?`, checkingId).Scan(&countCheck)
@@ -44,21 +44,21 @@ func (db *appdbimpl) checkValidId(checkingId string, startId string) (bool, erro
 	case "R":
 		err = db.c.QueryRowContext(context.Background(), `SELECT COUNT(*) FROM comment WHERE CommentId = ?`, checkingId).Scan(&countCheck)
 	default:
-		// Se startId non è valido, restituisci errore
+		
 		return false, fmt.Errorf("invalid startId value: %s", startId)
 	}
 
-	// Gestione degli errori generici
+	
 	if err != nil {
 		return false, fmt.Errorf("database query failed: %w", err)
 	}
 
-	// Se il count è 0, l'ID è disponibile (non esiste nel DB)
+	
 	if countCheck == 0 {
 		return true, nil
 	}
 
-	// Se l'ID esiste già, restituisci false
+	
 	return false, nil
 }
 
