@@ -308,14 +308,14 @@ const forwardMessage = async (convId) => {
   }
 }
 
-const deleteMessage = async (id) => {
+const deleteMessage = async (messageid) => {
   try {
     axios.defaults.headers.common['Authorization'] = UserId.value;
         
-    await axios.delete(`/users/${UserId.value}/messages/${id}/delete`);   
+    await axios.delete(`/users/${UserId.value}/messages/${messageid}/delete`);   
 
     Messages.value = Messages.value.filter(
-      Message => Message.messageId !== id
+      Message => Message.MessageId.Identifier !== messageid
     );
         
     alert("message canceled")
@@ -841,7 +841,7 @@ onMounted(() => {
                   </div>
                 </div>
               </div>
-              <button class="btn btn-danger btn-sm float-end" v-if="msg.User.Name == username" @click="deleteMessage(msg.messageId.Identifier)">X</button>
+              <button class="btn btn-danger btn-sm float-end" v-if="msg.User.Name == username" @click="deleteMessage(msg.MessageId.Identifier)">X</button>
               <strong>{{ msg.User.Name }}:</strong> {{ msg.MessageBody }}
               <div class="small text-muted">{{ msg.Date }}</div>
               <span v-if="msg.IsForwarded == 'yes'" class="badge bg-primary me-1">↠↠</span>
