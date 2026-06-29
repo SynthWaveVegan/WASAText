@@ -2,15 +2,17 @@
 import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from '../services/axios.js'
-import vuelogo from '@/assets/images/Vue.js_Logo_2.svg.png'
+import vuelogo from '@/assets/dataimages/Vue.js_Logo_2.svg.png'
 
 
 const router = useRouter()
 
 const User = reactive({
   Username: '',
-  UserId: ''
+  UserId: '',
+  UserPhoto: ''
 })
+
 
 const doLogin = async () => {
   
@@ -23,6 +25,7 @@ const doLogin = async () => {
 
     localStorage.setItem('userId', User.UserId)
     localStorage.setItem('username', User.Username)
+    localStorage.setItem('userphoto', User.UserPhoto)
 
     axios.defaults.headers.common['Authorization'] = User.UserId
     router.push('/home')

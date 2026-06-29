@@ -14,7 +14,7 @@ const startEdit = () => {
 const newUsername = ref("")
 const UserId = ref(localStorage.getItem('userId'));  
 const username = ref(localStorage.getItem('username')); 
-const userphoto = ref(localStorage.getItem("userphoto") || "");
+const userphoto = ref(localStorage.getItem("userphoto"));
 
 
 const SetMyUsername = async () => {
@@ -36,30 +36,30 @@ const SetMyUsername = async () => {
     }
 }
 
-const fileInput = ref(null);
-
-const openFilePicker = () => {
-  fileInput.value.click();
-};
-
-const selectedFile = ref(null);
-
-
-
 const photoPath = ref("");
 
 const updatePhoto = async () => {
   try {
     axios.defaults.headers.common['Authorization'] = UserId.value
 
-    await axios.put(`/users/${UserId.value}/photo`, {
-      Photo: photoPath.value
-    });
+    
 
-    userphoto.value = photoPath.value;
-    localStorage.setItem('userphoto', photoPath.value);
+    const fullPath = photoPath.value;
 
-    photoPath.value = "";
+
+    const index = fullPath.indexOf("/images");
+
+    if (index !== -1) {
+      const publicPath = fullPath.substring(index);
+
+      localStorage.setItem("userphoto", publicPath);
+
+      await axios.put(`/users/${UserId.value}/photo`, {
+        Photo: publicPath.value
+      });
+
+      userphoto.value = publicPath;
+    }
 
   } catch (e) {
     console.error(e);
@@ -70,41 +70,70 @@ const updatePhoto = async () => {
 </script>
 
 <template>
-  <div
-      class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-     
-    <h1 class="h2"><strong>{{ username }}'s Profile</strong></h1> 
-    
-    
+  <div class="container py-4">
+  <h1 class="mb-4">{{ username }}'s Profile</h1>
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <div class="text-center mb-4">
+        <img
+          :src="userphoto"
+          class="rounded-circle border"
+          style="width: 150px; height: 150px; object-fit: cover;"
+          alt="Profile photo"
+        >
+      </div>
+      <div class="mb-4">
+        <label class="form-label fw-bold">Username</label>
+        <div v-if="!editing" class="d-flex align-items-center gap-2">
+          <span class="fs-5">{{ username }}</span>
+          <button
+            class="btn btn-outline-primary btn-sm"
+            @click="startEdit">
+            Change
+          </button>
+        </div>
+        <div v-else class="input-group" style="max-width:400px;">
+          <input
+            v-model="newUsername"
+            class="form-control"
+          >
+          <button
+            class="btn btn-success"
+            @click="SetMyUsername">
+            Save
+          </button>
+          <button
+            class="btn btn-secondary"
+            @click="editing = false">
+            Cancel
+          </button>
+        </div>
+      </div>
+      <div>
+        <label class="form-label fw-bold">
+          Profile photo
+        </label>
+        <div class="input-group mb-2">
+          <input
+            v-model="photoPath"
+            type="text"
+            class="form-control"
+            placeholder="/images/avatar.jpg"
+          >
+          <button
+            class="btn btn-primary"
+            @click="updatePhoto">
+            Save
+          </button>
+        </div>
+        <small class="text-muted">
+          Save the image inside <strong>public/images</strong> and insert the
+          path like <code>/images/avatar.jpg</code>.
+        </small>
+      </div>
+    </div>
   </div>
-  <div v-if="!editing">
-    <span class="fw-bold">{{ username }}</span>
-    <button class="btn btn-sm btn-outline-primary ms-2"  @click="startEdit">Change Username</button>
-    
-  </div>
-  <div v-else>
-      <input v-model="newUsername" class="form-control d-inline-block w-auto" />
-      <button class="btn btn-sm btn-success ms-2" @click="SetMyUsername">
-        Save
-      </button>
-      <button class="btn btn-sm btn-secondary ms-1" @click="editing = false">
-        Cancel
-      </button>
-  </div>
-  <div>
-    <span class="fw-bold">{{ username }}'s Photo</span>
-    <img :src="userphoto" alt="User photo" />
-    <input
-      v-model="photoPath"
-      type="text"
-      placeholder="Insert path"
-    />
-
-    <button @click="updatePhoto">
-      Save profile pic
-    </button>
-    <li>you have to save the image in the images folder</li>
-  </div>
+</div>
   
   
     
