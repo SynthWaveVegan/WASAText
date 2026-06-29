@@ -17,8 +17,8 @@ func (rt *_router) Handler() http.Handler {
 
 	rt.router.POST("/users/:userId/conversations/:conversationId/messages", rt.wrap(rt.SENDMESSAGE))
 	rt.router.PUT("/users/:userId/conversations/:conversationId/messages/readstatus", rt.wrap(rt.MARKMESSAGEREAD))
-	rt.router.POST("/users/:userId/conversations/:conversationId/messages/:messageId/forwards", rt.wrap(rt.FORWARDMESSAGE))
-	rt.router.DELETE("/users/:userId/conversations/:conversationId/messages/:messageId/delete", rt.wrap(rt.DELETEMESSAGE))
+	rt.router.POST("/users/:userId/conversations/:conversationId/messages/:messageId/forwarded", rt.wrap(rt.FORWARDMESSAGE))
+	rt.router.DELETE("/users/:userId/conversations/:conversationId/messages/:messageId", rt.wrap(rt.DELETEMESSAGE))
 
 	rt.router.POST("/users/:userId/messages/:messageId/comments", rt.wrap(rt.COMMENTMESSAGE))
 	rt.router.DELETE("/users/:userId/messages/:messageId/comments/:commentId", rt.wrap(rt.UNCOMMENTMESSAGE))

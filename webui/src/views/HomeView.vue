@@ -271,7 +271,7 @@ const forwardMessage = async (convId) => {
   try{
     axios.defaults.headers.common['MediaType'] = "text"; 
     axios.defaults.headers.common['Authorization'] = UserId.value;
-    const response = await axios.post(`/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages/${messageToForward.value}/forwards`, 
+    const response = await axios.post(`/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages/${messageToForward.value}/forwarded`, 
       {Identifier : convId}
     )
 
@@ -322,7 +322,7 @@ const deleteMessage = async (messageid) => {
   try {
     axios.defaults.headers.common['Authorization'] = UserId.value;
         
-    await axios.delete(`/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages/${messageid}/delete`);   
+    await axios.delete(`/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages/${messageid}`);   
 
     Messages.value = Messages.value.filter(
       Message => Message.messageId.Identifier !== messageid

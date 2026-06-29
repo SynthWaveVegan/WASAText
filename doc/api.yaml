@@ -46,7 +46,7 @@ paths:
         the group will be seen with
       
 
-      operationId: SETGROUPPHOTO
+      operationId: setGroupPhoto
       requestBody:
         content:
           application/json:
@@ -88,7 +88,7 @@ paths:
         the group will be seen with
       
 
-      operationId: SETGROUPNAME
+      operationId: setGroupName
       requestBody:
         required: true
         content:
@@ -123,7 +123,7 @@ paths:
         the user conversations
       
         
-      operationId: LEAVEGROUP
+      operationId: leaveGroup
       responses:
         "204":
           description: group removed succesfully
@@ -172,7 +172,7 @@ paths:
       description: |-
         creates a new group or adds a user in an existing one
       
-      operationId: CREATEGROUP
+      operationId: createGroup
       requestBody:
         required: true
         content:
@@ -208,7 +208,7 @@ paths:
         updates status of message in conversation
       
         
-      operationId: MARKMESSAGEREAD
+      operationId: markMessageRead
       responses:
         "204":
           description: message updated succesfully
@@ -236,7 +236,7 @@ paths:
         or a group conversation
       
 
-      operationId: SENDMESSAGE
+      operationId: sendMessage
       requestBody:
         required: true
         content:
@@ -257,7 +257,7 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
-  /users/{userId}/conversations/{conversationId}/messages/{messageId}/delete:
+  /users/{userId}/conversations/{conversationId}/messages/{messageId}:
 
     parameters:
 
@@ -275,7 +275,7 @@ paths:
         of a specific user
       
         
-      operationId: DELETEMESSAGE
+      operationId: deleteMessage
       responses:
         "204":
           description: message removed succesfully
@@ -286,7 +286,7 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
   
-  /users/{userId}/conversations/{conversationId}/messages/{messageId}/forwards:
+  /users/{userId}/conversations/{conversationId}/messages/{messageId}/forwarded:
 
     parameters:
 
@@ -304,7 +304,7 @@ paths:
         to another conversation
       
         
-      operationId: FORWARDMESSAGE
+      operationId: forwardMessage
       requestBody:
         required: true
         content:
@@ -342,7 +342,7 @@ paths:
         message of a specific user
       
 
-      operationId: COMMENTMESSAGE
+      operationId: commentMessage
       requestBody:
         required: true
         content:
@@ -382,7 +382,7 @@ paths:
         message of a specific user
       
 
-      operationId: UNCOMMENTMESSAGE
+      operationId: uncommentMessage
       responses:
         "204":
           description: comment removed succesfully
@@ -408,7 +408,7 @@ paths:
         between two users
       
 
-      operationId: CREATECONVERSATION
+      operationId: createConversation
       requestBody:
         required: true
         content:
@@ -442,7 +442,7 @@ paths:
       description: |-
         returns personal stream of conversations
         for the user
-      operationId: GETMYCONVERSATIONS
+      operationId: getMyConversations
       responses:
         "200":
           description: conversations retrieved succesfully
@@ -474,7 +474,7 @@ paths:
         from its id
       
 
-      operationId: GETCONVERSATION
+      operationId: getConversation
       responses:
         "200":
           description: conversation retrieved succesfully
@@ -499,7 +499,7 @@ paths:
       description: |-
         if the user does not exist it will be created
         else it will be logged in; either way the userId is returned
-      operationId: DOLOGIN
+      operationId: doLogin
       requestBody:
         description: Username to be used for loggin in
         content:
@@ -543,7 +543,7 @@ paths:
         the user will be seen with
       
 
-      operationId: SETMYUSERNAME
+      operationId: setMyUsername
       requestBody:
         required: true
         description: creates/changes your own username
@@ -578,7 +578,7 @@ paths:
         the user will be seen with
       
         
-      operationId: SETMYPHOTO
+      operationId: setMyPhoto
       requestBody:
         required: true
         content:
