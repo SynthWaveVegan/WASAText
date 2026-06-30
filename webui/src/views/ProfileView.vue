@@ -17,7 +17,7 @@ const username = ref(localStorage.getItem('username'));
 const userphoto = ref(localStorage.getItem("userphoto"));
 
 
-const SetMyUsername = async () => {
+const setMyUsername = async () => {
   
   try {
     axios.defaults.headers.common['Authorization'] = UserId.value
@@ -38,24 +38,27 @@ const SetMyUsername = async () => {
 
 const photoPath = ref("");
 
-const updatePhoto = async () => {
+const setMyPhoto = async () => {
   try {
     axios.defaults.headers.common['Authorization'] = UserId.value
 
     
 
     const fullPath = photoPath.value;
+    const normalizedPath = fullPath.replace(/\\/g, '/')
 
 
-    const index = fullPath.indexOf("/images");
+    const index = normalizedPath.indexOf("/images");
 
     if (index !== -1) {
       const publicPath = fullPath.substring(index);
 
+      const fullUrl = `${window.location.protocol}//${window.location.ost}${publicPath}`;
+      
       localStorage.setItem("userphoto", publicPath);
 
       await axios.put(`/users/${UserId.value}/photo`, {
-        Photo: publicPath.value
+        photoUrl: fullUrl
       });
 
       userphoto.value = publicPath;
@@ -99,7 +102,7 @@ const updatePhoto = async () => {
           >
           <button
             class="btn btn-success"
-            @click="SetMyUsername">
+            @click="setMyUsername">
             Save
           </button>
           <button
@@ -122,7 +125,7 @@ const updatePhoto = async () => {
           >
           <button
             class="btn btn-primary"
-            @click="updatePhoto">
+            @click="setMyPhoto">
             Save
           </button>
         </div>

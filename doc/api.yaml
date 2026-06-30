@@ -243,6 +243,14 @@ paths:
           application/json: 
             schema:
               $ref: "#/components/schemas/MessageBody" 
+          multipart/form-data:
+            schema:
+              type: object
+              required : [image]
+              properties:
+                image:
+                  type: string
+                  format: binary
       responses:
         "201":
           description: message created succesfully

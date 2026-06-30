@@ -8,6 +8,8 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"log"
 	"net/http"
+	
+
 )
 
 type MessageRequest struct {
@@ -37,23 +39,74 @@ func (rt *_router) SENDMESSAGE(w http.ResponseWriter, r *http.Request, ps httpro
     w.WriteHeader(http.StatusBadRequest)
     ctx.Logger.Error("no mediatype retrieved")
     return
-  } else if MediaType != "text" && MediaType != "photo" {
+  } 
+  if MediaType != "text" && MediaType != "image" {
     w.WriteHeader(http.StatusBadRequest)
     ctx.Logger.Error("mediatype not valid for use")
     return
   }
 
-  var requestBody MessageRequest
+  /*var messageBody string
 
+  contentType := r.Header.Get("Content-Type")
+  if strings.HasPrefix(contentType, "multipart/form-data") {
+	err := r.ParseMultipartForm(10 << 20)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		ctx.Logger.Error("error parsing multipart form: ", err)
+		return
+	}
+	file, header, err := r.FormFile("image")
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		ctx.Logger.Error("error retrieving image file: ", err)
+		return
+	}
+	defer file.Close()
+
+	timestamp := time.Now().Unix()
+	fileExt := filepath.Ext(header.Filename)
+	newFileName := fmt.Sprintf("%d%s", timestamp, fileExt)
+	imagePath := fmt.Sprintf("/images/%s", newFileName)
+
+	err = os.MkdirAll("public/images", 0755)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+    	ctx.Logger.Error("error creating directory: ", err)
+    	return
+	}
+
+	dst, err := os.Create(filepath.Join("public/images", newFileName))
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+    	ctx.Logger.Error("error creating file: ", err)
+    	return
+	}
+
+	_, err = io.Copy(dst, file)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+    	ctx.Logger.Error("error saving file: ", err)
+    	return
+	}
+
+	messageBody = imagePath
+
+  } else {}*/
+
+  var requestBody MessageRequest
   err := json.NewDecoder(r.Body).Decode(&requestBody)
   if err != nil {
-    w.WriteHeader(http.StatusInternalServerError)
-    ctx.Logger.Error("something went wrong: ", err)
-    return
+    	w.WriteHeader(http.StatusInternalServerError)
+    	ctx.Logger.Error("something went wrong: ", err)
+    	return
   }
   defer r.Body.Close()
 
   MessageBody := requestBody.MessageBody
+  
+
+  
 
   UserId := structs.Identifier{
     Id: userId,

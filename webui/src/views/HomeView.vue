@@ -178,34 +178,56 @@ const Message = reactive({
 
 let ToggleImage = false;
 
-const ToggleImageButton = async (id) => {
-  if (ToggleImage == true) {
-    ToggleImage = false 
-  } else {
-    ToggleImage = true
-  }
-  await openConversation(id);
+const selectedFile = ref(null);
+
+const onFileSelected = (event) => {
+  selectedFile.value = event.target.files[0];
+  ToggleImage = true;
+};
+
+const openFilePicker = () => {
+  fileInput.value.click();
 }
 
-
-
+const clearFileSelection = () => {
+  selectedFile.value = null;
+  ToggleImage = false;
+  fileInput.value.value = '';
+}
 const sendMessage = async () => {
   try {
 
     axios.defaults.headers.common['Authorization'] = UserId.value;
-    if (ToggleImage == true) {
-      axios.defaults.headers.common['MediaType'] = image;
-    }
-    else {
-      axios.defaults.headers.common['MediaType'] = text;
-    }
 
-    const response = await axios.post(
+    let response; 
+    if (ToggleImage && selectedFile.value) {
+      const formData = new FormData();
+      formData.append("image", selectedFile.value);
+
+      response = await axios.post(
+        `/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            "MediaType": "image"
+          }
+        }
+      )
+    } else {
+      response = await axios.post(
         `/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages`,
         {
           MessageBody: Message.MessageBody
         },
-      );
+        {
+          headers: {
+            "MediaType": "text"
+          }
+        }
+      )
+    }
+    
 
     
 
@@ -241,9 +263,9 @@ const sendMessage = async () => {
     Message.IsForwarded = '';
     Message.Comments = [];
 
-    if (ToggleImage == true) {
-      ToggleImage = false
-    }
+    selectedFile.value = null;
+    ToggleImage = false;
+    
 
   } catch (e) {
     console.error(e);
@@ -475,34 +497,6 @@ const SetGroupName = async () => {
     alert(e)
   }
 }
-
-const fileInput = ref(null);
-
-const openFilePicker = () => {
-  fileInput.value.click();
-};
-
-const selectedFile = ref(null);
-
-const onFileSelected = (event) => {
-  selectedFile.value = event.target.files[0];
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 const messageToComment = ref(null);
 const showCommentModal = ref(false);
@@ -866,9 +860,16 @@ onMounted(() => {
       </div>
       <div class="p-2 border-top d-flex">
         <input v-model="Message.MessageBody" class="form-control me-2" v-if="ToggleImage == false" placeholder="Write message..." />
-        <input v-model="Message.MessageBody" class="form-control me-2" v-if="ToggleImage == true" placeholder="Write path..." />
-        <button class="btn btn-primary" @click="sendMessage">Send</button>
-        <button class="camera-button" @click="ToggleImageButton(selectedConversation.conversationId)">
+          <span v-if="ToggleImage && selectedFile"
+            class="me-2 p-2 bg-light rounded d-inline-flex align-items-center">
+            📷 {{ selectedFile.name }}
+            <button
+            class="btn btn-sm btn outline-danger ms-2" @click="clearFileSelection">x</button>
+          </span>
+        <input ref="fileInput" type="file" hidden accept="image/*" @change="onFileSelected">
+        <button class="btn btn-primary" @click="sendMessage"
+        :disabled="(!Message.MessageBody && !ToggleImage) || (ToggleImage && !selectedFile)">Send</button>
+        <button class="camera-button btn btn-outline-secondary" @click="openFilePicker">
           📷
         </button>
       </div>
