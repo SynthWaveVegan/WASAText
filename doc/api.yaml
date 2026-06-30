@@ -143,7 +143,7 @@ paths:
       description: |-
         takes an existing group and
         adds a user with a conversation in it
-      operationId: ADDTOGROUP
+      operationId: addToGroup
       requestBody:
         required: true
         content:
@@ -540,6 +540,28 @@ paths:
     parameters:
 
         - $ref: "#/components/parameters/userId"
+
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - User
+      summary: gets a specific user
+      operationId: getUser
+      responses:
+        "200":
+          description: user retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
     put:
       security:
         - bearerAuth: []
@@ -551,7 +573,7 @@ paths:
         the user will be seen with
       
 
-      operationId: setMyUsername
+      operationId: setMyUserName
       requestBody:
         required: true
         description: creates/changes your own username

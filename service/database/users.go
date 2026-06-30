@@ -112,7 +112,7 @@ func (db *appdbimpl) CheckUserExist(username string) (string, bool, error) {
 }
 
 func (db *appdbimpl) SetMyPhoto(userId structs.Identifier, photoLink string) error {
-	_, err := db.c.ExecContext(context.Background(),`UPDATE users SET UserPhoto = ? WHERE Userid = ?`, photoLink, userId.Id)
+	_, err := db.c.ExecContext(context.Background(),`UPDATE users SET UserPhoto = ? WHERE UserId = ?`, photoLink, userId.Id)
 	return err
 }
 

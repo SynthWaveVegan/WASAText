@@ -25,6 +25,11 @@ const doLogin = async () => {
 
     localStorage.setItem('userId', User.UserId)
     localStorage.setItem('username', User.Username)
+    
+    const userResponse = await axios.get(`/users/${User.UserId}`, {
+      headers: { 'Authorization': User.UserId }
+    });
+    User.UserPhoto = userResponse.data.UserPhoto
     localStorage.setItem('userphoto', User.UserPhoto)
 
     axios.defaults.headers.common['Authorization'] = User.UserId

@@ -78,7 +78,7 @@ const getConversation = async (id) => {
       conversationId: response.data.Identifier.Identifier,  
       Users: response.data.Users.map(user => ({
         Name: user.Name,
-        userId: user.Identifier,  
+        userId: user.userId,  
         UserPhoto: user.UserPhoto
       })),
       ChatName: response.data.Name,
@@ -498,6 +498,48 @@ const SetGroupName = async () => {
   }
 }
 
+const EditGroupPhotoInput = ref("")
+
+const OpenPhotoGroupModal = (id) => {
+  EditGroupPhotoInput.value = id
+}
+
+const ClosePhotoGroupModal = () => {
+  EditGroupPhotoInput.value = null
+}
+
+const setGroupPhoto = async () => {
+  try {
+    axios.defaults.headers.common['Authorization'] = UserId.value
+
+    
+
+    const fullPath = photoPath.value;
+    const normalizedPath = fullPath.replace(/\\/g, '/')
+
+
+    const index = normalizedPath.indexOf("/images");
+
+    if (index !== -1) {
+      const publicPath = fullPath.substring(index);
+
+      const fullUrl = `${window.location.protocol}//${window.location.ost}${publicPath}`;
+      
+      localStorage.setItem("userphoto", publicPath);
+
+      await axios.put(`/users/${UserId.value}/photo`, {
+        photoUrl: fullUrl
+      });
+
+      userphoto.value = publicPath;
+    }
+
+  } catch (e) {
+    console.error(e);
+    alert("something went wrong");
+  }
+};
+
 const messageToComment = ref(null);
 const showCommentModal = ref(false);
 
@@ -658,6 +700,7 @@ onMounted(() => {
       <div class="p-2 border-bottom">        
         <h5>{{ selectedConversation.ChatName }} 
           <button class="btn btn-secondary btn-sm" v-if="selectedConversation.IsGroup == 'yes'" @click="EditGroupModal(selectedConversation.conversationId)">✏️</button>
+          <button class="btn btn-primary btn-sm" v-if="selectedConversation.IsGroup == 'yes'" @click="OpenPhotoGroupModal(selectedConversation.conversationId)">📷</button>
           <button class="btn btn-danger btn-sm" v-if="selectedConversation.IsGroup == 'yes'" @click="LeaveGroupModal(selectedConversation.conversationId)">Leave</button>
           <button class="btn btn-danger btn-sm float-end" @click="closeConversation">X</button>
           <div
@@ -718,8 +761,8 @@ onMounted(() => {
         </div>
         <div v-if="EditGroupModalInput == selectedConversation.conversationId">
           <input v-model="newGroupName" />
-          <button @click="SetGroupName">Salva</button>
-          <button @click="CloseEditGroupModal">Annulla</button>
+          <button @click="SetGroupName">Save</button>
+          <button @click="CloseEditGroupModal">Close</button>
         </div>
         <div v-if="GroupModalInput == selectedConversation.conversationId"
               class="card shadow-sm border-0 mt-3">
