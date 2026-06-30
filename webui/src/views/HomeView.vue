@@ -176,46 +176,37 @@ const Message = reactive({
   Comments: [],
 })
 
+const ToggleImage = false;
+
+const ToggleImageButton = () => {
+  if (ToggleImage == true) {
+    ToggleImage = false 
+  } else {
+    ToggleImage = true
+  }
+}
+
+
 
 const sendMessage = async () => {
   try {
 
     axios.defaults.headers.common['Authorization'] = UserId.value;
+    if (ToggleImage == true) {
+      axios.defaults.headers.common['MediaType'] = image;
+    }
+    else {
+      axios.defaults.headers.common['MediaType'] = text;
+    }
 
-    let response;
-
-    if (selectedFile.value) {
-
-      const formData = new FormData();
-
-      formData.append("image", selectedFile.value);
-
-      response = await axios.post(
-        `/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            "MediaType": "image"
-          }
-        }
-      );
-
-    } else {
-
-      response = await axios.post(
+    const response = await axios.post(
         `/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages`,
         {
           MessageBody: Message.MessageBody
         },
-        {
-          headers: {
-            MediaType: "text"
-          }
-        }
       );
 
-    }
+    
 
     const updatedMessage = {
       MessageBody: response.data.MessageBody,
@@ -248,7 +239,10 @@ const sendMessage = async () => {
     Message.IsRead = '';
     Message.IsForwarded = '';
     Message.Comments = [];
-    selectedFile.value = null;
+
+    if (ToggleImage == true) {
+      ToggleImage = false
+    }
 
   } catch (e) {
     console.error(e);
@@ -269,7 +263,7 @@ const OpenForwardModal = async (message) => {
 
 const forwardMessage = async (convId) => {
   try{
-    axios.defaults.headers.common['MediaType'] = "text"; 
+    
     axios.defaults.headers.common['Authorization'] = UserId.value;
     const response = await axios.post(`/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages/${messageToForward.value}/forwarded`, 
       {Identifier : convId}
@@ -294,6 +288,7 @@ const forwardMessage = async (convId) => {
     };
 
     Messages.value = [...Messages.value, updatedMessage];
+    axios.defaults.headers.common['MediaType'] = updatedMessage.MediaType.value; 
     
     Message.MessageBody = '';
     Message.messageId = '';
@@ -869,19 +864,12 @@ onMounted(() => {
         </div>
       </div>
       <div class="p-2 border-top d-flex">
-        <input v-model="Message.MessageBody" class="form-control me-2" placeholder="Write..." />
+        <input v-model="Message.MessageBody" class="form-control me-2" v-if="ToggleImage == true" placeholder="Write message..." />
+        <input v-model="Message.MessageBody" class="form-control me-2" v-if="ToggleImage == false" placeholder="Write path..." />
         <button class="btn btn-primary" @click="sendMessage">Send</button>
-        <button class="camera-button" @click="openFilePicker">
+        <button class="camera-button" @click="ToggleImageButton">
           📷
         </button>
-
-        <input
-          ref="fileInput"
-          type="file"
-          hidden
-          accept="image/*"
-          @change="onFileSelected"
-        />
       </div>
     </div>
   </div>
