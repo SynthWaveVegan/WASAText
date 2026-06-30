@@ -133,8 +133,8 @@ const markMessageRead = async () => {
 }
 
 const closeConversation = () => {
-  selectedConversation.value = null;  // Chiudi la conversazione
-  Messages.value = [];  // Pulisci i messaggi
+  selectedConversation.value = null; 
+  Messages.value = []; 
 };
 
 const getMyConversations = async () => {
@@ -176,14 +176,15 @@ const Message = reactive({
   Comments: [],
 })
 
-const ToggleImage = false;
+let ToggleImage = false;
 
-const ToggleImageButton = () => {
+const ToggleImageButton = async (id) => {
   if (ToggleImage == true) {
     ToggleImage = false 
   } else {
     ToggleImage = true
   }
+  await openConversation(id);
 }
 
 
@@ -864,10 +865,10 @@ onMounted(() => {
         </div>
       </div>
       <div class="p-2 border-top d-flex">
-        <input v-model="Message.MessageBody" class="form-control me-2" v-if="ToggleImage == true" placeholder="Write message..." />
-        <input v-model="Message.MessageBody" class="form-control me-2" v-if="ToggleImage == false" placeholder="Write path..." />
+        <input v-model="Message.MessageBody" class="form-control me-2" v-if="ToggleImage == false" placeholder="Write message..." />
+        <input v-model="Message.MessageBody" class="form-control me-2" v-if="ToggleImage == true" placeholder="Write path..." />
         <button class="btn btn-primary" @click="sendMessage">Send</button>
-        <button class="camera-button" @click="ToggleImageButton">
+        <button class="camera-button" @click="ToggleImageButton(selectedConversation.conversationId)">
           📷
         </button>
       </div>
