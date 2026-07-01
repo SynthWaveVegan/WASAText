@@ -114,6 +114,7 @@ func (db *appdbimpl) CreateConversation(UserHosting structs.Identifier, UserConn
 		ChatName:       UserConnectedName,
 		Messages:       Messages,
 		IsGroup:        IsGroup,
+		ChatPhoto:      "",
 	}
 
 	return NewChat, nil
@@ -157,6 +158,7 @@ func (db *appdbimpl) GetConversation(ConversationId structs.Identifier, currentU
 
 	var isGroup string
 	var groupName string
+	var ChatPhoto string
 
 	err = db.c.QueryRowContext(context.Background(), `
     	SELECT IsGroup, GroupName
@@ -174,6 +176,13 @@ func (db *appdbimpl) GetConversation(ConversationId structs.Identifier, currentU
 	if isGroup == "yes" {
 
     	chatName = groupName
+		err = db.c.QueryRowContext(context.Background(), `
+    		SELECT ChatPhoto
+    		FROM conversation
+    		WHERE ConversationId = ?`,
+    		ConversationId.Id,
+		).Scan(&ChatPhoto)
+		
 
 	} else if otherUserId != "" {
 
@@ -187,6 +196,7 @@ func (db *appdbimpl) GetConversation(ConversationId structs.Identifier, currentU
     	}
 
     	chatName = otherUsername
+		ChatPhoto = ""
 	}
 
 	messageRows, err := db.c.QueryContext(context.Background(), `
@@ -271,6 +281,7 @@ func (db *appdbimpl) GetConversation(ConversationId structs.Identifier, currentU
 		ChatName:       chatName,      
 		Messages:       messages,        
 		IsGroup:        isGroup,
+		ChatPhoto:      ChatPhoto,
 	}
 
 	//log.Printf("Returning conversation: %#v", ChatRetrieved)

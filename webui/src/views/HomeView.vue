@@ -44,26 +44,20 @@ const createConversation = async () => {
       Name: Conversation.ChatName
     });
 
-    
     const newConversation = {
       conversationId: response.data.Identifier.Identifier, 
       Users: response.data.Users.map(user => ({
         Name: user.Name,
-        userId: user.Identifier,  
+        userId: user.userId.Identifier,  
         UserPhoto: user.UserPhoto
       })),
       ChatName: response.data.Name, 
       Messages: response.data.Messages,
       IsGroup: response.data.IsGroup,
-      ChatPhoto: ""
+      ChatPhoto: response.data.ChatPhoto
       
     };
 
-    if (newConversation.IsGroup) {
-      newConversation.ChatPhoto = response.data.ChatPhoto
-    }
-
-    
     console.log(newConversation);
     conversations.value.push(newConversation);
     Conversation.ChatName = '';
@@ -89,10 +83,12 @@ const getConversation = async (id) => {
       })),
       ChatName: response.data.Name,
       IsGroup: response.data.IsGroup,
-      ChatPhoto: "",
+      ChatPhoto: response.data.ChatPhoto,
       Messages: response.data.Messages || []  
     };
-
+    if (thisConversation.IsGroup) {
+      thisConversation.ChatPhoto = response.data.ChatPhoto
+    }
     console.log("Risposta di getConversation:", thisConversation);
     return thisConversation;
 
@@ -530,15 +526,16 @@ const setGroupPhoto = async () => {
     if (index !== -1) {
       const publicPath = fullPath.substring(index);
 
-      const fullUrl = `${window.location.protocol}//${window.location.ost}${publicPath}`;
+      const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+      const fullUrl = baseUrl + publicPath;
       
       await axios.put(`/groups/${EditGroupPhotoInput.value}/photo`, {
-        photoUrl: fullUrl
+        Photo: fullUrl
       });
 
       selectedConversation.value.ChatPhoto = publicPath;
 
-      await openConversation(EditGroupPhotoInput.value);
+      await getMyConversations();
 
       EditGroupPhotoInput.value = null
 

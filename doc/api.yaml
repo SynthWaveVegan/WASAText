@@ -51,16 +51,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              required: [photoUrl]
-              properties:
-                photoUrl:
-                  type: string
-                  format: url
-                  minLength: 10
-                  maxLength: 2048
-                  pattern: '^https?://.*$'
-                  description: New photo URL for the Group
+              $ref: "#/components/schemas/Photo"
       responses:
         "204":
           description: group photo updated succesfully
@@ -916,5 +907,8 @@ components:
           enum:
             - yes
             - no
+        ChatPhoto:
+          $ref: "#/components/schemas/Photo"
+        
 
             

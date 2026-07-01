@@ -46,5 +46,6 @@ type Conversation struct {
 	ChatName       string       `json:"Name"`
 	Messages       []Message    `json:"Messages"`
 	IsGroup        string       `json:"IsGroup"`
+	ChatPhoto      string       `json:"ChatPhoto"`
 }
 
