@@ -13,25 +13,73 @@ import (
 )
 func (db *appdbimpl) MarkMessageRead(UserId structs.Identifier, ConversationId structs.Identifier) error {
 
-	var otherUserId string
-
+	var IsGroup string
 	err := db.c.QueryRowContext(context.Background(), `
-		SELECT u.UserId
-		FROM users u
-		JOIN userChat uc ON u.UserId = uc.UserId
-		WHERE uc.ConversationId = ? AND u.UserId != ?`, ConversationId.Id, UserId.Id).Scan(&otherUserId)
-
+		SELECT IsGroup FROM conversation WHERE ConversationId = ?`,
+		ConversationId.Id).Scan(&IsGroup)
 	if err != nil {
-		log.Println("ERROR QUERY (getting users):", err)
 		return err
 	}
 	
-	_, err = db.c.ExecContext(context.Background(), `UPDATE message SET IsRead = 'yes' WHERE ConversationId = ? AND UploaderId = ? AND IsRead != 'yes'`,
-	 ConversationId.Id, otherUserId)
+	if IsGroup == "no" {
+
+		var otherUserId string
+
+		err := db.c.QueryRowContext(context.Background(), `
+			SELECT u.UserId
+			FROM users u
+			JOIN userChat uc ON u.UserId = uc.UserId
+			WHERE uc.ConversationId = ? AND u.UserId != ?`, ConversationId.Id, UserId.Id).Scan(&otherUserId)
+
+		if err != nil {
+			log.Println("ERROR QUERY (getting users):", err)
+			return err
+		}
+	
+		_, err = db.c.ExecContext(context.Background(), 
+		`UPDATE message SET IsRead = 'yes' WHERE ConversationId = ? AND UploaderId = ? AND IsRead != 'yes'`,
+	 	ConversationId.Id, otherUserId)
+			if err != nil {
+				return err
+			}
+	} else {
+
+		_, err = db.c.ExecContext(context.Background(), 
+		`UPDATE message SET IsRead = 'yes' WHERE ConversationId = ? AND UploaderId = ? AND IsRead != 'yes'`,
+	 	ConversationId.Id, UserId.Id)
 		if err != nil {
 			return err
 		}
-	return nil
+
+		var unreadCount int
+		err = db.c.QueryRowContext(context.Background(), `
+			SELECT COUNT(*)
+			FROM message m
+			JOIN userChat uc ON m.ConversationId = uc.ConversationId
+			WHERE m.ConversationId = ?
+			AND m.IsRead != 'yes'
+			AND uc.UserId != ?`,
+			ConversationId.Id, UserId.Id)
+		if err != nil {
+			return err
+		}
+
+		if unreadCount == 0 {
+			_, err = db.c.ExecContext(context.Background(), `
+				UPDATE message
+				SET IsRead = 'yes'
+				WHERE ConversationId = ?
+				AND IsRead != 'yes'`,
+				ConversationId.Id)
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	}
+
+		
 }
 
 func (db *appdbimpl) insertMessage(MessageBody string, UploaderId structs.Identifier, MessageId structs.Identifier, Date string, MediaType string, ConversationId structs.Identifier, IsRead string, IsForwarded string) error {

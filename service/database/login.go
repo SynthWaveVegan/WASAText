@@ -1,8 +1,8 @@
 package database
 
 import (
-	//"database/sql"
-	//"errors"
+	// "database/sql"
+	// "errors"
 	"fmt"
 	"github.com/SynthWaveVegan/WASAText/service/structs"
 	"log"

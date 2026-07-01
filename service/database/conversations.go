@@ -1,8 +1,8 @@
 package database
 
 import (
-	//"database/sql"
-	//"errors"
+	// "database/sql"
+	// "errors"
 	"fmt"
 	"github.com/SynthWaveVegan/WASAText/service/structs"
 	"log"
@@ -284,7 +284,7 @@ func (db *appdbimpl) GetConversation(ConversationId structs.Identifier, currentU
 		ChatPhoto:      ChatPhoto,
 	}
 
-	//log.Printf("Returning conversation: %#v", ChatRetrieved)
+	// log.Printf("Returning conversation: %#v", ChatRetrieved)
 	return ChatRetrieved, nil
 }
 
@@ -296,7 +296,7 @@ func (db *appdbimpl) GetMyConversations(UserHosting structs.Identifier) ([]struc
 
 	rows, err := db.c.QueryContext(context.Background(),`SELECT ConversationId FROM userChat WHERE UserId = ?`, UserHosting.Id)
 	if err != nil {
-		log.Fatal(err)
+		return []structs.Identifier{}, err
 	}
 	defer rows.Close()
 

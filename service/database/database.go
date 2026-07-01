@@ -45,8 +45,8 @@ type AppDatabase interface {
 
 	
 	DoLogin(Username string) (structs.Identifier, error)
-	//checkValidId(checkingId string, startId string) (bool, error)
-	//checkUserExist(Username string) (string, bool, error)
+	// checkValidId(checkingId string, startId string) (bool, error)
+	// checkUserExist(Username string) (string, bool, error)
 
 	GetConversation(ConversationId structs.Identifier, currentUserId string) (structs.Conversation, error)
 	GetMyConversations(UserHosting structs.Identifier) ([]structs.Identifier, error)
@@ -54,21 +54,21 @@ type AppDatabase interface {
 
 	SetMyUsername(mode string, newName string, UserId string) error
 	GetUser(UserId structs.Identifier) (structs.User, error)
-	//CreateUser(Username string, UserId string) error
-	//checkUserExist(Username string) (string, bool, error)
+	// CreateUser(Username string, UserId string) error
+	// checkUserExist(Username string) (string, bool, error)
 
-	//sendPhoto(file []byte, format string, UploaderId structs.Identifier) (structs.Photo, error)
-	//forwardPhoto(OldPhotoId structs.Identifier, UploaderId structs.Identifier) (structs.Photo, error)
-	//insertPhoto(PhotoId string, Path string, UploaderId string, Date string) (error)
+	// sendPhoto(file []byte, format string, UploaderId structs.Identifier) (structs.Photo, error)
+	// forwardPhoto(OldPhotoId structs.Identifier, UploaderId structs.Identifier) (structs.Photo, error)
+	// insertPhoto(PhotoId string, Path string, UploaderId string, Date string) (error)
 
-	//insertMessage(MessageBody string, Comments []structs.Comment, UploaderUserid structs.Identifier, MessageId structs.Identifier, Date string) (error)
+	// insertMessage(MessageBody string, Comments []structs.Comment, UploaderUserid structs.Identifier, MessageId structs.Identifier, Date string) (error)
 	SendMessage(MessageBody string, UploaderId structs.Identifier, MediaType string, ConversationId structs.Identifier) (structs.Message, error)
 	ForwardMessage(OldMessageId structs.Identifier, UploaderId structs.Identifier, ConversationId structs.Identifier) (structs.Message, error)
 	DeleteMessage(MessageId structs.Identifier) error
 	MarkMessageRead(UserId structs.Identifier, ConversationId structs.Identifier) error
 
 	CommentMessage(CommentBody string, MessageId structs.Identifier, UploaderId structs.Identifier) (structs.Comment, error)
-	//insertComment(CommentId structs.Identifier, MessageId structs.Identifier, CommentBody string, Date string) error
+	// insertComment(CommentId structs.Identifier, MessageId structs.Identifier, CommentBody string, Date string) error
 	UncommentMessage(CommentId structs.Identifier) error
 
 	AddToGroup(GroupId structs.Identifier,  NewUser string) error
@@ -79,7 +79,7 @@ type AppDatabase interface {
 	SetMyPhoto(userId structs.Identifier, photoLink string) error
 	SetGroupPhoto(photoLink string, GroupId structs.Identifier) error
 
-	//GetUserIdByName(Username string) (structs.Identifier, error)
+	// GetUserIdByName(Username string) (structs.Identifier, error)
 
 	Ping() error
 }
