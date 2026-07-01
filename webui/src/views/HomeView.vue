@@ -798,14 +798,14 @@ onMounted(() => {
         </div>
         <div v-if="EditGroupModalInput == selectedConversation.conversationId">
           <input v-model="newGroupName" />
-          <button @click="SetGroupName">Save</button>
+          <button class="mb-2" @click="SetGroupName">Save</button>
           <button @click="CloseEditGroupModal">Close</button>
         </div>
         <div v-if="EditGroupPhotoInput == selectedConversation.conversationId">
           <input 
           v-model="photoPath"
           type="text"
-          class="form-control"
+          class="form-control mb-2"
           placeholder="/images/groupimage.jpg"
            />
           <button @click="setGroupPhoto">Save</button>
