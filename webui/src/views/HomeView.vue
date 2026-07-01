@@ -197,6 +197,20 @@ const clearFileSelection = () => {
   ToggleImage = false;
   fileInput.value.value = '';
 }
+
+const currentReply = ref(null);
+
+const replyToMessage = (message) => {
+  currentReply.value = {
+    messageId: message.messageId, 
+    text: message.MessageBody,
+    sender: message.User.Name
+  }
+}
+
+const cancelReply = () => {
+  currentReply.value = null;
+}
 const sendMessage = async () => {
   try {
 
@@ -384,7 +398,7 @@ const CreateGroup = async () => {
       Users: response.data.Users.map(user => ({
         Name: user.Name,
         userId: user.userId.Identifier,  
-        UserPhoto: user.UserPhoto
+        UserPhgetHellooto: user.UserPhoto
       })),
       ChatName: response.data.Name, 
       Messages: response.data.Messages,
