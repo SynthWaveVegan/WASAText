@@ -49,13 +49,19 @@ const createConversation = async () => {
       conversationId: response.data.Identifier.Identifier, 
       Users: response.data.Users.map(user => ({
         Name: user.Name,
-        userId: user.Identifier,  // Accesso corretto
+        userId: user.Identifier,  
         UserPhoto: user.UserPhoto
       })),
       ChatName: response.data.Name, 
       Messages: response.data.Messages,
-      IsGroup: response.data.IsGroup
+      IsGroup: response.data.IsGroup,
+      ChatPhoto: ""
+      
     };
+
+    if (newConversation.IsGroup) {
+      newConversation.ChatPhoto = response.data.ChatPhoto
+    }
 
     
     console.log(newConversation);
@@ -78,11 +84,12 @@ const getConversation = async (id) => {
       conversationId: response.data.Identifier.Identifier,  
       Users: response.data.Users.map(user => ({
         Name: user.Name,
-        userId: user.userId,  
+        userId: user.userId.Identifier,  
         UserPhoto: user.UserPhoto
       })),
       ChatName: response.data.Name,
       IsGroup: response.data.IsGroup,
+      ChatPhoto: "",
       Messages: response.data.Messages || []  
     };
 
@@ -380,7 +387,7 @@ const CreateGroup = async () => {
       conversationId: response.data.conversationId.Identifier, 
       Users: response.data.Users.map(user => ({
         Name: user.Name,
-        userId: user.Identifier,  
+        userId: user.userId.Identifier,  
         UserPhoto: user.UserPhoto
       })),
       ChatName: response.data.Name, 
@@ -508,12 +515,12 @@ const ClosePhotoGroupModal = () => {
   EditGroupPhotoInput.value = null
 }
 
+const photoPath = ref("")
+
 const setGroupPhoto = async () => {
   try {
-    axios.defaults.headers.common['Authorization'] = UserId.value
 
-    
-
+    axios.defaults.headers.common['Authorization'] = EditGroupPhotoInput.value
     const fullPath = photoPath.value;
     const normalizedPath = fullPath.replace(/\\/g, '/')
 
@@ -525,13 +532,16 @@ const setGroupPhoto = async () => {
 
       const fullUrl = `${window.location.protocol}//${window.location.ost}${publicPath}`;
       
-      localStorage.setItem("userphoto", publicPath);
-
-      await axios.put(`/users/${UserId.value}/photo`, {
+      await axios.put(`/groups/${EditGroupPhotoInput.value}/photo`, {
         photoUrl: fullUrl
       });
 
-      userphoto.value = publicPath;
+      selectedConversation.value.ChatPhoto = publicPath;
+
+      await openConversation(EditGroupPhotoInput.value);
+
+      EditGroupPhotoInput.value = null
+
     }
 
   } catch (e) {
@@ -670,7 +680,22 @@ onMounted(() => {
     <div class="col-12">
       <div v-for="conv in conversations" :key="conv.conversationId">
         <div class="card mb-3">
-          <div class="card-body">            
+          <div class="card-body">  
+            <div v-if="conv.IsGroup == 'no'"v-for="user in conv.Users" :key="user.userId.Identifier">
+              <img 
+              v-if="user.Name != username"   
+                :src="user.UserPhoto"
+                class="rounded-circle me-2"
+                style="width: 40px; height: 40px; object-fit: cover;"
+                alt="no Photo">
+            </div>
+            <div v-if="conv.IsGroup == 'yes'">
+              <img    
+                :src="conv.ChatPhoto"
+                class="rounded-circle me-2"
+                style="width: 40px; height: 40px; object-fit: cover;"
+                alt="no Photo">
+            </div>
             <h5 class="card-title d-flex justify-content-between align-items-center">
               {{ conv.ChatName }}
               <button class="btn btn-success btn-sm" v-if="conv.IsGroup == 'no'" @click="toggleGroupInput(conv.conversationId)">New Group</button>
@@ -750,6 +775,21 @@ onMounted(() => {
             </div>
           </div>
         </h5>
+        <div v-if="selectedConversation.IsGroup == 'no'"v-for="user in selectedConversation.Users" :key="user.userId.Identifier">
+              <img 
+              v-if="user.Name != username"   
+                :src="user.UserPhoto"
+                class="rounded-circle me-2"
+                style="width: 40px; height: 40px; object-fit: cover;"
+                alt="no Photo">
+        </div>
+        <div v-if="selectedConversation.IsGroup == 'yes'">
+              <img    
+                :src="selectedConversation.ChatPhoto"
+                class="rounded-circle me-2"
+                style="width: 40px; height: 40px; object-fit: cover;"
+                alt="no Photo">
+        </div>
         <div class="user-list mt-2">
          <h6>Members:</h6>
           <div class="d-flex flex-wrap">
@@ -763,6 +803,16 @@ onMounted(() => {
           <input v-model="newGroupName" />
           <button @click="SetGroupName">Save</button>
           <button @click="CloseEditGroupModal">Close</button>
+        </div>
+        <div v-if="EditGroupPhotoInput == selectedConversation.conversationId">
+          <input 
+          v-model="photoPath"
+          type="text"
+          class="form-control"
+          placeholder="/images/groupimage.jpg"
+           />
+          <button @click="setGroupPhoto">Save</button>
+          <button @click="ClosePhotoGroupModal">Close</button>
         </div>
         <div v-if="GroupModalInput == selectedConversation.conversationId"
               class="card shadow-sm border-0 mt-3">
