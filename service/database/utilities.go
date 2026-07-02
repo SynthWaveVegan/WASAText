@@ -30,6 +30,7 @@ func generateIdentifier(startId string) structs.Identifier {
 }
 
 func (db *appdbimpl) checkValidId(checkingId string, startId string) (bool, error) {
+	
 	var countCheck int
 	var err error
 
