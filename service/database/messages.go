@@ -52,7 +52,7 @@ func (db *appdbimpl) MarkMessageRead(UserId structs.Identifier, ConversationId s
 		}
 
 		var unreadCount int
-		err = db.c.QueryRowContext(context.Background(), `
+		_ = db.c.QueryRowContext(context.Background(), `
 			SELECT COUNT(*)
 			FROM message m
 			JOIN userChat uc ON m.ConversationId = uc.ConversationId
@@ -60,9 +60,7 @@ func (db *appdbimpl) MarkMessageRead(UserId structs.Identifier, ConversationId s
 			AND m.IsRead != 'yes'
 			AND uc.UserId != ?`,
 			ConversationId.Id, UserId.Id)
-		if err != nil {
-			return err
-		}
+		
 
 		if unreadCount == 0 {
 			_, err = db.c.ExecContext(context.Background(), `
@@ -76,10 +74,10 @@ func (db *appdbimpl) MarkMessageRead(UserId structs.Identifier, ConversationId s
 			}
 		}
 
-		return nil
+		
 	}
 
-		
+	return nil
 }
 
 func (db *appdbimpl) insertMessage(MessageBody string, UploaderId structs.Identifier, MessageId structs.Identifier, Date string, MediaType string, ConversationId structs.Identifier, IsRead string, IsForwarded string) error {

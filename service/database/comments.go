@@ -3,7 +3,7 @@ package database
 import (
 	// "database/sql"
 	// "errors"
-	"fmt"
+	// "fmt"
 	"github.com/SynthWaveVegan/WASAText/service/structs"
 	// "log"
 	// "os"
@@ -27,7 +27,7 @@ func (db *appdbimpl) CommentMessage(CommentBody string, MessageId structs.Identi
 	err := db.c.QueryRowContext(context.Background(), `SELECT COUNT(*) FROM comment WHERE UploaderId = ?`, UploaderId.Id).Scan(&counter)
 	if counter == 1 {
 		log.Printf("user has already commented")
-		return fmt.Errorf("user has already commented") 
+		return structs.Comment{}, err 
 	}
 
 	thisCommentId := generateIdentifier("R")
