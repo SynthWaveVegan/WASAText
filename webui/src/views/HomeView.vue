@@ -206,17 +206,30 @@ const replyToMessage = (message) => {
     text: message.MessageBody,
     sender: message.User.Name
   }
+  ToggleImage = false;
 }
 
 const cancelReply = () => {
   currentReply.value = null;
 }
+
+const getOriginalMessage = (replyToId) => {
+  return Messages.value.find(m => m.messageId.Identifier === replyToId);
+}
+
 const sendMessage = async () => {
   try {
 
     axios.defaults.headers.common['Authorization'] = UserId.value;
 
+    const payload = {};
+
     let response; 
+
+    if (currentReply.value) {
+      payload.ReplyTo = currentReply.value.MessageId
+    }
+
     if (ToggleImage && selectedFile.value) {
       const formData = new FormData();
       formData.append("image", selectedFile.value);
@@ -232,6 +245,13 @@ const sendMessage = async () => {
         }
       )
     } else {
+
+      payload.MessageBody = Message.MessageBody
+
+      if (currentReply.value) {
+        payload.ReplyTo = currentReply.value.MessageId
+      }
+
       response = await axios.post(
         `/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages`,
         {
@@ -262,7 +282,8 @@ const sendMessage = async () => {
         Name: response.data.User.Name,
         userId: response.data.User.userId.Identifier,
         UserPhoto: response.data.User.UserPhoto
-      }
+      },
+      ReplyTo: currentReply.value?.messageId
     };
 
     Messages.value.push(updatedMessage);
@@ -282,6 +303,7 @@ const sendMessage = async () => {
 
     selectedFile.value = null;
     ToggleImage = false;
+    currentReply.value = null;
     
 
   } catch (e) {
@@ -882,6 +904,7 @@ onMounted(() => {
             }">
               <button class="btn btn-success btn-sm float-end ms-1"  @click="OpenForwardModal(msg)">⇉</button>
               <button class="btn btn-secondary btn-sm float-end ms-1"  @click="OpenCommentModal(msg)">💬</button>
+              <button class="btn btn-sm btn-outline-primary me-1" @click="replyToMessage(msg)">Reply</button>
               <div v-if="showConversationModal"
                   class="modal fade show d-block"
                   tabindex="-1"
@@ -945,6 +968,13 @@ onMounted(() => {
                   </div>
                 </div>
               </div>
+              <div v-if="msg.replyTo" class="small text-muted mb-1">
+                Reply To:
+                <span v-if="getOriginalMessage(msg.ReplyTo)">
+                  <strong>{{ getOriginalMessage(msg.ReplyTo).User.Name }}:</strong>
+                  "{{ getOriginalMessage(msg.ReplyTo).MessageBody }}"
+                </span>
+              </div>
               <button class="btn btn-danger btn-sm float-end" v-if="msg.User.Name == username" @click="deleteMessage(msg.messageId.Identifier)">X</button>
               <strong>{{ msg.User.Name }}:</strong> {{ msg.MessageBody }}
               <div class="small text-muted">{{ msg.Date }}</div>
@@ -963,6 +993,13 @@ onMounted(() => {
         </div>
       </div>
       <div class="p-2 border-top d-flex">
+        <div v-if="currentReply" class="bg-light p-2 rounded mb-2 d-flex justify-content-between align-items-center">
+          <div>
+            <strong>Reply To {{ currentReply.sender }}:</strong>
+            <span class="text-muted ms-2">{{ currentReply.text }}</span>
+          </div>
+          <button @click="cancelReply" class="btn btn-sm btn-outline-danger">x</button>
+        </div>
         <input v-model="Message.MessageBody" class="form-control me-2" v-if="ToggleImage == false" placeholder="Write message..." />
           <span v-if="ToggleImage && selectedFile"
             class="me-2 p-2 bg-light rounded d-inline-flex align-items-center">
