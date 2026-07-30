@@ -1,0 +1,11 @@
+FROM golang as builder
+
+COPY /service /app/service
+COPY /cmd /app/cmd
+COPY /vendor /app/vendor
+COPY /go.mod /app/go.mod
+COPY /go.sum /app/go.sum
+
+WORKDIR /app
+
+RUN go run ./cmd/webapi

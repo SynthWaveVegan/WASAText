@@ -1,0 +1,8 @@
+FROM node:lts as builder
+
+WORKDIR /app
+COPY webui webui
+
+WORKDIR /app/webui
+
+RUN yarn run dev
