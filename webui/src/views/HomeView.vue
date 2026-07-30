@@ -202,11 +202,12 @@ const currentReply = ref(null);
 
 const replyToMessage = (message) => {
   currentReply.value = {
-    messageId: message.messageId, 
+    messageId: message.messageId.Identifier, 
     text: message.MessageBody,
     sender: message.User.Name
   }
   ToggleImage = false;
+  console.log(currentReply);
 }
 
 const cancelReply = () => {
@@ -227,7 +228,7 @@ const sendMessage = async () => {
     let response; 
 
     if (currentReply.value) {
-      payload.ReplyTo = currentReply.value.MessageId
+      payload.ReplyTo = currentReply.value.messageId
     }
 
     if (ToggleImage && selectedFile.value) {
@@ -249,7 +250,7 @@ const sendMessage = async () => {
       payload.MessageBody = Message.MessageBody
 
       if (currentReply.value) {
-        payload.ReplyTo = currentReply.value.MessageId
+        payload.ReplyTo = currentReply.value.messageId
       }
 
       response = await axios.post(
@@ -968,6 +969,8 @@ onMounted(() => {
                   </div>
                 </div>
               </div>
+              <button class="btn btn-danger btn-sm float-end" v-if="msg.User.Name == username" @click="deleteMessage(msg.messageId.Identifier)">X</button>
+              <strong>{{ msg.User.Name }}:</strong> {{ msg.MessageBody }}
               <div v-if="msg.replyTo" class="small text-muted mb-1">
                 Reply To:
                 <span v-if="getOriginalMessage(msg.ReplyTo)">
@@ -975,8 +978,6 @@ onMounted(() => {
                   "{{ getOriginalMessage(msg.ReplyTo).MessageBody }}"
                 </span>
               </div>
-              <button class="btn btn-danger btn-sm float-end" v-if="msg.User.Name == username" @click="deleteMessage(msg.messageId.Identifier)">X</button>
-              <strong>{{ msg.User.Name }}:</strong> {{ msg.MessageBody }}
               <div class="small text-muted">{{ msg.Date }}</div>
               <span v-if="msg.IsForwarded == 'yes'" class="badge bg-primary me-1">↠↠</span>
               <div class="message-status" v-if="msg.User.Name === username">
