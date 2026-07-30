@@ -1,4 +1,4 @@
-FROM golang as builder
+FROM golang:tip-alpine3.23 as builder
 
 COPY /service /app/service
 COPY /cmd /app/cmd
