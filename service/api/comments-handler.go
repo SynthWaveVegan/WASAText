@@ -21,10 +21,10 @@ func (rt *_router) COMMENTMESSAGE(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
-	MessageId := structs.Identifier{
+	MessageId := structs.Identifier {
 		Id: messageId,
 	}
-	UserId := structs.Identifier{
+	UserId := structs.Identifier { 
 		Id: userId,
 	}
 
@@ -90,7 +90,7 @@ func (rt *_router) UNCOMMENTMESSAGE(w http.ResponseWriter, r *http.Request, ps h
 		ctx.Logger.Error("user is not allowed")
 		return
 	}
-	CommentId := structs.Identifier{
+	CommentId := structs.Identifier {
 		Id: commentId,
 	}
 

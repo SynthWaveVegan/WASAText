@@ -14,9 +14,7 @@ import (
 func (db *appdbimpl) MarkMessageRead(UserId structs.Identifier, ConversationId structs.Identifier) error {
 
 	var IsGroup string
-	err := db.c.QueryRowContext(context.Background(), `
-		SELECT IsGroup FROM conversation WHERE ConversationId = ?`,
-		ConversationId.Id).Scan(&IsGroup)
+	err := db.c.QueryRowContext(context.Background(), `SELECT IsGroup FROM conversation WHERE ConversationId = ?`, ConversationId.Id).Scan(&IsGroup)
 	if err != nil {
 		return err
 	}
@@ -36,17 +34,13 @@ func (db *appdbimpl) MarkMessageRead(UserId structs.Identifier, ConversationId s
 			return err
 		}
 	
-		_, err = db.c.ExecContext(context.Background(), 
-		`UPDATE message SET IsRead = 'yes' WHERE ConversationId = ? AND UploaderId = ? AND IsRead != 'yes'`,
-	 	ConversationId.Id, otherUserId)
+		_, err = db.c.ExecContext(context.Background(), `UPDATE message SET IsRead = 'yes' WHERE ConversationId = ? AND UploaderId = ? AND IsRead != 'yes'`, ConversationId.Id, otherUserId)
 			if err != nil {
 				return err
 			}
 	} else {
 
-		_, err = db.c.ExecContext(context.Background(), 
-		`UPDATE message SET IsRead = 'yes' WHERE ConversationId = ? AND UploaderId = ? AND IsRead != 'yes'`,
-	 	ConversationId.Id, UserId.Id)
+		_, err = db.c.ExecContext(context.Background(), `UPDATE message SET IsRead = 'yes' WHERE ConversationId = ? AND UploaderId = ? AND IsRead != 'yes'`, ConversationId.Id, UserId.Id)
 		if err != nil {
 			return err
 		}
@@ -81,9 +75,7 @@ func (db *appdbimpl) MarkMessageRead(UserId structs.Identifier, ConversationId s
 }
 
 func (db *appdbimpl) insertMessage(MessageBody string, UploaderId structs.Identifier, MessageId structs.Identifier, Date string, MediaType string, ConversationId structs.Identifier, IsRead string, IsForwarded string) error {
-	_, err := db.c.ExecContext(context.Background(),
-	`INSERT INTO message (MessageId, MessageBody,  Date, UploaderId, MediaType, IsRead, IsForwarded, ConversationId) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, 
-	MessageId.Id, MessageBody, Date, UploaderId.Id, MediaType, IsRead, IsForwarded, ConversationId.Id)
+	_, err := db.c.ExecContext(context.Background(), `INSERT INTO message (MessageId, MessageBody,  Date, UploaderId, MediaType, IsRead, IsForwarded, ConversationId) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, MessageId.Id, MessageBody, Date, UploaderId.Id, MediaType, IsRead, IsForwarded, ConversationId.Id)
 
 	return err
 }
@@ -152,10 +144,7 @@ func (db *appdbimpl) ForwardMessage(OldMessageId structs.Identifier, UploaderId 
 	IsRead := "no"
 	IsForwarded := "yes" 
 
-	err = db.c.QueryRowContext(context.Background(),
-    	`SELECT MessageBody, MediaType FROM message WHERE MessageId = ?`,
-    	OldMessageId.Id,
-	).Scan(&MessageBody, &MediaType)
+	err = db.c.QueryRowContext(context.Background(), `SELECT MessageBody, MediaType FROM message WHERE MessageId = ?`, OldMessageId.Id,).Scan(&MessageBody, &MediaType)
 	if err != nil {
 		return structs.Message{}, err
 	}

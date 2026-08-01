@@ -70,22 +70,19 @@ func (db *appdbimpl) CreateConversation(UserHosting structs.Identifier, UserConn
 		return structs.Conversation{}, err
 	}
 	
-	_, err = db.c.ExecContext(context.Background(),`INSERT INTO conversation (ConversationId, ChatPhoto, GroupName, IsGroup) VALUES (?, ?, ?, ?)`, 
-	ConversationId.Id, ChatPhoto, GroupName, IsGroup)
+	_, err = db.c.ExecContext(context.Background(),`INSERT INTO conversation (ConversationId, ChatPhoto, GroupName, IsGroup) VALUES (?, ?, ?, ?)`, ConversationId.Id, ChatPhoto, GroupName, IsGroup)
 	if err != nil {
     log.Println("Errore nell'inserimento della conversazione:", err)
     return structs.Conversation{}, err
 	}
 
-	_, err = db.c.ExecContext(context.Background(),`INSERT INTO UserChat (ConversationId, UserId) VALUES (?, ?)`, 
-	ConversationId.Id, UserConnected.Id)
+	_, err = db.c.ExecContext(context.Background(),`INSERT INTO UserChat (ConversationId, UserId) VALUES (?, ?)`, ConversationId.Id, UserConnected.Id)
 	if err != nil {
     log.Println("Errore nell'inserimento della conversazione:", err)
     return structs.Conversation{}, err
 	}
 
-	_, err = db.c.ExecContext(context.Background(),`INSERT INTO UserChat (ConversationId, UserId) VALUES (?, ?)`, 
-	ConversationId.Id, UserHosting.Id)
+	_, err = db.c.ExecContext(context.Background(),`INSERT INTO UserChat (ConversationId, UserId) VALUES (?, ?)`, ConversationId.Id, UserHosting.Id)
 	if err != nil {
     log.Println("Errore nell'inserimento della conversazione:", err)
     return structs.Conversation{}, err
@@ -122,11 +119,7 @@ func (db *appdbimpl) CreateConversation(UserHosting structs.Identifier, UserConn
 
 func (db *appdbimpl) GetConversation(ConversationId structs.Identifier, currentUserId string) (structs.Conversation, error) {
 
-	rows, err := db.c.QueryContext(context.Background(), `
-		SELECT u.UserId, u.Username, u.UserPhoto
-		FROM users u
-		JOIN userChat uc ON u.UserId = uc.UserId
-		WHERE uc.ConversationId = ?`, ConversationId.Id)
+	rows, err := db.c.QueryContext(context.Background(), `SELECT u.UserId, u.Username, u.UserPhoto FROM users u JOIN userChat uc ON u.UserId = uc.UserId WHERE uc.ConversationId = ?`, ConversationId.Id)
 
 	if err != nil {
 		log.Println("ERROR QUERY (getting users):", err)
@@ -160,12 +153,7 @@ func (db *appdbimpl) GetConversation(ConversationId structs.Identifier, currentU
 	var groupName string
 	var ChatPhoto string
 
-	err = db.c.QueryRowContext(context.Background(), `
-    	SELECT IsGroup, GroupName
-    	FROM conversation
-    	WHERE ConversationId = ?`,
-    	ConversationId.Id,
-	).Scan(&isGroup, &groupName)
+	err = db.c.QueryRowContext(context.Background(), `SELECT IsGroup, GroupName FROM conversation WHERE ConversationId = ?`, ConversationId.Id).Scan(&isGroup, &groupName)
 
 	if err != nil {
     	return structs.Conversation{}, err
@@ -176,12 +164,7 @@ func (db *appdbimpl) GetConversation(ConversationId structs.Identifier, currentU
 	if isGroup == "yes" {
 
     	chatName = groupName
-		err = db.c.QueryRowContext(context.Background(), `
-    		SELECT ChatPhoto
-    		FROM conversation
-    		WHERE ConversationId = ?`,
-    		ConversationId.Id,
-		).Scan(&ChatPhoto)
+		err = db.c.QueryRowContext(context.Background(), `SELECT ChatPhoto FROM conversation WHERE ConversationId = ?`, ConversationId.Id,).Scan(&ChatPhoto)
 		
 
 	} else if otherUserId != "" {
@@ -199,11 +182,7 @@ func (db *appdbimpl) GetConversation(ConversationId structs.Identifier, currentU
 		ChatPhoto = ""
 	}
 
-	messageRows, err := db.c.QueryContext(context.Background(), `
-		SELECT MessageId, MessageBody, Date, UploaderId, MediaType, IsRead, IsForwarded
-		FROM message
-		WHERE ConversationId = ?
-		ORDER BY Date ASC`, ConversationId.Id)
+	messageRows, err := db.c.QueryContext(context.Background(), ` SELECT MessageId, MessageBody, Date, UploaderId, MediaType, IsRead, IsForwarded FROM message WHERE ConversationId = ? ORDER BY Date ASC`, ConversationId.Id)
 
 	if err != nil {
 		log.Println("ERROR QUERY (getting messages):", err)
@@ -228,12 +207,12 @@ func (db *appdbimpl) GetConversation(ConversationId structs.Identifier, currentU
 		msg.ConversationId = ConversationId
 
 		commentRows, err := db.c.QueryContext(context.Background(), `
-        SELECT CommentId, CommentBody, Date, UploaderId
-        FROM comment
-        WHERE MessageId = ?
-        ORDER BY Date ASC`,
-        msg.MessageId.Id,
-    	)
+        	SELECT CommentId, CommentBody, Date, UploaderId
+        	FROM comment
+        	WHERE MessageId = ?
+        	ORDER BY Date ASC`,
+        	msg.MessageId.Id,
+		)
 
     	if err != nil {
         	log.Println("ERROR QUERY (comments):", err)

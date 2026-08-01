@@ -25,7 +25,7 @@ func (rt *_router) GETCONVERSATION(w http.ResponseWriter, r *http.Request, ps ht
 		return
 	}
 	
-	ConversationId := structs.Identifier{
+	ConversationId := structs.Identifier {
 		Id: conversationId,
 	}
 
@@ -65,7 +65,7 @@ func (rt *_router) CREATECONVERSATION(w http.ResponseWriter, r *http.Request, ps
 		return
 	}
 	
-	UserId := structs.Identifier{
+	UserId := structs.Identifier {
 		Id: userId,
 	}
 
@@ -122,7 +122,7 @@ func (rt *_router) GETMYCONVERSATIONS(w http.ResponseWriter, r *http.Request, ps
 		return
 	}
 
-	UserId := structs.Identifier{
+	UserId := structs.Identifier {
 		Id: userId,
 	}
 

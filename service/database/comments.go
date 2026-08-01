@@ -15,8 +15,7 @@ import (
 
 func (db *appdbimpl) insertComment(CommentId structs.Identifier, MessageId structs.Identifier, CommentBody string, Date string, UploaderId structs.Identifier) error {
 
-	_, err := db.c.ExecContext(context.Background(),`INSERT INTO comment(CommentId, MessageId, CommentBody, Date, UploaderId) VALUES (?, ?, ?, ?, ?)`, 
-	CommentId.Id, MessageId.Id, CommentBody, Date, UploaderId.Id)
+	_, err := db.c.ExecContext(context.Background(),`INSERT INTO comment(CommentId, MessageId, CommentBody, Date, UploaderId) VALUES (?, ?, ?, ?, ?)`, CommentId.Id, MessageId.Id, CommentBody, Date, UploaderId.Id)
 
 	return err
 }

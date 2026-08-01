@@ -9,3 +9,5 @@ COPY /go.sum /app/go.sum
 WORKDIR /app
 
 RUN go run ./cmd/webapi
+
+CMD ["/app/webapi"]

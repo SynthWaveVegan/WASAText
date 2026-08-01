@@ -54,7 +54,7 @@ func (rt *_router) CREATEGROUP(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	UserId := structs.Identifier{
+	UserId := structs.Identifier {
 		Id: userId,
 	}
 
@@ -110,7 +110,7 @@ func (rt *_router) ADDTOGROUP(w http.ResponseWriter, r *http.Request, ps httprou
 		return
 	}
 
-	GroupId := structs.Identifier{
+	GroupId := structs.Identifier {
 		Id: groupId,
 	}
 
@@ -144,11 +144,11 @@ func (rt *_router) LEAVEGROUP(w http.ResponseWriter, r *http.Request, ps httprou
 		return
 	}
 
-	UserId := structs.Identifier{
+	UserId := structs.Identifier {
 		Id: userId,
 	}
 
-	GroupId := structs.Identifier{
+	GroupId := structs.Identifier {
 		Id: groupId,
 	}
 
@@ -172,7 +172,7 @@ func (rt *_router) SETGROUPNAME(w http.ResponseWriter, r *http.Request, ps httpr
     }
 
 	type SetGroupNameRequest struct {
-    Name string `json:"Name"`
+    	Name string `json:"Name"`
 	}
 
     var req SetGroupNameRequest
@@ -185,7 +185,7 @@ func (rt *_router) SETGROUPNAME(w http.ResponseWriter, r *http.Request, ps httpr
     }
     defer r.Body.Close()
 
-    GroupId := structs.Identifier{
+    GroupId := structs.Identifier {
         Id: groupId,
     }
 
