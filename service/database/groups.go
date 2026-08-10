@@ -28,7 +28,7 @@ func (db *appdbimpl) CreateGroup(GroupName string, CreatorUserId structs.Identif
 		return structs.Group{}, err
 	}
 	if !validId {
-		return structs.Group{}, err
+		return structs.Group{}, fmt.Errorf("invalid id")
 	}
 
 	CreatorUser, err := db.GetUser(CreatorUserId)
@@ -60,7 +60,10 @@ func (db *appdbimpl) CreateGroup(GroupName string, CreatorUserId structs.Identif
 			AddUserId = thisUserId
 		}
 	}
-
+	if AddUserId == "" {
+		return structs.Group{}, fmt.Errorf("no other user")
+	}
+	
 	AddUser := structs.Identifier{
 		Id: AddUserId,
 	}
@@ -80,6 +83,9 @@ func (db *appdbimpl) CreateGroup(GroupName string, CreatorUserId structs.Identif
 
 	for _, user := range Users {
 		err = db.insertUserinGroup(thisGroupId, user.UserId)
+		if err != nil {
+			return structs.Group{}, err
+		}
 	}
 	
 	var GroupPhoto = ""
@@ -111,7 +117,7 @@ func (db *appdbimpl) SetGroupName(mode string, newName string, GroupId structs.I
 	}
 	if !validName {
 		log.Printf("name invalid")
-		return nil
+		return err
 	}
 	if counter == 0 && validName {
 
@@ -134,7 +140,7 @@ func (db *appdbimpl) SetGroupName(mode string, newName string, GroupId structs.I
 			return nil
 
 		default:
-			return err
+			return nil
 		}
 	}
 	return err
@@ -174,7 +180,7 @@ func (db *appdbimpl) LeaveGroup(GroupId structs.Identifier, UserId structs.Ident
 		return err
 	}
 	if counter == 0 {
-		return err // user not in group
+		return fmt.Errorf("user not in group")
 	}
 	if counter == 1 {
 

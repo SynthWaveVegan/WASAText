@@ -47,7 +47,7 @@ func (db *appdbimpl) CreateConversation(UserHosting structs.Identifier, UserConn
 		return structs.Conversation{}, err
 	}
 	if !validId {
-		return structs.Conversation{}, err
+		return structs.Conversation{}, fmt.Errorf("invalid id")
 	}
 
 	UserConnected, err := db.GetUserIdByName(UserConnectedName)
@@ -165,7 +165,9 @@ func (db *appdbimpl) GetConversation(ConversationId structs.Identifier, currentU
 
     	chatName = groupName
 		err = db.c.QueryRowContext(context.Background(), `SELECT ChatPhoto FROM conversation WHERE ConversationId = ?`, ConversationId.Id,).Scan(&ChatPhoto)
-		
+		if err != nil {
+			return structs.Conversation{}, err
+		}
 
 	} else if otherUserId != "" {
 
@@ -204,6 +206,9 @@ func (db *appdbimpl) GetConversation(ConversationId structs.Identifier, currentU
 		}
 
 		msg.Uploader, err = db.GetUser(msg.UploaderId)
+		if err != nil {
+			return structs.Conversation{}, err
+		}
 		msg.ConversationId = ConversationId
 
 		commentRows, err := db.c.QueryContext(context.Background(), `
@@ -239,6 +244,9 @@ func (db *appdbimpl) GetConversation(ConversationId structs.Identifier, currentU
 
         	c.MessageId = msg.MessageId
 			c.Uploader, err = db.GetUser(c.UploaderId)
+			if err != nil {
+				return structs.Conversation{}, err
+			}
 
         	comments = append(comments, c)
     	}

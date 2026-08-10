@@ -3,7 +3,7 @@ package database
 import (
 	// "database/sql"
 	// "errors"
-	// "fmt"
+	"fmt"
 	"github.com/SynthWaveVegan/WASAText/service/structs"
 	"log"
 	// "os"
@@ -46,14 +46,24 @@ func (db *appdbimpl) MarkMessageRead(UserId structs.Identifier, ConversationId s
 		}
 
 		var unreadCount int
-		_ = db.c.QueryRowContext(context.Background(), `
+
+		err = db.c.QueryRowContext(
+			context.Background(),
+			`
 			SELECT COUNT(*)
 			FROM message m
 			JOIN userChat uc ON m.ConversationId = uc.ConversationId
 			WHERE m.ConversationId = ?
-			AND m.IsRead != 'yes'
-			AND uc.UserId != ?`,
-			ConversationId.Id, UserId.Id)
+				AND m.IsRead != 'yes'
+				AND uc.UserId != ?
+			`,
+			ConversationId.Id,
+			UserId.Id,
+		).Scan(&unreadCount)
+
+		if err != nil {
+			return err
+		}
 		
 
 		if unreadCount == 0 {
@@ -87,7 +97,7 @@ func (db *appdbimpl) SendMessage(MessageBody string, UploaderId structs.Identifi
 	checkId, err := db.checkValidId(thisMessageId.Id, "M")
 
 	if !checkId {
-		return structs.Message{}, err
+		return structs.Message{}, fmt.Errorf("invalid id")
 	}
 	if err != nil {
 		return structs.Message{}, err
@@ -134,7 +144,7 @@ func (db *appdbimpl) ForwardMessage(OldMessageId structs.Identifier, UploaderId 
 	checkId, err := db.checkValidId(thisMessageId.Id, "M")
 
 	if !checkId {
-		return structs.Message{}, err
+		return structs.Message{}, fmt.Errorf("invalid id")
 	}
 	if err != nil {
 		return structs.Message{}, err

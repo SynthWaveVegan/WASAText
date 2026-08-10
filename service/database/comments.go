@@ -3,7 +3,7 @@ package database
 import (
 	// "database/sql"
 	// "errors"
-	// "fmt"
+	"fmt"
 	"github.com/SynthWaveVegan/WASAText/service/structs"
 	// "log"
 	// "os"
@@ -23,7 +23,16 @@ func (db *appdbimpl) insertComment(CommentId structs.Identifier, MessageId struc
 func (db *appdbimpl) CommentMessage(CommentBody string, MessageId structs.Identifier, UploaderId structs.Identifier) (structs.Comment, error) {
 
 	var counter int
-	err := db.c.QueryRowContext(context.Background(), `SELECT COUNT(*) FROM comment WHERE UploaderId = ?`, UploaderId.Id).Scan(&counter)
+	err := db.c.QueryRowContext(
+		context.Background(),
+		`SELECT COUNT(*) FROM comment WHERE UploaderId = ? AND MessageId = ?`,
+		UploaderId.Id, MessageId.Id,
+	).Scan(&counter)
+
+	if err != nil {
+		return structs.Comment{}, err
+	}
+
 	if counter == 1 {
 		log.Printf("user has already commented")
 		return structs.Comment{}, err 
@@ -33,7 +42,7 @@ func (db *appdbimpl) CommentMessage(CommentBody string, MessageId structs.Identi
 	
 	checkId, err := db.checkValidId(thisCommentId.Id, "R")
 	if !checkId {
-		return structs.Comment{}, err
+		return structs.Comment{}, fmt.Errorf("invalid id")
 	}
 	if err != nil {
 		return structs.Comment{}, err
