@@ -1,9 +1,14 @@
 FROM node:lts AS builder
 
 WORKDIR /app
-COPY webui webui
+COPY webui/package.json webui/package-lock.json ./webui/
 
 WORKDIR /app/webui
+
+RUN npm install
+
+COPY webui .
+
 RUN npm run build-prod
 
 FROM nginx:stable

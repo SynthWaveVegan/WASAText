@@ -44,7 +44,7 @@ const doLogin = async () => {
 <template>
   <div class="text-center">
     <div class="container mt-4 text-center">
-      <img :src="vuelogo" class="img-fluid mb-3" style="max-width: 180px;"></img>
+      <img :src="vuelogo" class="img-fluid mb-3" style="max-width: 180px;">
     </div>
     <div><strong>WASATEXT</strong></div>
     <div>Login</div>

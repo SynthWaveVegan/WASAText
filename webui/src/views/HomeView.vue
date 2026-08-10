@@ -715,7 +715,7 @@ onMounted(() => {
       <div v-for="conv in conversations" :key="conv.conversationId">
         <div class="card mb-3">
           <div class="card-body">  
-            <div v-if="conv.IsGroup == 'no'"v-for="user in conv.Users" :key="user.userId.Identifier">
+            <div v-if="conv.IsGroup == 'no'" v-for="user in conv.Users" :key="user.userId.Identifier">
               <img 
               v-if="user.Name != username"   
                 :src="user.UserPhoto"
@@ -809,7 +809,7 @@ onMounted(() => {
             </div>
           </div>
         </h5>
-        <div v-if="selectedConversation.IsGroup == 'no'"v-for="user in selectedConversation.Users" :key="user.userId.Identifier">
+        <div v-if="selectedConversation.IsGroup == 'no'" v-for="user in selectedConversation.Users" :key="user.userId.Identifier">
               <img 
               v-if="user.Name != username"   
                 :src="user.UserPhoto"
