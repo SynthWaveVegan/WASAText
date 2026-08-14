@@ -256,7 +256,7 @@ const sendMessage = async () => {
       response = await axios.post(
         `/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages`,
         {
-          MessageBody: Message.MessageBody
+          payload,
         },
         {
           headers: {
@@ -627,26 +627,29 @@ const commentMessage = async (reaction) => {
     }
 
     
-
-    Comments.value.push(UpdatedComment);
-    console.log("Commento inviato:", UpdatedComment);
+    
+      Comments.value.push(UpdatedComment);
+      console.log("Commento inviato:", UpdatedComment);
 
     
-    const msgIndex = Messages.value.findIndex(msg => msg.MessageId === messageToComment.value);
-    if (msgIndex !== -1) {
-      if (!Messages.value[msgIndex].Comments) {
-        Messages.value[msgIndex].Comments = [];
+      const msgIndex = Messages.value.findIndex(msg => msg.MessageId === messageToComment.value);
+      if (msgIndex !== -1) {
+        if (!Messages.value[msgIndex].Comments) {
+          Messages.value[msgIndex].Comments = [];
+        }
+        Messages.value[msgIndex].Comments.push(UpdatedComment);
       }
-      Messages.value[msgIndex].Comments.push(UpdatedComment);
-    }
 
-    Comment.CommentId = '';
-    Comment.MessageId = '';
-    Comment.CommentBody = '';
-    Comment.CommentDate = '';
-    Comment.UploaderId = '';
-    Comment.User = '';
+      Comment.CommentId = '';
+      Comment.MessageId = '';
+      Comment.CommentBody = '';
+      Comment.CommentDate = '';
+      Comment.UploaderId = '';
+      Comment.User = '';
 
+    
+    
+    
   }catch(e){
     alert(e)
   }
@@ -971,7 +974,7 @@ onMounted(() => {
               </div>
               <button class="btn btn-danger btn-sm float-end" v-if="msg.User.Name == username" @click="deleteMessage(msg.messageId.Identifier)">X</button>
               <strong>{{ msg.User.Name }}:</strong> {{ msg.MessageBody }}
-              <div v-if="msg.replyTo" class="small text-muted mb-1">
+              <div v-if="msg.ReplyTo" class="small text-muted mb-1">
                 Reply To:
                 <span v-if="getOriginalMessage(msg.ReplyTo)">
                   <strong>{{ getOriginalMessage(msg.ReplyTo).User.Name }}:</strong>

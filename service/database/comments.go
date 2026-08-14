@@ -33,9 +33,9 @@ func (db *appdbimpl) CommentMessage(CommentBody string, MessageId structs.Identi
 		return structs.Comment{}, err
 	}
 
-	if counter == 1 {
+	if counter > 0 {
 		log.Printf("user has already commented")
-		return structs.Comment{}, err 
+		return structs.Comment{}, fmt.Errorf("user already commented") 
 	}
 
 	thisCommentId := generateIdentifier("R")
@@ -69,7 +69,7 @@ func (db *appdbimpl) CommentMessage(CommentBody string, MessageId structs.Identi
 		Uploader:    Uploader,
 	}
 
-	return newComment, err
+	return newComment, nil
 
 }
 

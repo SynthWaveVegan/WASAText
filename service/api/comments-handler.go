@@ -52,6 +52,16 @@ func (rt *_router) COMMENTMESSAGE(w http.ResponseWriter, r *http.Request, ps htt
 	}
 	defer r.Body.Close()
 
+	log.Println("comment body: ", commentReq.CommentBody)
+
+	if commentReq.CommentBody == "" {
+    	w.WriteHeader(http.StatusBadRequest)
+    	ctx.Logger.Error("comment body is empty")
+    	return
+	}
+
+	
+
 	NewComment, err := rt.db.CommentMessage(commentReq.CommentBody, MessageId, UserId)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -60,14 +70,19 @@ func (rt *_router) COMMENTMESSAGE(w http.ResponseWriter, r *http.Request, ps htt
 	}
 
 	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+
 	err = json.NewEncoder(w).Encode(NewComment)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		ctx.Logger.Error("something went wrong: ", err)
 	}
 
-	w.WriteHeader(http.StatusCreated)
+	
 	log.Println("Message commented successfully")
+	
+
+	
 
 }
 
