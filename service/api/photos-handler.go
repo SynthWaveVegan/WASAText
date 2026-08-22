@@ -20,7 +20,7 @@ func (rt *_router) SETMYPHOTO(w http.ResponseWriter, r *http.Request, ps httprou
 	}
 
 	type PhotoRequest struct {
-    	Photo string `json:"Photo"`
+		Photo string `json:"Photo"`
 	}
 
 	var req PhotoRequest
@@ -61,7 +61,7 @@ func (rt *_router) SETGROUPPHOTO(w http.ResponseWriter, r *http.Request, ps http
 	}
 
 	type PhotoRequest struct {
-    	Photo string `json:"Photo"`
+		Photo string `json:"Photo"`
 	}
 
 	var req PhotoRequest

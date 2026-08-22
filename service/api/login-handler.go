@@ -23,7 +23,6 @@ func (rt *_router) DOLOGIN(w http.ResponseWriter, r *http.Request, ps httprouter
 	}
 	defer r.Body.Close()
 
-
 	userId, err := rt.db.DoLogin(user.Username)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -41,5 +40,4 @@ func (rt *_router) DOLOGIN(w http.ResponseWriter, r *http.Request, ps httprouter
 		return
 	}
 
-	
 }

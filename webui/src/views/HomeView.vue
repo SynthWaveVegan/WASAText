@@ -179,14 +179,30 @@ const Message = reactive({
   Comments: [],
 })
 
+const fileInput = ref(null);
+
+const openFileSelector = () => {
+  fileInput.value?.click();
+};
+
 let ToggleImage = false;
 
 const selectedFile = ref(null);
 
-const onFileSelected = (event) => {
-  selectedFile.value = event.target.files[0];
+const handleFileSelected = (event) => {
+  const file = event.target.files[0];
+
+  if (!file) {
+    return;
+  }
+
+  selectedFile.value = file;
   ToggleImage = true;
+
+  console.log("File selezionato:", file);
 };
+
+
 
 const openFilePicker = () => {
   fileInput.value.click();
@@ -317,8 +333,10 @@ const showConversationModal = ref(false);
 const messageToForward = ref(null);
 
 const OpenForwardModal = async (message) => {
-  messageToForward.value = message.messageId.Identifier;
-  console.log("messaggio da inoltrare:", messageToForward.value)
+  messageToForward.value = message;
+
+  console.log("messaggio da inoltrare:", message);
+
   await getMyConversations();
   showConversationModal.value = true;
 };
@@ -328,7 +346,7 @@ const forwardMessage = async (convId) => {
   try{
     
     axios.defaults.headers.common['Authorization'] = UserId.value;
-    const response = await axios.post(`/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages/${messageToForward.value}/forwarded`, 
+    const response = await axios.post(`/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages/${messageToForward.messageId.value}/forwarded`, 
       {Identifier : convId}
     )
 
@@ -1004,7 +1022,7 @@ onMounted(() => {
           </div>
           <button @click="cancelReply" class="btn btn-sm btn-outline-danger">x</button>
         </div>
-        <input v-model="Message.MessageBody" class="form-control me-2" v-if="ToggleImage == false" placeholder="Write message..." />
+        <input v-model="Message.MessageBody" class="form-control me-2" placeholder="Write message..." />
           <span v-if="ToggleImage && selectedFile"
             class="me-2 p-2 bg-light rounded d-inline-flex align-items-center">
             📷 {{ selectedFile.name }}

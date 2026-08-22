@@ -21,13 +21,12 @@ func (rt *_router) COMMENTMESSAGE(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
-	MessageId := structs.Identifier {
+	MessageId := structs.Identifier{
 		Id: messageId,
 	}
-	UserId := structs.Identifier { 
+	UserId := structs.Identifier{
 		Id: userId,
 	}
-
 
 	authorization := r.Header.Get("Authorization")
 
@@ -38,7 +37,7 @@ func (rt *_router) COMMENTMESSAGE(w http.ResponseWriter, r *http.Request, ps htt
 	}
 
 	type CommentRequest struct {
-    	CommentBody string `json:"CommentBody"`
+		CommentBody string `json:"CommentBody"`
 	}
 
 	var commentReq CommentRequest
@@ -55,12 +54,10 @@ func (rt *_router) COMMENTMESSAGE(w http.ResponseWriter, r *http.Request, ps htt
 	log.Println("comment body: ", commentReq.CommentBody)
 
 	if commentReq.CommentBody == "" {
-    	w.WriteHeader(http.StatusBadRequest)
-    	ctx.Logger.Error("comment body is empty")
-    	return
+		w.WriteHeader(http.StatusBadRequest)
+		ctx.Logger.Error("comment body is empty")
+		return
 	}
-
-	
 
 	NewComment, err := rt.db.CommentMessage(commentReq.CommentBody, MessageId, UserId)
 	if err != nil {
@@ -78,11 +75,7 @@ func (rt *_router) COMMENTMESSAGE(w http.ResponseWriter, r *http.Request, ps htt
 		ctx.Logger.Error("something went wrong: ", err)
 	}
 
-	
 	log.Println("Message commented successfully")
-	
-
-	
 
 }
 
@@ -105,7 +98,7 @@ func (rt *_router) UNCOMMENTMESSAGE(w http.ResponseWriter, r *http.Request, ps h
 		ctx.Logger.Error("user is not allowed")
 		return
 	}
-	CommentId := structs.Identifier {
+	CommentId := structs.Identifier{
 		Id: commentId,
 	}
 

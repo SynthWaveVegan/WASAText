@@ -13,7 +13,6 @@ func (db *appdbimpl) DoLogin(username string) (structs.Identifier, error) {
 	var checkId bool
 	var userId string
 
-	
 	log.Println("Verifica se l'utente esiste:", username)
 	userId, checkId, err := db.CheckUserExist(username)
 	if err != nil {
@@ -26,7 +25,6 @@ func (db *appdbimpl) DoLogin(username string) (structs.Identifier, error) {
 		return structs.Identifier{Id: userId}, nil
 	}
 
-	
 	newId := generateIdentifier("U")
 	if err != nil {
 		log.Println("Errore nel generare l'id:", err)
@@ -35,25 +33,21 @@ func (db *appdbimpl) DoLogin(username string) (structs.Identifier, error) {
 
 	newUserId := newId.Id
 
-	
 	validId, err := db.checkValidId(newUserId, "U")
 	if err != nil {
 		log.Println("errore id non valido:", err)
 		return structs.Identifier{}, err
 	}
 
-	
 	if !validId {
 		return structs.Identifier{}, fmt.Errorf("invalid user ID generated")
 	}
 
-	
 	err = db.SetMyUsername("New", username, newUserId)
 	if err != nil {
 		log.Println("Errore nel set myusername:", err)
 		return structs.Identifier{}, err
 	}
 
-	
 	return structs.Identifier{Id: newUserId}, nil
 }

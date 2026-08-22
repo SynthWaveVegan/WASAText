@@ -3,16 +3,15 @@ package database
 import (
 	// "database/sql"
 	// "errors"
+	"context"
+	"crypto/rand"
 	"fmt"
 	"github.com/SynthWaveVegan/WASAText/service/structs"
 	"log"
-	"crypto/rand"
-    "math/big"
-	"context"
-	
+	"math/big"
 )
 
-// startId: U(user) M(message) C(conversation) R(comment) 
+// startId: U(user) M(message) C(conversation) R(comment)
 func generateIdentifier(startId string) structs.Identifier {
 
 	var randomInt string
@@ -30,11 +29,10 @@ func generateIdentifier(startId string) structs.Identifier {
 }
 
 func (db *appdbimpl) checkValidId(checkingId string, startId string) (bool, error) {
-	
+
 	var countCheck int
 	var err error
 
-	
 	switch startId {
 	case "U":
 		err = db.c.QueryRowContext(context.Background(), `SELECT COUNT(*) FROM users WHERE UserId = ?`, checkingId).Scan(&countCheck)
@@ -45,27 +43,23 @@ func (db *appdbimpl) checkValidId(checkingId string, startId string) (bool, erro
 	case "R":
 		err = db.c.QueryRowContext(context.Background(), `SELECT COUNT(*) FROM comment WHERE CommentId = ?`, checkingId).Scan(&countCheck)
 	default:
-		
+
 		return false, fmt.Errorf("invalid startId value: %s", startId)
 	}
 
-	
 	if err != nil {
 		return false, fmt.Errorf("database query failed: %w", err)
 	}
 
-	
 	if countCheck == 0 {
 		return true, nil
 	}
 
-	
 	return false, nil
 }
 
-
 func checkValidName(checkingName string) bool {
-	
+
 	log.Printf("Nome ricevuto: '%s'", checkingName)
 	if len([]rune(checkingName)) >= 1 && len([]rune(checkingName)) <= 16 {
 		return true
@@ -77,7 +71,7 @@ func checkValidName(checkingName string) bool {
 
 func (db *appdbimpl) getUsernamebyId(UserId structs.Identifier) (string, error) {
 	var username string
-	err := db.c.QueryRowContext(context.Background(),`SELECT Username FROM users WHERE UserId = ?`, UserId.Id).Scan(&username)
+	err := db.c.QueryRowContext(context.Background(), `SELECT Username FROM users WHERE UserId = ?`, UserId.Id).Scan(&username)
 	if err != nil {
 		return "", err
 	}
@@ -86,7 +80,7 @@ func (db *appdbimpl) getUsernamebyId(UserId structs.Identifier) (string, error) 
 
 func (db *appdbimpl) GetUserIdByName(Username string) (structs.Identifier, error) {
 	var userId string
-	err := db.c.QueryRowContext(context.Background(),`SELECT UserId FROM users WHERE Username = ?`, Username).Scan(&userId)
+	err := db.c.QueryRowContext(context.Background(), `SELECT UserId FROM users WHERE Username = ?`, Username).Scan(&userId)
 	if err != nil {
 		return structs.Identifier{}, err
 	}
@@ -98,9 +92,9 @@ func (db *appdbimpl) GetUserIdByName(Username string) (structs.Identifier, error
 }
 
 func (db *appdbimpl) getUserPhotobyId(UserId string) (string, error) {
-	
+
 	var Photo string
-	err := db.c.QueryRowContext(context.Background(),`SELECT UserPhoto FROM users WHERE UserId = ?`, UserId).Scan(&Photo)
+	err := db.c.QueryRowContext(context.Background(), `SELECT UserPhoto FROM users WHERE UserId = ?`, UserId).Scan(&Photo)
 	if err != nil {
 		return "", err
 	}

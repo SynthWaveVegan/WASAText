@@ -42,8 +42,6 @@ import (
 
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
-
-	
 	DoLogin(Username string) (structs.Identifier, error)
 	// checkValidId(checkingId string, startId string) (bool, error)
 	// checkUserExist(Username string) (string, bool, error)
@@ -71,7 +69,7 @@ type AppDatabase interface {
 	// insertComment(CommentId structs.Identifier, MessageId structs.Identifier, CommentBody string, Date string) error
 	UncommentMessage(CommentId structs.Identifier) error
 
-	AddToGroup(GroupId structs.Identifier,  NewUser string) error
+	AddToGroup(GroupId structs.Identifier, NewUser string) error
 	CreateGroup(GroupName string, CreatorUserId structs.Identifier, ConversationId string) (structs.Group, error)
 	LeaveGroup(GroupId structs.Identifier, UserId structs.Identifier) error
 	SetGroupName(mode string, newName string, GroupId structs.Identifier) error
@@ -97,7 +95,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 
 	// Check if table exists. If not, the database is empty, and we need to create the structure
 	var tableName string
-	err := db.QueryRowContext(context.Background(),`SELECT name FROM sqlite_master WHERE type='table' AND name='example_table';`).Scan(&tableName)
+	err := db.QueryRowContext(context.Background(), `SELECT name FROM sqlite_master WHERE type='table' AND name='example_table';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
 
 		userQuery := `CREATE TABLE IF NOT EXISTS users (
@@ -150,10 +148,10 @@ func New(db *sql.DB) (AppDatabase, error) {
 		)`*/
 
 		/*groupQuery := `CREATE TABLE IF NOT EXISTS groups (
-		GroupId VARCHAR(11) NOT NULL PRIMARY KEY,
-		GroupName VARCHAR(16) NOT NULL,
-		GroupPhoto TEXT
-	)`*/
+			GroupId VARCHAR(11) NOT NULL PRIMARY KEY,
+			GroupName VARCHAR(16) NOT NULL,
+			GroupPhoto TEXT
+		)`*/
 
 		err = execQueries(db, userQuery, messageQuery, commentQuery, userChatQuery, conversationQuery)
 		if err != nil {

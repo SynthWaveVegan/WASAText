@@ -3,14 +3,14 @@ package database
 import (
 	// "database/sql"
 	// "errors"
+	"context"
 	"fmt"
 	"github.com/SynthWaveVegan/WASAText/service/structs"
 	"log"
-	"context"
 )
 
 func (db *appdbimpl) ConversationExists(user1Id string, user2Id string) (bool, error) {
-	
+
 	query := `
 		SELECT COUNT(*) 
 		FROM userChat uc1
@@ -24,24 +24,23 @@ func (db *appdbimpl) ConversationExists(user1Id string, user2Id string) (bool, e
 	if err != nil {
 		return false, err
 	}
-	
+
 	if count == 0 {
 		return false, nil
 	}
 	return true, nil
-	
+
 }
- 
+
 func (db *appdbimpl) CreateConversation(UserHosting structs.Identifier, UserConnectedName string) (structs.Conversation, error) {
 
 	var Messages []structs.Message
 	var IsGroup = "no"
 	var GroupName = ""
-	
 
 	ConversationId := generateIdentifier("C")
 	log.Println("Generated Conversation ID:", ConversationId.Id)
-	
+
 	validId, err := db.checkValidId(ConversationId.Id, "C")
 	if err != nil {
 		return structs.Conversation{}, err
@@ -57,35 +56,35 @@ func (db *appdbimpl) CreateConversation(UserHosting structs.Identifier, UserConn
 
 	exists, err := db.ConversationExists(UserHosting.Id, UserConnected.Id)
 	log.Println("exist = ", exists)
-		if err != nil {
-			return structs.Conversation{}, err
-		}
+	if err != nil {
+		return structs.Conversation{}, err
+	}
 
-		if exists  {
-			return structs.Conversation{}, fmt.Errorf("conversation already exists between %s and %s", UserHosting.Id, UserConnected.Id)
-		}
+	if exists {
+		return structs.Conversation{}, fmt.Errorf("conversation already exists between %s and %s", UserHosting.Id, UserConnected.Id)
+	}
 
 	ChatPhoto, err := db.getUserPhotobyId(UserConnected.Id)
 	if err != nil {
 		return structs.Conversation{}, err
 	}
-	
-	_, err = db.c.ExecContext(context.Background(),`INSERT INTO conversation (ConversationId, ChatPhoto, GroupName, IsGroup) VALUES (?, ?, ?, ?)`, ConversationId.Id, ChatPhoto, GroupName, IsGroup)
+
+	_, err = db.c.ExecContext(context.Background(), `INSERT INTO conversation (ConversationId, ChatPhoto, GroupName, IsGroup) VALUES (?, ?, ?, ?)`, ConversationId.Id, ChatPhoto, GroupName, IsGroup)
 	if err != nil {
-    log.Println("Errore nell'inserimento della conversazione:", err)
-    return structs.Conversation{}, err
+		log.Println("Errore nell'inserimento della conversazione:", err)
+		return structs.Conversation{}, err
 	}
 
-	_, err = db.c.ExecContext(context.Background(),`INSERT INTO UserChat (ConversationId, UserId) VALUES (?, ?)`, ConversationId.Id, UserConnected.Id)
+	_, err = db.c.ExecContext(context.Background(), `INSERT INTO UserChat (ConversationId, UserId) VALUES (?, ?)`, ConversationId.Id, UserConnected.Id)
 	if err != nil {
-    log.Println("Errore nell'inserimento della conversazione:", err)
-    return structs.Conversation{}, err
+		log.Println("Errore nell'inserimento della conversazione:", err)
+		return structs.Conversation{}, err
 	}
 
-	_, err = db.c.ExecContext(context.Background(),`INSERT INTO UserChat (ConversationId, UserId) VALUES (?, ?)`, ConversationId.Id, UserHosting.Id)
+	_, err = db.c.ExecContext(context.Background(), `INSERT INTO UserChat (ConversationId, UserId) VALUES (?, ?)`, ConversationId.Id, UserHosting.Id)
 	if err != nil {
-    log.Println("Errore nell'inserimento della conversazione:", err)
-    return structs.Conversation{}, err
+		log.Println("Errore nell'inserimento della conversazione:", err)
+		return structs.Conversation{}, err
 	}
 
 	var Users []structs.User
@@ -139,7 +138,6 @@ func (db *appdbimpl) GetConversation(ConversationId structs.Identifier, currentU
 		}
 		users = append(users, u)
 
-		
 		if u.UserId.Id != currentUserId {
 			otherUserId = u.UserId.Id
 		}
@@ -156,31 +154,31 @@ func (db *appdbimpl) GetConversation(ConversationId structs.Identifier, currentU
 	err = db.c.QueryRowContext(context.Background(), `SELECT IsGroup, GroupName FROM conversation WHERE ConversationId = ?`, ConversationId.Id).Scan(&isGroup, &groupName)
 
 	if err != nil {
-    	return structs.Conversation{}, err
+		return structs.Conversation{}, err
 	}
-	
+
 	var chatName string
 
 	if isGroup == "yes" {
 
-    	chatName = groupName
-		err = db.c.QueryRowContext(context.Background(), `SELECT ChatPhoto FROM conversation WHERE ConversationId = ?`, ConversationId.Id,).Scan(&ChatPhoto)
+		chatName = groupName
+		err = db.c.QueryRowContext(context.Background(), `SELECT ChatPhoto FROM conversation WHERE ConversationId = ?`, ConversationId.Id).Scan(&ChatPhoto)
 		if err != nil {
 			return structs.Conversation{}, err
 		}
 
 	} else if otherUserId != "" {
 
-    	OtherUserId := structs.Identifier{
-        	Id: otherUserId,
-    	}
+		OtherUserId := structs.Identifier{
+			Id: otherUserId,
+		}
 
-    	otherUsername, err := db.getUsernamebyId(OtherUserId)
-    	if err != nil {
-        	return structs.Conversation{}, err
-    	}
+		otherUsername, err := db.getUsernamebyId(OtherUserId)
+		if err != nil {
+			return structs.Conversation{}, err
+		}
 
-    	chatName = otherUsername
+		chatName = otherUsername
 		ChatPhoto = ""
 	}
 
@@ -194,7 +192,6 @@ func (db *appdbimpl) GetConversation(ConversationId structs.Identifier, currentU
 
 	var messages []structs.Message
 
-	
 	for messageRows.Next() {
 
 		var msg structs.Message
@@ -216,57 +213,53 @@ func (db *appdbimpl) GetConversation(ConversationId structs.Identifier, currentU
         	FROM comment
         	WHERE MessageId = ?
         	ORDER BY Date ASC`,
-        	msg.MessageId.Id,
+			msg.MessageId.Id,
 		)
 
-    	if err != nil {
-        	log.Println("ERROR QUERY (comments):", err)
-        	return structs.Conversation{}, err
-    	}
+		if err != nil {
+			log.Println("ERROR QUERY (comments):", err)
+			return structs.Conversation{}, err
+		}
 
-    	var comments []structs.Comment
+		var comments []structs.Comment
 
-    	for commentRows.Next() {
+		for commentRows.Next() {
 
-        	var c structs.Comment
+			var c structs.Comment
 
-       		err := commentRows.Scan(
-            	&c.CommentId.Id,
-            	&c.CommentBody,
-            	&c.Date,
-            	&c.UploaderId.Id,
-        	)
+			err := commentRows.Scan(
+				&c.CommentId.Id,
+				&c.CommentBody,
+				&c.Date,
+				&c.UploaderId.Id,
+			)
 
-        	if err != nil {
-            	log.Println("ERROR SCAN (comments):", err)
-            	return structs.Conversation{}, err
-        	}
+			if err != nil {
+				log.Println("ERROR SCAN (comments):", err)
+				return structs.Conversation{}, err
+			}
 
-        	c.MessageId = msg.MessageId
+			c.MessageId = msg.MessageId
 			c.Uploader, err = db.GetUser(c.UploaderId)
 			if err != nil {
 				return structs.Conversation{}, err
 			}
 
-        	comments = append(comments, c)
-    	}
+			comments = append(comments, c)
+		}
 
-    	commentRows.Close()
-		
+		commentRows.Close()
+
 		msg.Comments = comments
 
 		messages = append(messages, msg)
 	}
 
-	
-	
-
-
 	ChatRetrieved := structs.Conversation{
 		ConversationId: ConversationId,
-		Users:          users,           
-		ChatName:       chatName,      
-		Messages:       messages,        
+		Users:          users,
+		ChatName:       chatName,
+		Messages:       messages,
 		IsGroup:        isGroup,
 		ChatPhoto:      ChatPhoto,
 	}
@@ -275,13 +268,12 @@ func (db *appdbimpl) GetConversation(ConversationId structs.Identifier, currentU
 	return ChatRetrieved, nil
 }
 
-
 func (db *appdbimpl) GetMyConversations(UserHosting structs.Identifier) ([]structs.Identifier, error) {
 
 	var ChatStream []structs.Identifier
 	var ConversationId structs.Identifier
 
-	rows, err := db.c.QueryContext(context.Background(),`SELECT ConversationId FROM userChat WHERE UserId = ?`, UserHosting.Id)
+	rows, err := db.c.QueryContext(context.Background(), `SELECT ConversationId FROM userChat WHERE UserId = ?`, UserHosting.Id)
 	if err != nil {
 		return []structs.Identifier{}, err
 	}

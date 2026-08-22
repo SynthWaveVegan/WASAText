@@ -8,9 +8,10 @@ import (
 	"log"
 	// "os"
 	// "path/filepath"
-	"time"
 	"context"
+	"time"
 )
+
 func (db *appdbimpl) MarkMessageRead(UserId structs.Identifier, ConversationId structs.Identifier) error {
 
 	var IsGroup string
@@ -18,7 +19,7 @@ func (db *appdbimpl) MarkMessageRead(UserId structs.Identifier, ConversationId s
 	if err != nil {
 		return err
 	}
-	
+
 	if IsGroup == "no" {
 
 		var otherUserId string
@@ -33,11 +34,11 @@ func (db *appdbimpl) MarkMessageRead(UserId structs.Identifier, ConversationId s
 			log.Println("ERROR QUERY (getting users):", err)
 			return err
 		}
-	
+
 		_, err = db.c.ExecContext(context.Background(), `UPDATE message SET IsRead = 'yes' WHERE ConversationId = ? AND UploaderId = ? AND IsRead != 'yes'`, ConversationId.Id, otherUserId)
-			if err != nil {
-				return err
-			}
+		if err != nil {
+			return err
+		}
 	} else {
 
 		_, err = db.c.ExecContext(context.Background(), `UPDATE message SET IsRead = 'yes' WHERE ConversationId = ? AND UploaderId = ? AND IsRead != 'yes'`, ConversationId.Id, UserId.Id)
@@ -64,7 +65,6 @@ func (db *appdbimpl) MarkMessageRead(UserId structs.Identifier, ConversationId s
 		if err != nil {
 			return err
 		}
-		
 
 		if unreadCount == 0 {
 			_, err = db.c.ExecContext(context.Background(), `
@@ -78,7 +78,6 @@ func (db *appdbimpl) MarkMessageRead(UserId structs.Identifier, ConversationId s
 			}
 		}
 
-		
 	}
 
 	return nil
@@ -104,8 +103,8 @@ func (db *appdbimpl) SendMessage(MessageBody string, UploaderId structs.Identifi
 	}
 
 	messageDate := time.Now().UTC().Format("02/01/2006 15:04:05")
-	IsRead := "no" 
-	IsForwarded := "no" 
+	IsRead := "no"
+	IsForwarded := "no"
 
 	err = db.insertMessage(MessageBody, UploaderId, thisMessageId, messageDate, MediaType, ConversationId, IsRead, IsForwarded)
 	if err != nil {
@@ -119,8 +118,8 @@ func (db *appdbimpl) SendMessage(MessageBody string, UploaderId structs.Identifi
 
 	newMessage := structs.Message{
 
-		MessageBody: MessageBody,
-		Comments:      []structs.Comment{},
+		MessageBody:    MessageBody,
+		Comments:       []structs.Comment{},
 		UploaderId:     UploaderId,
 		Uploader:       Uploader,
 		MessageId:      thisMessageId,
@@ -152,9 +151,9 @@ func (db *appdbimpl) ForwardMessage(OldMessageId structs.Identifier, UploaderId 
 
 	messageDate := time.Now().UTC().Format("02/01/2006 15:04:05")
 	IsRead := "no"
-	IsForwarded := "yes" 
+	IsForwarded := "yes"
 
-	err = db.c.QueryRowContext(context.Background(), `SELECT MessageBody, MediaType FROM message WHERE MessageId = ?`, OldMessageId.Id,).Scan(&MessageBody, &MediaType)
+	err = db.c.QueryRowContext(context.Background(), `SELECT MessageBody, MediaType FROM message WHERE MessageId = ?`, OldMessageId.Id).Scan(&MessageBody, &MediaType)
 	if err != nil {
 		return structs.Message{}, err
 	}
@@ -171,7 +170,7 @@ func (db *appdbimpl) ForwardMessage(OldMessageId structs.Identifier, UploaderId 
 
 	forwardedMessage := structs.Message{
 		MessageBody:    MessageBody,
-		Comments:      []structs.Comment{},
+		Comments:       []structs.Comment{},
 		UploaderId:     UploaderId,
 		Uploader:       Uploader,
 		MessageId:      thisMessageId,
@@ -186,6 +185,6 @@ func (db *appdbimpl) ForwardMessage(OldMessageId structs.Identifier, UploaderId 
 }
 
 func (db *appdbimpl) DeleteMessage(MessageId structs.Identifier) error {
-	_, err := db.c.ExecContext(context.Background(),`DELETE FROM message WHERE MessageId = ?`, MessageId.Id)
+	_, err := db.c.ExecContext(context.Background(), `DELETE FROM message WHERE MessageId = ?`, MessageId.Id)
 	return err
 }

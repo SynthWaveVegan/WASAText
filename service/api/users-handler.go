@@ -22,7 +22,6 @@ func (rt *_router) GETUSER(w http.ResponseWriter, r *http.Request, ps httprouter
 		Id: userId,
 	}
 
-
 	ThisUser, err := rt.db.GetUser(ThisUserId)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -49,7 +48,7 @@ func (rt *_router) SETMYUSERNAME(w http.ResponseWriter, r *http.Request, ps http
 		return
 	}
 	type RequestBody struct {
-    	Name string `json:"Name"`
+		Name string `json:"Name"`
 	}
 
 	var username RequestBody
