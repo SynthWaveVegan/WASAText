@@ -10,3 +10,4 @@ func (rt *_router) getHelloWorld(w http.ResponseWriter, r *http.Request, ps http
 	w.Header().Set("content-type", "text/plain")
 	_, _ = w.Write([]byte("Hello World!"))
 }
+*/
