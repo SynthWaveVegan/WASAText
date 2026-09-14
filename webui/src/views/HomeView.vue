@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted} from 'vue'
 import axios from '../services/axios.js'
 import { reactive } from 'vue'
 
@@ -115,6 +115,15 @@ const openConversation = async (id) => {
 
       await markMessageRead();
 
+      const updatedData = await getConversation(  //
+      selectedConversation.value.conversationId
+    );
+
+    if (updatedData) {
+      selectedConversation.value = updatedData;
+      Messages.value = updatedData.Messages || [];
+    }           //
+
     } else {
       console.error("La risposta non contiene un conversationId valido.");
       alert("Errore: la conversazione non è stata trovata.");
@@ -156,6 +165,27 @@ const getMyConversations = async () => {
       );
 
       conversations.value = allConversations;
+
+
+      if (selectedConversation.value) {  //
+
+        const updatedConversation = allConversations.find(
+          conv => conv.conversationId === selectedConversation.value.conversationId
+        );
+
+        if (updatedConversation) {
+          Messages.value = updatedConversation.Messages || [];
+
+          selectedConversation.value = updatedConversation;
+          const hasUnreadMessages = updatedConversation.Messages?.some(
+            msg => msg.IsRead === 'no' && msg.User.userId !== UserId.value
+          );
+
+          if (hasUnreadMessages) {
+            await markMessageRead();
+          }
+        }
+      } //
       console.log("Conversazioni recuperate:", allConversations);
     } else {
       console.log("Nessuna conversazione trovata.");
@@ -271,12 +301,11 @@ const sendMessage = async () => {
 
       response = await axios.post(
         `/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages`,
-        {
-          payload,
-        },
+        payload,
         {
           headers: {
-            "MediaType": "text"
+            "MediaType": "text",
+            "Content-Type": "application/json"
           }
         }
       )
@@ -346,7 +375,7 @@ const forwardMessage = async (convId) => {
   try{
     
     axios.defaults.headers.common['Authorization'] = UserId.value;
-    const response = await axios.post(`/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages/${messageToForward.messageId.value}/forwarded`, 
+    const response = await axios.post(`/users/${UserId.value}/conversations/${selectedConversation.value.conversationId}/messages/${messageToForward.value.messageId.Identifier}/forwarded`, 
       {Identifier : convId}
     )
 
@@ -646,11 +675,14 @@ const commentMessage = async (reaction) => {
 
     
     
-      Comments.value.push(UpdatedComment);
+      
+      Comments.value = [...Comments.value, UpdatedComment];
       console.log("Commento inviato:", UpdatedComment);
 
     
-      const msgIndex = Messages.value.findIndex(msg => msg.MessageId === messageToComment.value);
+      const msgIndex = Messages.value.findIndex(
+        msg => msg.messageId?.Identifier === messageToComment.value
+      );
       if (msgIndex !== -1) {
         if (!Messages.value[msgIndex].Comments) {
           Messages.value[msgIndex].Comments = [];
@@ -696,12 +728,23 @@ const closeCommentModal = () => {
 }
 
 
-// Chiamata alla funzione refresh quando il componente viene montato
-onMounted(() => {
 
+
+let refreshInterval;
+
+onMounted(() => {
   getMyConversations();
-  
+
+  refreshInterval = setInterval(() => {
+    getMyConversations();
+  }, 1000);
 });
+
+onUnmounted(() => {
+  clearInterval(refreshInterval);
+});
+
+
 </script>
 
 <template>
